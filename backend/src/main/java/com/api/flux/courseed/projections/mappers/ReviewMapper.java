@@ -9,6 +9,8 @@ import com.api.flux.courseed.projections.dtos.SaveReviewDto;
 
 @Mapper(componentModel = "spring")
 public interface ReviewMapper {
+    @Mapping(target = "course", ignore = true)
+    @Mapping(target = "user", ignore = true)
     ReviewDto toReviewDto(Review review);
 
     @Mapping(target = "id", ignore = true)

@@ -9,6 +9,8 @@ import com.api.flux.courseed.projections.dtos.SaveLikeDto;
 
 @Mapper(componentModel = "spring")
 public interface LikeMapper {
+    @Mapping(target = "course", ignore = true)
+    @Mapping(target = "user", ignore = true)
     LikeDto toLikeDto(Like like);
 
     @Mapping(target = "id", ignore = true)
