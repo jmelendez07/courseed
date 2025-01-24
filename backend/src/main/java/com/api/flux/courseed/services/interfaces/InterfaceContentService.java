@@ -11,5 +11,5 @@ public interface InterfaceContentService {
     public Mono<ContentDto> getContentById(String id);
     public Mono<ContentDto> createContent(SaveContentDto content);
     public Mono<ContentDto> updateContent(String id, SaveContentDto content);
-    public Mono<Void> deleteContent(String id);
+    public Mono<Boolean> deleteContent(String id);
 }

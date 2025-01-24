@@ -14,10 +14,10 @@ import lombok.Data;
 @GroupSequence({ LoginUserDto.class, FirstValidationGroup.class, SecondValidationGroup.class })
 public class LoginUserDto implements Serializable {
 
-    @NotBlank(message = "El email del usuario no puede estar vacio", groups = FirstValidationGroup.class)
-    @Email(message = "El email del usuario no es valido", groups = SecondValidationGroup.class)
+    @NotBlank(message = "Para proceder, debes completar el campo correspondiente al correo electrónico del usuario.", groups = FirstValidationGroup.class)
+    @Email(message = "Asegúrate de que el correo electrónico proporcionado sea correcto y válido.", groups = SecondValidationGroup.class)
     private String email;
 
-    @NotBlank(message = "La contraseña del usuario no puede estar vacia", groups = FirstValidationGroup.class)
+    @NotBlank(message = "Para proceder, debes completar el campo correspondiente a la contraseña del usuario.", groups = FirstValidationGroup.class)
     private String password;
 }

@@ -1,69 +1,64 @@
 package com.api.flux.courseed.web.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.MediaType;
+import org.springframework.web.reactive.function.server.ServerRequest;
+import org.springframework.web.reactive.function.server.ServerResponse;
 
 import com.api.flux.courseed.projections.dtos.InstitutionDto;
 import com.api.flux.courseed.projections.dtos.SaveInstitutionDto;
 import com.api.flux.courseed.services.implementations.InstitutionService;
+import com.api.flux.courseed.services.implementations.ValidationService;
 
-import jakarta.validation.Valid;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.PutMapping;
-
-@RestController
-@RequestMapping("/institutions")
 public class InstitutionController {
 
     @Autowired
     private InstitutionService institutionService;
 
-    @GetMapping
-    public Flux<InstitutionDto> getAllInstitutions() {
-        return institutionService.getAllInstitutions();
+    @Autowired
+    private ValidationService validationService;
+
+    public Mono<ServerResponse> getAllInstitutions(ServerRequest serverRequest) {
+        return ServerResponse.ok()
+            .contentType(MediaType.APPLICATION_JSON)
+            .body(institutionService.getAllInstitutions(), InstitutionDto.class);
     }
 
-    @GetMapping("/{id}")
-    public Mono<ResponseEntity<InstitutionDto>> getInstitutionById(@PathVariable String id) {
-        return institutionService.getInstitutionById(id)
-            .map(institution -> ResponseEntity.ok(institution))
-            .defaultIfEmpty(ResponseEntity.notFound().build());
+    public Mono<ServerResponse> getInstitutionById(ServerRequest serverRequest) {
+        return institutionService.getInstitutionById(serverRequest.pathVariable("id"))
+            .flatMap(institutionDto -> ServerResponse.ok().bodyValue(institutionDto))
+            .switchIfEmpty(ServerResponse.notFound().build());
     }
     
-    @GetMapping("/name/{name}")
-    public Mono<ResponseEntity<InstitutionDto>> getInstitutionByName(@PathVariable String name) {
-        return institutionService.getInstitutionByName(name)
-            .map(institution -> ResponseEntity.ok(institution))
-            .defaultIfEmpty(ResponseEntity.notFound().build());
+    public Mono<ServerResponse> getInstitutionByName(ServerRequest serverRequest) {
+        return institutionService.getInstitutionByName(serverRequest.pathVariable("name"))
+            .flatMap(institutionDto -> ServerResponse.ok().bodyValue(institutionDto))
+            .switchIfEmpty(ServerResponse.notFound().build());
     }
 
-    @PostMapping
-    public Mono<ResponseEntity<InstitutionDto>> createInstitution(@Valid @RequestBody SaveInstitutionDto saveInstitutionDto) {
-        return institutionService.createInstitution(saveInstitutionDto)
-            .map(i -> new ResponseEntity<>(i, HttpStatus.CREATED))
-            .defaultIfEmpty(ResponseEntity.notFound().build());
+    public Mono<ServerResponse> createInstitution(ServerRequest serverRequest) {
+        return serverRequest.bodyToMono(SaveInstitutionDto.class)
+            .doOnNext(validationService::validate)
+            .flatMap(saveInstitutionDto -> institutionService.createInstitution(saveInstitutionDto)
+                .flatMap(institutionDto -> ServerResponse.ok().bodyValue(institutionDto))
+                .switchIfEmpty(ServerResponse.notFound().build())
+            );
     }
 
-    @PutMapping("/{id}")
-    public Mono<ResponseEntity<InstitutionDto>> updateInstitution(@PathVariable String id, @Valid @RequestBody SaveInstitutionDto saveInstitutionDto) {
-        return institutionService.updateInstitution(id, saveInstitutionDto)
-            .map(i -> ResponseEntity.ok(i))
-            .defaultIfEmpty(ResponseEntity.notFound().build());
+    public Mono<ServerResponse> updateInstitution(ServerRequest serverRequest) {
+        return serverRequest.bodyToMono(SaveInstitutionDto.class)
+            .doOnNext(validationService::validate)
+            .flatMap(saveInstitutionDto -> institutionService.updateInstitution(serverRequest.pathVariable("id"), saveInstitutionDto)
+                .flatMap(institutionDto -> ServerResponse.ok().bodyValue(institutionDto))
+                .switchIfEmpty(ServerResponse.notFound().build())
+            );
     }
 
-    @DeleteMapping("/{id}")
-    public Mono<ResponseEntity<Void>> deleteInstitution(@PathVariable String id) {
-        return institutionService.deleteInstitution(id)
-            .map(i -> ResponseEntity.ok(i));
+    public Mono<ServerResponse> deleteInstitution(ServerRequest serverRequest) {
+        return institutionService.deleteInstitution(serverRequest.pathVariable("id"))
+            .flatMap(i -> ServerResponse.ok().bodyValue(i))
+            .switchIfEmpty(ServerResponse.notFound().build());
     }
 }

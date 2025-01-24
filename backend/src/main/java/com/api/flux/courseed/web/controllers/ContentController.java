@@ -1,61 +1,66 @@
 package com.api.flux.courseed.web.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.MediaType;
 
 import com.api.flux.courseed.projections.dtos.ContentDto;
 import com.api.flux.courseed.projections.dtos.SaveContentDto;
 import com.api.flux.courseed.services.implementations.ContentService;
+import com.api.flux.courseed.services.implementations.ValidationService;
 
-import jakarta.validation.Valid;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.reactive.function.server.ServerRequest;
+import org.springframework.web.reactive.function.server.ServerResponse;
 
-
-@RestController
-@RequestMapping("/contents")
 public class ContentController {
 
     @Autowired
     private ContentService contentService;
 
-    @GetMapping("/course/{courseId}")
-    public Flux<ContentDto> getContentByCourseId(@PathVariable String courseId) {
-        return contentService.getContentsByCourseId(courseId);
+    @Autowired
+    private ValidationService validationService;
+
+    public Mono<ServerResponse> getContentById(ServerRequest serverRequest) {
+        return contentService.getContentById(serverRequest.pathVariable("id"))
+            .flatMap(content -> ServerResponse.ok().bodyValue(content))
+            .switchIfEmpty(ServerResponse.notFound().build());
     }
 
-    @GetMapping("/{id}")
-    public Mono<ResponseEntity<ContentDto>> getContentById(@PathVariable String id) {
-        return contentService.getContentById(id)
-            .map(ResponseEntity::ok)
-            .defaultIfEmpty(ResponseEntity.notFound().build());
-    }
-    
-    @PostMapping
-    public Mono<ResponseEntity<ContentDto>> createContent(@Valid @RequestBody SaveContentDto saveContentDto) {
-        return contentService.createContent(saveContentDto)
-            .map(ResponseEntity::ok)
-            .defaultIfEmpty(ResponseEntity.notFound().build());
-    }
-
-    @PutMapping("/{id}")
-    public Mono<ResponseEntity<ContentDto>> updateContent(@PathVariable String id, @Valid @RequestBody SaveContentDto saveContentDto) {
-        return contentService.updateContent(id, saveContentDto)
-            .map(ResponseEntity::ok)
-            .defaultIfEmpty(ResponseEntity.notFound().build());
+    public Mono<ServerResponse> getContentByCourseId(ServerRequest serverRequest) {
+        return contentService.getContentsByCourseId(serverRequest.pathVariable("courseId"))
+            .collectList().flatMap(list -> {
+                if (!list.isEmpty()) {
+                    return ServerResponse.ok()
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(Flux.fromIterable(list), ContentDto.class);
+                } else {
+                    return ServerResponse.notFound().build();
+                }
+            });
     }
 
-    @DeleteMapping("/{id}")
-    public Mono<ResponseEntity<Void>> deleteContent(@PathVariable String id) {
-        return contentService.deleteContent(id)
-            .map(c -> ResponseEntity.ok(c));
+    public Mono<ServerResponse> createContent(ServerRequest serverRequest) {
+        return serverRequest.bodyToMono(SaveContentDto.class)
+            .doOnNext(validationService::validate)
+            .flatMap(saveContentDto -> contentService.createContent(saveContentDto)
+                .flatMap(contentDto -> ServerResponse.ok().bodyValue(contentDto))  
+                .switchIfEmpty(ServerResponse.notFound().build())
+            );
+    }
+
+    public Mono<ServerResponse> updateContent(ServerRequest serverRequest) {
+        return serverRequest.bodyToMono(SaveContentDto.class)
+            .doOnNext(validationService::validate)
+            .flatMap(saveContentDto -> contentService.updateContent(serverRequest.pathVariable("id"), saveContentDto)
+                .flatMap(contentDto -> ServerResponse.ok().bodyValue(contentDto))
+                .switchIfEmpty(ServerResponse.notFound().build())
+            );
+    }
+
+    public Mono<ServerResponse> deleteContent(ServerRequest serverRequest) {
+        return contentService.deleteContent(serverRequest.pathVariable("id"))
+            .flatMap(c -> ServerResponse.ok().bodyValue(c))
+            .switchIfEmpty(ServerResponse.notFound().build());
     }
 }

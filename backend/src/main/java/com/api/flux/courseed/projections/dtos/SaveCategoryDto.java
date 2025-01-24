@@ -8,7 +8,7 @@ import lombok.Data;
 @Data
 public class SaveCategoryDto implements Serializable {
 
-    @NotBlank(message = "El nombre de la categoria no puede estar vacio")
+    @NotBlank(message = "Para proceder, debes completar el campo correspondiente al nombre de la categoria.")
     private String name;
 
 }

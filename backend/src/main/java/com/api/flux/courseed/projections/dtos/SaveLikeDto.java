@@ -7,10 +7,6 @@ import lombok.Data;
 
 @Data
 public class SaveLikeDto implements Serializable {
-
-    @NotBlank(message = "El id del usuario no puede estar vacio")
-    private String userId;
-
-    @NotBlank(message = "El id del curso no puede estar vacio")
+    @NotBlank(message = "Es importante que selecciones un curso antes de continuar.")
     private String courseId;
 }

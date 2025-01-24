@@ -1,7 +1,5 @@
 package com.api.flux.courseed.persistence.documents;
 
-import java.util.List;
-
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -13,5 +11,8 @@ public class Role {
     @Id
     private String id;
     private String name;
-    private List<String> usersId;
+
+    public Role(String name) {
+        this.name = name;
+    }
 }

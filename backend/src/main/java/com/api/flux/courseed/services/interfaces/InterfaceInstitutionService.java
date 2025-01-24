@@ -10,7 +10,7 @@ public interface InterfaceInstitutionService {
     Flux<InstitutionDto> getAllInstitutions();
     Mono<InstitutionDto> getInstitutionById(String id);
     Mono<InstitutionDto> getInstitutionByName(String name);
-    Mono<InstitutionDto> createInstitution(SaveInstitutionDto saveInstitutionDto);
-    Mono<InstitutionDto> updateInstitution(String id, SaveInstitutionDto saveInstitutionDto);
-    Mono<Void> deleteInstitution(String id);
+    Mono<Object> createInstitution(SaveInstitutionDto saveInstitutionDto);
+    Mono<Object> updateInstitution(String id, SaveInstitutionDto saveInstitutionDto);
+    Mono<Boolean> deleteInstitution(String id);
 }

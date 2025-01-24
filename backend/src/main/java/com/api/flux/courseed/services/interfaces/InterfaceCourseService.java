@@ -14,5 +14,5 @@ public interface InterfaceCourseService {
     public Mono<CourseDto> getCourseById(String id);
     public Mono<CourseDto> createCourse(SaveCourseDto saveCourseDto);
     public Mono<CourseDto> updateCourse(String id, SaveCourseDto saveCourseDto);
-    public Mono<Void> deleteCourse(String id);
+    public Mono<Boolean> deleteCourse(String id);
 }

@@ -1,66 +1,71 @@
 package com.api.flux.courseed.web.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.MediaType;
+import org.springframework.web.reactive.function.server.ServerRequest;
+import org.springframework.web.reactive.function.server.ServerResponse;
 
 import com.api.flux.courseed.projections.dtos.LikeDto;
 import com.api.flux.courseed.projections.dtos.SaveLikeDto;
 import com.api.flux.courseed.services.implementations.LikeService;
+import com.api.flux.courseed.services.implementations.ValidationService;
 
-import jakarta.validation.Valid;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-@RestController
-@RequestMapping("/likes")
 public class LikeController {
 
     @Autowired
     private LikeService likeService;
 
-    @GetMapping("/course/{courseId}")
-    public Flux<LikeDto> getLikeByCourseId(@PathVariable String courseId) {
-        return likeService.getLikesByCourseId(courseId);
+    @Autowired
+    private ValidationService validationService;
+
+    public Mono<ServerResponse> getLikesByCourseId(ServerRequest serverRequest) {
+        return likeService.getLikesByCourseId(serverRequest.pathVariable("courseId"))
+            .collectList().flatMap(list -> {
+                if (!list.isEmpty()) {
+                    return ServerResponse.ok()
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(Flux.fromIterable(list), LikeDto.class);
+                } else {
+                    return ServerResponse.notFound().build();
+                }
+            });
     }
 
-    @GetMapping("/user/{userId}")
-    public Flux<LikeDto> getLikeByUserId(@PathVariable String userId) {
-        return likeService.getLikesByUserId(userId);
+    public Mono<ServerResponse> getLikesByAuthUser(ServerRequest serverRequest) {
+        return serverRequest.principal()
+            .flatMap(principal -> likeService.getLikesByAuthUser(principal)
+                .collectList().flatMap(list -> {
+                    if (!list.isEmpty()) {
+                        return ServerResponse.ok()
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .body(Flux.fromIterable(list), LikeDto.class);
+                    } else {
+                        return ServerResponse.notFound().build();
+                    }
+                })
+            );
     }
 
-    @GetMapping("/{id}")
-    public Mono<ResponseEntity<LikeDto>> getLikeById(@PathVariable String id) {
-        return likeService.getLikeById(id)
-            .map(ResponseEntity::ok)
-            .defaultIfEmpty(ResponseEntity.notFound().build());
+    public Mono<ServerResponse> createLike(ServerRequest serverRequest) {
+        return serverRequest.bodyToMono(SaveLikeDto.class)
+            .doOnNext(validationService::validate)
+            .flatMap(saveLikeDto -> serverRequest.principal()
+                .flatMap(principal -> likeService.createLike(principal, saveLikeDto)
+                    .flatMap(like -> ServerResponse.ok().bodyValue(like))
+                    .switchIfEmpty(ServerResponse.notFound().build())
+                )
+            );
     }
 
-    @PostMapping
-    public Mono<ResponseEntity<LikeDto>> createLike(@Valid @RequestBody SaveLikeDto saveLikeDto) {
-        return likeService.createLike(saveLikeDto)
-            .map(ResponseEntity::ok)
-            .defaultIfEmpty(ResponseEntity.notFound().build());
-    }
-
-    @PutMapping("/{id}")
-    public Mono<ResponseEntity<LikeDto>> updateLike(@PathVariable String id, @Valid @RequestBody SaveLikeDto saveLikeDto) {
-        return likeService.updateLike(id, saveLikeDto)
-            .map(ResponseEntity::ok)
-            .defaultIfEmpty(ResponseEntity.notFound().build());
-    }
-
-    @DeleteMapping("/{id}")
-    public Mono<ResponseEntity<Void>> deleteLike(@PathVariable String id) {
-        return likeService.deleteLike(id)
-            .map(l -> ResponseEntity.ok(l));
+    public Mono<ServerResponse> deleteLike(ServerRequest serverRequest) {
+        return serverRequest.principal()
+            .flatMap(principal -> likeService.deleteLike(principal, serverRequest.pathVariable("id"))
+                .flatMap(like -> ServerResponse.ok().bodyValue(like))
+                .switchIfEmpty(ServerResponse.notFound().build())
+            );
     }
 
 }

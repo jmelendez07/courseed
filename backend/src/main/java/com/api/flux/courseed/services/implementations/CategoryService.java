@@ -8,6 +8,7 @@ import com.api.flux.courseed.projections.dtos.CategoryDto;
 import com.api.flux.courseed.projections.dtos.SaveCategoryDto;
 import com.api.flux.courseed.projections.mappers.CategoryMapper;
 import com.api.flux.courseed.services.interfaces.InterfaceCategoryService;
+import com.api.flux.courseed.web.exceptions.CustomWebExchangeBindException;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -30,35 +31,84 @@ public class CategoryService implements InterfaceCategoryService {
     @Override
     public Mono<CategoryDto> getCategoryById(String id) {
         return categoryRepository.findById(id)
-            .map(categoryMapper::toCategoryDto);
+            .map(categoryMapper::toCategoryDto)
+            .switchIfEmpty(Mono.error(
+                new CustomWebExchangeBindException(
+                    id, 
+                    "categoryId", 
+                    "No hemos podido encontrar la categoría indicada. Te sugerimos que verifiques la información y lo intentes de nuevo."
+                ).getWebExchangeBindException())
+            );
     }
 
     @Override
     public Mono<CategoryDto> getCategoryByName(String name) {
         return categoryRepository.findByName(name)
-            .map(categoryMapper::toCategoryDto);
-    }
-
-    @Override
-    public Mono<CategoryDto> createCategory(SaveCategoryDto saveCategoryDto) {
-        return categoryRepository.save(categoryMapper.toCategory(saveCategoryDto))
-            .map(categoryMapper::toCategoryDto);
-    }
-
-    @Override
-    public Mono<CategoryDto> updateCategory(String id, SaveCategoryDto saveCategoryDto) {
-        return categoryRepository.findById(id)
-            .flatMap(existingCategory -> {
-                existingCategory.setName(saveCategoryDto.getName());
-                return categoryRepository.save(existingCategory);
-            })
             .map(categoryMapper::toCategoryDto)
-            .onErrorReturn(new CategoryDto());
+            .switchIfEmpty(Mono.error(
+                new CustomWebExchangeBindException(
+                    name, 
+                    "name", 
+                    "No hemos podido encontrar la categoría indicada por su nombre. Te sugerimos que verifiques y lo intentes nuevamente."
+                ).getWebExchangeBindException()
+            ));
     }
 
     @Override
-    public Mono<Void> deleteCategory(String id) {
-        return categoryRepository.deleteById(id);
+    public Mono<Object> createCategory(SaveCategoryDto saveCategoryDto) {
+        return categoryRepository.findByName(saveCategoryDto.getName())
+            .flatMap(category -> Mono.error(
+                new CustomWebExchangeBindException(
+                    saveCategoryDto.getName(), 
+                    "name", 
+                    "La categoría que has mencionado ya está registrada. Asegúrate de elegir un nombre diferente e intenta nuevamente."
+                ).getWebExchangeBindException()
+            ))
+            .switchIfEmpty(categoryRepository.save(categoryMapper.toCategory(saveCategoryDto))
+                .map(categoryMapper::toCategoryDto)
+            );
+    }
+
+    @Override
+    public Mono<Object> updateCategory(String id, SaveCategoryDto saveCategoryDto) {
+        return categoryRepository.findByName(saveCategoryDto.getName())
+            .flatMap(categoryByName -> Mono.error(
+                new CustomWebExchangeBindException(
+                    saveCategoryDto.getName(), 
+                    "name", 
+                    "La categoría que has mencionado ya está registrada. Asegúrate de elegir un nombre diferente e intenta nuevamente."
+                ).getWebExchangeBindException()
+            ))
+            .switchIfEmpty(categoryRepository.findById(id)
+                .flatMap(category -> {
+                    category.setName(saveCategoryDto.getName());
+                    return categoryRepository.save(category)
+                        .map(categoryMapper::toCategoryDto);
+                })
+                .switchIfEmpty(Mono.error(
+                    new CustomWebExchangeBindException(
+                        id, 
+                        "categoryId", 
+                        "No hemos podido encontrar la categoría indicada. Te sugerimos que verifiques la información y lo intentes de nuevo."
+                    ).getWebExchangeBindException()
+                ))    
+            );
+    }
+
+    @Override
+    public Mono<Boolean> deleteCategory(String id) {
+        return categoryRepository.findById(id)
+            .flatMap(category -> 
+                categoryRepository.deleteById(id)
+                    .then(Mono.just(true))
+            )
+            .switchIfEmpty(Mono.error(
+                new CustomWebExchangeBindException(
+                    id, 
+                    "categoryId", 
+                    "No hemos podido encontrar la categoría indicada. Te sugerimos que verifiques la información y lo intentes de nuevo."
+                ).getWebExchangeBindException())
+            );
     }
 
 }

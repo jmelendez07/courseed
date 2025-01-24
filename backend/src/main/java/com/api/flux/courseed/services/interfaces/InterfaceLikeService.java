@@ -1,5 +1,7 @@
 package com.api.flux.courseed.services.interfaces;
 
+import java.security.Principal;
+
 import com.api.flux.courseed.projections.dtos.LikeDto;
 import com.api.flux.courseed.projections.dtos.SaveLikeDto;
 
@@ -8,9 +10,7 @@ import reactor.core.publisher.Mono;
 
 public interface InterfaceLikeService {
     public Flux<LikeDto> getLikesByCourseId(String courseId);
-    public Flux<LikeDto> getLikesByUserId(String userId);    
-    public Mono<LikeDto> getLikeById(String id);
-    public Mono<LikeDto> createLike(SaveLikeDto saveLikeDto);
-    public Mono<LikeDto> updateLike(String id, SaveLikeDto saveLikeDto);
-    public Mono<Void> deleteLike(String id);
+    public Flux<LikeDto> getLikesByAuthUser(Principal principal);
+    public Mono<Object> createLike(Principal principal, SaveLikeDto saveLikeDto);
+    public Mono<Boolean> deleteLike(Principal principal, String id);
 }

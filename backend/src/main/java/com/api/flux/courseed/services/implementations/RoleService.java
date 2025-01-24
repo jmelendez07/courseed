@@ -1,6 +1,7 @@
 package com.api.flux.courseed.services.implementations;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import com.api.flux.courseed.persistence.documents.Role;
 import com.api.flux.courseed.persistence.repositories.RoleRepository;
@@ -9,14 +10,11 @@ import com.api.flux.courseed.services.interfaces.InterfaceRoleService;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+@Service
 public class RoleService implements InterfaceRoleService {
 
     @Autowired
     private RoleRepository roleRepository;
-
-    public RoleService(RoleRepository roleRepository) {
-        this.roleRepository = roleRepository;
-    }
 
     @Override
     public Flux<Role> findAll() {

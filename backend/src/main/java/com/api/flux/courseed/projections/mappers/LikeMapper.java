@@ -15,5 +15,6 @@ public interface LikeMapper {
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "userId", ignore = true)
     Like toLike(SaveLikeDto saveLikeDto);
 }

@@ -10,7 +10,7 @@ public interface InterfaceCategoryService {
     Flux<CategoryDto> getAllCategories();
     Mono<CategoryDto> getCategoryById(String id);
     Mono<CategoryDto> getCategoryByName(String name);
-    Mono<CategoryDto> createCategory(SaveCategoryDto category);
-    Mono<CategoryDto> updateCategory(String id, SaveCategoryDto category);
-    Mono<Void> deleteCategory(String id);
+    Mono<Object> createCategory(SaveCategoryDto category);
+    Mono<Object> updateCategory(String id, SaveCategoryDto category);
+    Mono<Boolean> deleteCategory(String id);
 }

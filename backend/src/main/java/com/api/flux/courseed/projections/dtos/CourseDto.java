@@ -15,6 +15,7 @@ public class CourseDto implements Serializable {
     private String prerequisites;
     private Double price;
     private String duration;
+    private String modality;
     private CategoryDto category;
     private InstitutionDto institution;
     private List<ContentDto> contents;

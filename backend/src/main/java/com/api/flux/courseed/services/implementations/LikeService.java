@@ -1,5 +1,7 @@
 package com.api.flux.courseed.services.implementations;
 
+import java.security.Principal;
+
 import org.springframework.stereotype.Service;
 
 import com.api.flux.courseed.persistence.documents.Category;
@@ -25,6 +27,7 @@ import com.api.flux.courseed.projections.mappers.LikeMapper;
 import com.api.flux.courseed.projections.mappers.ReviewMapper;
 import com.api.flux.courseed.projections.mappers.UserMapper;
 import com.api.flux.courseed.services.interfaces.InterfaceLikeService;
+import com.api.flux.courseed.web.exceptions.CustomWebExchangeBindException;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -67,14 +70,39 @@ public class LikeService implements InterfaceLikeService {
     @Override
     public Flux<LikeDto> getLikesByCourseId(String courseId) {
         return likeRepository.findByCourseId(courseId)
-            .map(likeMapper::toLikeDto);
+            .flatMap(like -> userRepository.findById(like.getUserId())
+                .flatMap(user -> courseRepository.findById(like.getCourseId())
+                    .flatMap(course -> categoryRepository.findById(course.getCategoryId())
+                        .flatMap(category -> institutionRepository.findById(course.getInstitutionId())
+                            .flatMap(institution -> {
+                                LikeDto likeDto = likeMapper.toLikeDto(like);
+                                CourseDto courseDto = courseMapper.toCourseDto(course);
+                                UserDto userDto = new UserDto(user.getId(), user.getEmail());
+
+                                courseDto.setCategory(categoryMapper.toCategoryDto(category));
+                                courseDto.setInstitution(institutionMapper.toInstitutionDto(institution));
+
+                                likeDto.setCourse(courseDto);
+                                likeDto.setUser(userDto);
+
+                                return Mono.just(likeDto);
+                            })
+                        )
+                    )
+                )
+            )
+            .switchIfEmpty(Mono.error(new CustomWebExchangeBindException(
+                courseId,
+                "courseId",
+                "No se encontraron 'me gusta' del curso indicado. Te sugerimos que verifiques la información y lo intentes de nuevo."
+            ).getWebExchangeBindException()));
     }
 
     @Override
-    public Flux<LikeDto> getLikesByUserId(String userId) {
-        return likeRepository.findByUserId(userId)
-            .flatMap(like -> userRepository.findById(like.getUserId())
-                .flatMap(user -> courseRepository.findById(like.getCourseId())
+    public Flux<LikeDto> getLikesByAuthUser(Principal principal) {
+        return userRepository.findByEmail(principal.getName())
+            .flatMapMany(user -> likeRepository.findByUserId(user.getId())
+                .flatMap(like -> courseRepository.findById(like.getCourseId())
                     .flatMap(course -> {
                         Mono<Category> categoryMono = categoryRepository.findById(course.getCategoryId());
                         Mono<Institution> institutionMono = institutionRepository.findById(course.getInstitutionId());
@@ -104,67 +132,90 @@ public class LikeService implements InterfaceLikeService {
                             });
                     })
                 )
-            ).onErrorReturn(new LikeDto());
+            )
+            .switchIfEmpty(Mono.error(
+                new CustomWebExchangeBindException(
+                    principal.getName(), 
+                    "auth", 
+                    "No se encontraron 'me gusta' del usuario autenticado. Te sugerimos que verifiques la información y lo intentes de nuevo."
+                ).getWebExchangeBindException()
+            ));
     }
 
     @Override
-    public Mono<LikeDto> getLikeById(String id) {
-        return likeRepository.findById(id)
-            .flatMap(like -> userRepository.findById(like.getUserId())
-                .flatMap(user -> courseRepository.findById(like.getCourseId())
-                    .flatMap(course -> {
-                        Mono<Category> categoryMono = categoryRepository.findById(course.getCategoryId());
-                        Mono<Institution> institutionMono = institutionRepository.findById(course.getInstitutionId());
-                        Flux<Review> reviewFlux = reviewRepository.findByCourseId(course.getId());
-                        Flux<Like> likeFlux = likeRepository.findByCourseId(course.getId());
-
-                        return Mono.zip(categoryMono, institutionMono, reviewFlux.collectList(), likeFlux.collectList())
-                            .map(tuple -> {
+    public Mono<Object> createLike(Principal principal, SaveLikeDto saveLikeDto) {
+        return userRepository.findByEmail(principal.getName())
+            .flatMap(user -> courseRepository.findById(saveLikeDto.getCourseId())
+                .flatMap(course -> likeRepository.findByUserIdAndCourseId(user.getId(), course.getId())
+                    .flatMap(like -> Mono.error(
+                        new CustomWebExchangeBindException(
+                            saveLikeDto.getCourseId(), 
+                            "courseId",
+                            "¡Genial que te guste el curso! Ten en cuenta que solo se permite un 'me gusta' por usuario."
+                        ).getWebExchangeBindException()
+                    ))
+                    .switchIfEmpty(Mono.defer(() -> {
+                        Like like = new Like();
+                        like.setUserId(user.getId());
+                        like.setCourseId(course.getId());
+                        return likeRepository.save(like)
+                            .flatMap(createdLike -> {
                                 LikeDto likeDto = likeMapper.toLikeDto(like);
-                                CourseDto courseDto = courseMapper.toCourseDto(course);
-                                UserDto userDto = userMapper.toUserDto(user);
+                                likeDto.setCourse(courseMapper.toCourseDto(course));
+                                likeDto.setUser(new UserDto(user.getId(), user.getEmail()));
 
-                                courseDto.setCategory(categoryMapper.toCategoryDto(tuple.getT1()));
-                                courseDto.setInstitution(institutionMapper.toInstitutionDto(tuple.getT2()));
-                                courseDto.setReviews(tuple.getT3().stream()
-                                    .map(reviewMapper::toReviewDto)
-                                    .toList()
-                                );
-                                courseDto.setLikes(tuple.getT4().stream()
-                                    .map(likeMapper::toLikeDto)
-                                    .toList()
-                                );
-                                likeDto.setCourse(courseDto);
-                                likeDto.setUser(userDto);
-
-                                return likeDto;
+                                return Mono.just(likeDto);
                             });
-                    })
+                    }))
                 )
-            ).onErrorReturn(new LikeDto());
+                .switchIfEmpty(Mono.error(
+                    new CustomWebExchangeBindException(
+                        saveLikeDto.getCourseId(), 
+                        "courseId", 
+                        "No hemos podido encontrar el curso indicado. Te sugerimos que verifiques la información y lo intentes de nuevo."
+                    ).getWebExchangeBindException()
+                ))
+            ).switchIfEmpty(Mono.error(
+                new CustomWebExchangeBindException(
+                    principal.getName(), 
+                    "auth", 
+                    "Parece que el usuario autenticado no se encuentra en el sistema. Te recomendamos cerrar sesión y volver a ingresar."
+                ).getWebExchangeBindException()
+            ));
     }
 
     @Override
-    public Mono<LikeDto> createLike(SaveLikeDto savelikeDto) {
-        return likeRepository.save(likeMapper.toLike(savelikeDto))
-            .map(likeMapper::toLikeDto);
+    public Mono<Boolean> deleteLike(Principal principal, String id) {
+        return userRepository.findByEmail(principal.getName())
+            .flatMap(user -> likeRepository.findById(id)
+                .flatMap(like -> {
+                    if (like.getUserId().equals(user.getId())) {
+                        return likeRepository.deleteById(like.getId())
+                            .then(Mono.just(true));
+                    } else {
+                        return Mono.error(
+                            new CustomWebExchangeBindException(
+                                principal.getName(), 
+                                "auth", 
+                                "No tiene la autorización necesaria para eliminar un 'me gusta' que corresponde a otro usuario."
+                            ).getWebExchangeBindException()
+                        );
+                    }
+                })
+                .switchIfEmpty(Mono.error(
+                    new CustomWebExchangeBindException(
+                        id, 
+                        "likeId", 
+                        "No hemos podido encontrar el 'me gusta' indicado. Te sugerimos que verifiques la información y lo intentes de nuevo."
+                    ).getWebExchangeBindException()
+                ))
+            )
+            .switchIfEmpty(Mono.error(
+                new CustomWebExchangeBindException(
+                    principal.getName(), 
+                    "auth", 
+                    "Parece que el usuario autenticado no se encuentra en el sistema. Te recomendamos cerrar sesión y volver a ingresar."
+                ).getWebExchangeBindException()
+            ));
     }
-
-    @Override
-    public Mono<LikeDto> updateLike(String id, SaveLikeDto saveLikeDto) {
-        return likeRepository.findById(id)
-            .flatMap(likeToUpdate -> {
-                likeToUpdate.setCourseId(saveLikeDto.getCourseId());
-                likeToUpdate.setUserId(saveLikeDto.getUserId());
-                return likeRepository.save(likeToUpdate);
-            })
-            .map(likeMapper::toLikeDto)
-            .onErrorReturn(new LikeDto());
-    }
-
-    @Override
-    public Mono<Void> deleteLike(String id) {
-        return likeRepository.deleteById(id);
-    }
-    
 }

@@ -1,77 +1,98 @@
 package com.api.flux.courseed.web.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.MediaType;
+import org.springframework.web.reactive.function.server.ServerRequest;
+import org.springframework.web.reactive.function.server.ServerResponse;
 
 import com.api.flux.courseed.projections.dtos.CourseDto;
 import com.api.flux.courseed.projections.dtos.SaveCourseDto;
 import com.api.flux.courseed.services.implementations.CourseService;
+import com.api.flux.courseed.services.implementations.ValidationService;
 
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-
-@RestController
-@RequestMapping("/courses")
 public class CourseController {
 
     @Autowired
     private CourseService courseService;
 
-    @GetMapping
-    public Flux<CourseDto> getAllCourses() {
-        return courseService.getAllCourses();
+    @Autowired
+    private ValidationService validationService;
+
+    public Mono<ServerResponse> getAllCourses(ServerRequest serverRequest) {
+        return ServerResponse.ok()
+            .contentType(MediaType.APPLICATION_JSON)
+            .body(courseService.getAllCourses(), CourseDto.class);
     }
 
-    @GetMapping("/category/{id}")
-    public Flux<CourseDto> getCoursesByCategoryId(@PathVariable String id) {
-        return courseService.getCoursesByCategoryId(id);
+    public Mono<ServerResponse> getCourseById(ServerRequest serverRequest) {
+        return courseService.getCourseById(serverRequest.pathVariable("id"))
+            .flatMap(course -> ServerResponse.ok().bodyValue(course))
+            .switchIfEmpty(ServerResponse.notFound().build());
     }
 
-    @GetMapping("/institution/{id}")
-    public Flux<CourseDto> getCoursesByInstitutionId(@PathVariable String id) {
-        return courseService.getCoursesByInstitutionId(id);
+    public Mono<ServerResponse> searchCoursesByText(ServerRequest serverRequest) {
+        return courseService.searchCoursesByText(serverRequest.queryParam("text").orElse(""))
+            .collectList().flatMap(list -> {
+                if (!list.isEmpty()) {
+                    return ServerResponse.ok()
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(Flux.fromIterable(list), CourseDto.class);
+                } else {
+                    return ServerResponse.notFound().build();
+                }
+            });  
     }
 
-    @GetMapping("/search")
-    public Flux<CourseDto> searchCoursesByText(@Valid @NotBlank(message = "texto requerido") @RequestParam String text) {
-        return courseService.searchCoursesByText(text);
+    public Mono<ServerResponse> getCoursesByCategoryId(ServerRequest serverRequest) {
+        return courseService.getCoursesByCategoryId(serverRequest.pathVariable("categoryId"))
+            .collectList().flatMap(list -> {
+                if (!list.isEmpty()) {
+                    return ServerResponse.ok()
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(Flux.fromIterable(list), CourseDto.class);
+                } else {
+                    return ServerResponse.notFound().build();
+                }
+            });
+    }
+
+    public Mono<ServerResponse> getCoursesByInstitutionId(ServerRequest serverRequest) {
+        return courseService.getCoursesByInstitutionId(serverRequest.pathVariable("institutionId"))
+            .collectList().flatMap(list -> {
+                if (!list.isEmpty()) {
+                    return ServerResponse.ok()
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(Flux.fromIterable(list), CourseDto.class);
+                } else {
+                    return ServerResponse.notFound().build();   
+                }
+            });
+    }
+
+    public Mono<ServerResponse> createCourse(ServerRequest serverRequest) {
+        return serverRequest.bodyToMono(SaveCourseDto.class)
+            .doOnNext(validationService::validate)
+            .flatMap(saveCourseDto -> courseService.createCourse(saveCourseDto)
+                .flatMap(courseDto -> ServerResponse.ok().bodyValue(courseDto))
+                .switchIfEmpty(ServerResponse.notFound().build())
+            );
     }
     
-    @GetMapping("/{id}")
-    public Mono<ResponseEntity<CourseDto>> getCourseById(@PathVariable String id) {
-        return courseService.getCourseById(id)
-            .map(course -> ResponseEntity.ok(course))
-            .defaultIfEmpty(ResponseEntity.notFound().build());
+    public Mono<ServerResponse> updateCourse(ServerRequest serverRequest) {
+        return serverRequest.bodyToMono(SaveCourseDto.class)
+            .doOnNext(validationService::validate)
+            .flatMap(saveCourseDto -> courseService.updateCourse(serverRequest.pathVariable("id"), saveCourseDto)
+                .flatMap(courseDto -> ServerResponse.ok().bodyValue(courseDto))
+                .switchIfEmpty(ServerResponse.notFound().build())
+            );
     }
 
-    @PostMapping
-    public Mono<ResponseEntity<CourseDto>> createCourse(@Valid @RequestBody SaveCourseDto saveCourseDto) {
-        return courseService.createCourse(saveCourseDto)
-            .map(c -> ResponseEntity.ok(c))
-            .defaultIfEmpty(ResponseEntity.notFound().build());
-    }
-    
-    @PutMapping("/{id}")
-    public Mono<ResponseEntity<CourseDto>> updateCourse(@PathVariable String id, @Valid @RequestBody SaveCourseDto saveCourseDto) {
-        return courseService.updateCourse(id, saveCourseDto)
-            .map(c -> ResponseEntity.ok(c))
-            .defaultIfEmpty(ResponseEntity.notFound().build());
-    }
-
-    @DeleteMapping("/{id}")
-    public Mono<Void> deleteCourse(@PathVariable String id) {
-        return courseService.deleteCourse(id);
+    public Mono<ServerResponse> deleteCourse(ServerRequest serverRequest) {
+        return courseService.deleteCourse(serverRequest.pathVariable("id"))
+            .flatMap(c -> ServerResponse.ok().bodyValue(c))
+            .switchIfEmpty(ServerResponse.notFound().build());
     }    
 }

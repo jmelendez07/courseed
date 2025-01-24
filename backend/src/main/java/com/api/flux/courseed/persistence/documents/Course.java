@@ -17,6 +17,7 @@ public class Course {
     private String prerequisites;
     private Double price;
     private String duration;
+    private String modality;
     private String categoryId;
     private String institutionId;
 }
