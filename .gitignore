@@ -1,4 +1,5 @@
 backend/.env
+web-scraping/.env
 backend/HELP.md
 backend/target/
 backend/.mvn/wrapper/maven-wrapper.jar
@@ -19,6 +20,7 @@ backend/.idea
 backend/*.iws
 backend/*.iml
 backend/*.ipr
+web-scraping/.idea
 
 ### NetBeans ###
 backend/nbproject/private/
@@ -32,3 +34,13 @@ backend/!**/src/test/**/build/
 
 ### VS Code ###
 backend/.vscode/
+web-scraping/.vscode/
+
+# Byte-compiled / optimized / DLL files
+web-scraping/**/__pycache__/*.pyc
+web-scraping/**/*.pyc
+web-scraping/**/*.pyo
+web-scraping/**/*.pyd
+
+# LOG FILES
+web-scraping/**/*.log
