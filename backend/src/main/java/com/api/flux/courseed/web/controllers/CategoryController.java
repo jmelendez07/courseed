@@ -1,9 +1,6 @@
 package com.api.flux.courseed.web.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
-
-import com.api.flux.courseed.projections.dtos.CategoryDto;
 import com.api.flux.courseed.projections.dtos.SaveCategoryDto;
 import com.api.flux.courseed.services.implementations.CategoryService;
 import com.api.flux.courseed.services.implementations.ValidationService;
@@ -22,9 +19,13 @@ public class CategoryController {
     private ValidationService validationService;
 
     public Mono<ServerResponse> getAllCategories(ServerRequest serverRequest) {
-        return ServerResponse.ok()
-            .contentType(MediaType.APPLICATION_JSON)
-            .body(categoryService.getAllCategories(), CategoryDto.class);
+        return categoryService
+            .getAllCategories(
+                Integer.parseInt(serverRequest.queryParam("page").orElse("0")), 
+                Integer.parseInt(serverRequest.queryParam("size").orElse("10")) 
+            )
+            .flatMap(categories -> ServerResponse.ok().bodyValue(categories))
+            .switchIfEmpty(ServerResponse.notFound().build());
     }
 
     public Mono<ServerResponse> getCategoryById(ServerRequest serverRequest) {

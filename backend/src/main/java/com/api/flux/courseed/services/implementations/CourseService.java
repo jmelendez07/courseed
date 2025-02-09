@@ -1,5 +1,9 @@
 package com.api.flux.courseed.services.implementations;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.api.flux.courseed.persistence.documents.Category;
@@ -71,8 +75,10 @@ public class CourseService implements InterfaceCourseService {
     }
 
     @Override
-    public Flux<CourseDto> getAllCourses() {
-        return courseRepository.findAll()
+    public Mono<Page<CourseDto>> getAllCourses(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+
+        return courseRepository.findAllBy(pageable)
             .flatMap(course -> {
                 Mono<Category> categoryMono = categoryRepository.findById(course.getCategoryId());
                 Mono<Institution> institutionMono = institutionRepository.findById(course.getInstitutionId());
@@ -100,7 +106,10 @@ public class CourseService implements InterfaceCourseService {
 
                         return courseDto;
                     });
-            });
+            })
+            .collectList()
+            .zipWith(courseRepository.count())
+            .map(p -> new PageImpl<>(p.getT1(), pageable, p.getT2()));
     }
 
     @Override
@@ -150,8 +159,11 @@ public class CourseService implements InterfaceCourseService {
     }
 
     @Override
-    public Flux<CourseDto> getCoursesByCategoryId(String categoryId) {
-        return courseRepository.findByCategoryId(categoryId)
+    public Mono<Page<CourseDto>> getCoursesByCategoryId(String categoryId, int page, int size) {
+
+        Pageable pageable = PageRequest.of(page, size);
+
+        return courseRepository.findByCategoryId(categoryId, pageable)
             .flatMap(course -> {
                 Mono<Category> categoryMono = categoryRepository.findById(course.getCategoryId());
                 Mono<Institution> institutionMono = institutionRepository.findById(course.getInstitutionId());
@@ -186,12 +198,17 @@ public class CourseService implements InterfaceCourseService {
                     "categoryId", 
                     "No se encontraron cursos de la categoria indicada. Te sugerimos que verifiques la información y lo intentes de nuevo."
                 ).getWebExchangeBindException())
-            );
+            )
+            .collectList()
+            .zipWith(courseRepository.count())
+            .map(p -> new PageImpl<>(p.getT1(), pageable, p.getT2()));
     }
 
     @Override
-    public Flux<CourseDto> getCoursesByInstitutionId(String institutionId) {
-        return courseRepository.findByInstitutionId(institutionId)
+    public Mono<Page<CourseDto>> getCoursesByInstitutionId(String institutionId, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+
+        return courseRepository.findByInstitutionId(institutionId, pageable)
             .flatMap(course -> {
                 Mono<Category> categoryMono = categoryRepository.findById(course.getCategoryId());
                 Mono<Institution> institutionMono = institutionRepository.findById(course.getInstitutionId());
@@ -226,12 +243,17 @@ public class CourseService implements InterfaceCourseService {
                     "institutionId", 
                     "No se encontraron cursos de la institución indicada. Te sugerimos que verifiques la información y lo intentes de nuevo."
                 ).getWebExchangeBindException())
-            );
+            )
+            .collectList()
+            .zipWith(courseRepository.count())
+            .map(p -> new PageImpl<>(p.getT1(), pageable, p.getT2()));
     }
     
     @Override
-    public Flux<CourseDto> searchCoursesByText(String text) {
-        return courseRepository.searchCourses(text)
+    public Mono<Page<CourseDto>> searchCoursesByText(String text, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+
+        return courseRepository.searchCourses(text, pageable)
             .flatMap(course -> {
                 Mono<Category> categoryMono = categoryRepository.findById(course.getCategoryId());
                 Mono<Institution> institutionMono = institutionRepository.findById(course.getInstitutionId());
@@ -259,7 +281,10 @@ public class CourseService implements InterfaceCourseService {
 
                         return courseDto;
                     });
-            });
+            })
+            .collectList()
+            .zipWith(courseRepository.count())
+            .map(p -> new PageImpl<>(p.getT1(), pageable, p.getT2()));
     }
 
     @Override

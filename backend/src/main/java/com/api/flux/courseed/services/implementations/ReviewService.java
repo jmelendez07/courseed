@@ -2,6 +2,10 @@ package com.api.flux.courseed.services.implementations;
 
 import java.security.Principal;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.api.flux.courseed.persistence.documents.Category;
@@ -74,8 +78,10 @@ public class ReviewService implements InterfaceReviewService {
     }
 
     @Override
-    public Flux<ReviewDto> getReviewsByCourseId(String courseId) {
-        return reviewRepository.findByCourseId(courseId)
+    public Mono<Page<ReviewDto>> getReviewsByCourseId(String courseId, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+
+        return reviewRepository.findByCourseId(courseId, pageable)
             .flatMap(review -> userRepository.findById(review.getUserId())
                 .flatMap(user -> {
                     ReviewDto reviewDto = reviewMapper.toReviewDto(review);
@@ -90,13 +96,18 @@ public class ReviewService implements InterfaceReviewService {
                     "courseId", 
                     "No se encontraron reseñas del curso indicado. Te sugerimos que verifiques la información y lo intentes de nuevo."
                 ).getWebExchangeBindException()
-            ));
+            ))
+            .collectList()
+            .zipWith(reviewRepository.count())
+            .map(p -> new PageImpl<>(p.getT1(), pageable, p.getT2()));
     }
 
     @Override
-    public Flux<ReviewDto> getReviewsByAuthUser(Principal principal) {
+    public Mono<Page<ReviewDto>> getReviewsByAuthUser(Principal principal, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+
         return userRepository.findByEmail(principal.getName())
-            .flatMapMany(user -> reviewRepository.findByUserId(user.getId())
+            .flatMapMany(user -> reviewRepository.findByUserId(user.getId(), pageable)
                 .flatMap(review -> courseRepository.findById(review.getCourseId())
                     .flatMap(course -> {
                         Mono<Category> categoryMono = categoryRepository.findById(course.getCategoryId());
@@ -138,7 +149,10 @@ public class ReviewService implements InterfaceReviewService {
                     "auth", 
                     "No se encontraron reseñas del usuario autenticado. Te sugerimos que verifiques la información y lo intentes de nuevo."
                 ).getWebExchangeBindException()
-            ));
+            ))
+            .collectList()
+            .zipWith(reviewRepository.count())
+            .map(p -> new PageImpl<>(p.getT1(), pageable, p.getT2()));
     }
 
     @Override

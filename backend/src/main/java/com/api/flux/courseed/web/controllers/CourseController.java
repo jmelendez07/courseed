@@ -1,16 +1,13 @@
 package com.api.flux.courseed.web.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 
-import com.api.flux.courseed.projections.dtos.CourseDto;
 import com.api.flux.courseed.projections.dtos.SaveCourseDto;
 import com.api.flux.courseed.services.implementations.CourseService;
 import com.api.flux.courseed.services.implementations.ValidationService;
 
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 public class CourseController {
@@ -22,9 +19,13 @@ public class CourseController {
     private ValidationService validationService;
 
     public Mono<ServerResponse> getAllCourses(ServerRequest serverRequest) {
-        return ServerResponse.ok()
-            .contentType(MediaType.APPLICATION_JSON)
-            .body(courseService.getAllCourses(), CourseDto.class);
+        return courseService
+            .getAllCourses(
+                Integer.parseInt(serverRequest.queryParam("page").orElse("0")), 
+                Integer.parseInt(serverRequest.queryParam("size").orElse("10"))
+            )
+            .flatMap(courses -> ServerResponse.ok().bodyValue(courses))
+            .switchIfEmpty(ServerResponse.notFound().build());
     }
 
     public Mono<ServerResponse> getCourseById(ServerRequest serverRequest) {
@@ -34,42 +35,36 @@ public class CourseController {
     }
 
     public Mono<ServerResponse> searchCoursesByText(ServerRequest serverRequest) {
-        return courseService.searchCoursesByText(serverRequest.queryParam("text").orElse(""))
-            .collectList().flatMap(list -> {
-                if (!list.isEmpty()) {
-                    return ServerResponse.ok()
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .body(Flux.fromIterable(list), CourseDto.class);
-                } else {
-                    return ServerResponse.notFound().build();
-                }
-            });  
+        return courseService
+            .searchCoursesByText(
+                serverRequest.queryParam("text").orElse(""),
+                Integer.parseInt(serverRequest.queryParam("page").orElse("0")), 
+                Integer.parseInt(serverRequest.queryParam("size").orElse("10"))
+            )
+            .flatMap(courses -> ServerResponse.ok().bodyValue(courses))
+            .switchIfEmpty(ServerResponse.notFound().build()); 
     }
 
     public Mono<ServerResponse> getCoursesByCategoryId(ServerRequest serverRequest) {
-        return courseService.getCoursesByCategoryId(serverRequest.pathVariable("categoryId"))
-            .collectList().flatMap(list -> {
-                if (!list.isEmpty()) {
-                    return ServerResponse.ok()
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .body(Flux.fromIterable(list), CourseDto.class);
-                } else {
-                    return ServerResponse.notFound().build();
-                }
-            });
+        return courseService
+            .getCoursesByCategoryId(
+                serverRequest.pathVariable("categoryId"),
+                Integer.parseInt(serverRequest.queryParam("page").orElse("0")), 
+                Integer.parseInt(serverRequest.queryParam("size").orElse("10"))
+            )
+            .flatMap(courses -> ServerResponse.ok().bodyValue(courses))
+            .switchIfEmpty(ServerResponse.notFound().build());
     }
 
     public Mono<ServerResponse> getCoursesByInstitutionId(ServerRequest serverRequest) {
-        return courseService.getCoursesByInstitutionId(serverRequest.pathVariable("institutionId"))
-            .collectList().flatMap(list -> {
-                if (!list.isEmpty()) {
-                    return ServerResponse.ok()
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .body(Flux.fromIterable(list), CourseDto.class);
-                } else {
-                    return ServerResponse.notFound().build();   
-                }
-            });
+        return courseService
+            .getCoursesByInstitutionId(
+                serverRequest.pathVariable("institutionId"),
+                Integer.parseInt(serverRequest.queryParam("page").orElse("0")), 
+                Integer.parseInt(serverRequest.queryParam("size").orElse("10"))
+            )
+            .flatMap(courses -> ServerResponse.ok().bodyValue(courses))
+            .switchIfEmpty(ServerResponse.notFound().build());
     }
 
     public Mono<ServerResponse> createCourse(ServerRequest serverRequest) {

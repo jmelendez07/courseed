@@ -1,11 +1,9 @@
 package com.api.flux.courseed.web.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import com.api.flux.courseed.projections.dtos.UpdateUserEmailDto;
 import com.api.flux.courseed.projections.dtos.UpdateUserPasswordDto;
 import com.api.flux.courseed.projections.dtos.UpdateUserRolesDto;
-import com.api.flux.courseed.projections.dtos.UserDto;
 import com.api.flux.courseed.services.implementations.UserService;
 import com.api.flux.courseed.services.implementations.ValidationService;
 
@@ -22,9 +20,13 @@ public class UserController {
     private ValidationService validationService;
 
     public Mono<ServerResponse> getAllUsers(ServerRequest serverRequest) {
-        return ServerResponse.ok()
-            .contentType(MediaType.APPLICATION_JSON)
-            .body(userService.getAllUsers(), UserDto.class);
+        return userService
+            .getAllUsers(
+                Integer.parseInt(serverRequest.queryParam("page").orElse("0")), 
+                Integer.parseInt(serverRequest.queryParam("size").orElse("10")) 
+            )
+            .flatMap(users -> ServerResponse.ok().bodyValue(users))
+            .switchIfEmpty(ServerResponse.notFound().build());
     }
 
     public Mono<ServerResponse> getUserById(ServerRequest serverRequest) {

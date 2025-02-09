@@ -1,17 +1,14 @@
 package com.api.flux.courseed.web.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 
 import com.api.flux.courseed.projections.dtos.CreateReviewDto;
-import com.api.flux.courseed.projections.dtos.ReviewDto;
 import com.api.flux.courseed.projections.dtos.UpdateReviewDto;
 import com.api.flux.courseed.services.implementations.ReviewService;
 import com.api.flux.courseed.services.implementations.ValidationService;
 
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 public class ReviewController {
@@ -23,31 +20,47 @@ public class ReviewController {
     private ValidationService validationService;
 
     public Mono<ServerResponse> getReviewsByCourseId(ServerRequest serverRequest) {
-        return reviewService.getReviewsByCourseId(serverRequest.pathVariable("courseId"))
-            .collectList().flatMap(list -> {
-                if (!list.isEmpty()) {
-                    return ServerResponse.ok()
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .body(Flux.fromIterable(list), ReviewDto.class);
-                } else {
-                    return ServerResponse.notFound().build();
-                }
-            });
+        return reviewService
+            .getReviewsByCourseId(
+                serverRequest.pathVariable("courseId"),
+                Integer.parseInt(serverRequest.queryParam("page").orElse("0")), 
+                Integer.parseInt(serverRequest.queryParam("size").orElse("10")) 
+            )
+            .flatMap(reviews-> ServerResponse.ok().bodyValue(reviews))
+            .switchIfEmpty(ServerResponse.notFound().build());
+
+            // .collectList().flatMap(list -> {
+            //     if (!list.isEmpty()) {
+            //         return ServerResponse.ok()
+            //             .contentType(MediaType.APPLICATION_JSON)
+            //             .body(Flux.fromIterable(list), ReviewDto.class);
+            //     } else {
+            //         return ServerResponse.notFound().build();
+            //     }
+            // });
     }
 
     public Mono<ServerResponse> getReviewsByAuthUser(ServerRequest serverRequest) {
         return serverRequest.principal()
-            .flatMap(principal -> reviewService.getReviewsByAuthUser(principal)
-                .collectList().flatMap(list -> {
-                    if (!list.isEmpty()) {
-                        return ServerResponse.ok()
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .body(Flux.fromIterable(list), ReviewDto.class);
-                    } else {
-                        return ServerResponse.notFound().build();
-                    }
-                })
+            .flatMap(principal -> reviewService
+                .getReviewsByAuthUser(
+                    principal,
+                    Integer.parseInt(serverRequest.queryParam("page").orElse("0")), 
+                    Integer.parseInt(serverRequest.queryParam("size").orElse("10"))
+                )
+                .flatMap(reviews-> ServerResponse.ok().bodyValue(reviews))
+                .switchIfEmpty(ServerResponse.notFound().build())
             );
+
+            // .collectList().flatMap(list -> {
+            //     if (!list.isEmpty()) {
+            //         return ServerResponse.ok()
+            //             .contentType(MediaType.APPLICATION_JSON)
+            //             .body(Flux.fromIterable(list), ReviewDto.class);
+            //     } else {
+            //         return ServerResponse.notFound().build();
+            //     }
+            // })
     }
 
     public Mono<ServerResponse> createReview(ServerRequest serverRequest) {

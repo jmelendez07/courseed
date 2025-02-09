@@ -3,6 +3,10 @@ package com.api.flux.courseed.services.implementations;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import com.api.flux.courseed.persistence.repositories.UserRepository;
@@ -15,7 +19,6 @@ import com.api.flux.courseed.services.interfaces.InterfaceUserService;
 import com.api.flux.courseed.services.interfaces.Roles;
 import com.api.flux.courseed.web.exceptions.CustomWebExchangeBindException;
 
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Service
@@ -31,9 +34,14 @@ public class UserService implements InterfaceUserService {
     private PasswordEncoder passwordEncoder;
 
     @Override
-    public Flux<UserDto> getAllUsers() {
-        return userRepository.findAll()
-            .map(userMapper::toUserDto);
+    public Mono<Page<UserDto>> getAllUsers(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+
+        return userRepository.findAllBy(pageable)
+            .map(userMapper::toUserDto)
+            .collectList()
+            .zipWith(userRepository.count())
+            .map(p -> new PageImpl<>(p.getT1(), pageable, p.getT2()));
     }
 
     @Override

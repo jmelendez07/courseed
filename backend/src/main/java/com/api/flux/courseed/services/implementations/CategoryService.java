@@ -1,6 +1,10 @@
 package com.api.flux.courseed.services.implementations;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.api.flux.courseed.persistence.repositories.CategoryRepository;
@@ -10,7 +14,6 @@ import com.api.flux.courseed.projections.mappers.CategoryMapper;
 import com.api.flux.courseed.services.interfaces.InterfaceCategoryService;
 import com.api.flux.courseed.web.exceptions.CustomWebExchangeBindException;
 
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Service
@@ -23,9 +26,14 @@ public class CategoryService implements InterfaceCategoryService {
     private CategoryMapper categoryMapper;
 
     @Override
-    public Flux<CategoryDto> getAllCategories() {
-        return categoryRepository.findAll()
-            .map(categoryMapper::toCategoryDto);
+    public Mono<Page<CategoryDto>> getAllCategories(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        
+        return categoryRepository.findAllBy(pageable)
+            .map(categoryMapper::toCategoryDto)
+            .collectList()
+            .zipWith(categoryRepository.count())
+            .map(p -> new PageImpl<>(p.getT1(), pageable, p.getT2()));
     }
 
     @Override

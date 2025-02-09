@@ -1,13 +1,14 @@
 package com.api.flux.courseed.services.interfaces;
 
+import org.springframework.data.domain.Page;
+
 import com.api.flux.courseed.projections.dtos.CategoryDto;
 import com.api.flux.courseed.projections.dtos.SaveCategoryDto;
 
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 public interface InterfaceCategoryService {
-    Flux<CategoryDto> getAllCategories();
+    Mono<Page<CategoryDto>> getAllCategories(int page, int size);
     Mono<CategoryDto> getCategoryById(String id);
     Mono<CategoryDto> getCategoryByName(String name);
     Mono<Object> createCategory(SaveCategoryDto category);

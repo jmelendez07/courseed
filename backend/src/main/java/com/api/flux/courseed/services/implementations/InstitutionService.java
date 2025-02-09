@@ -1,6 +1,10 @@
 package com.api.flux.courseed.services.implementations;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.api.flux.courseed.persistence.repositories.InstitutionRepository;
@@ -10,7 +14,6 @@ import com.api.flux.courseed.projections.mappers.InstitutionMapper;
 import com.api.flux.courseed.services.interfaces.InterfaceInstitutionService;
 import com.api.flux.courseed.web.exceptions.CustomWebExchangeBindException;
 
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Service
@@ -23,9 +26,14 @@ public class InstitutionService implements InterfaceInstitutionService {
     private InstitutionMapper institutionMapper;    
 
     @Override
-    public Flux<InstitutionDto> getAllInstitutions() {
-        return institutionRepository.findAll()
-            .map(institutionMapper::toInstitutionDto);
+    public Mono<Page<InstitutionDto>> getAllInstitutions(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+
+        return institutionRepository.findAllBy(pageable)
+            .map(institutionMapper::toInstitutionDto)
+            .collectList()
+            .zipWith(institutionRepository.count())
+            .map(p -> new PageImpl<>(p.getT1(), pageable, p.getT2()));
     }
 
     @Override

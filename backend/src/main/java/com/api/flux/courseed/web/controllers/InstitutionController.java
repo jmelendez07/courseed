@@ -1,11 +1,9 @@
 package com.api.flux.courseed.web.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 
-import com.api.flux.courseed.projections.dtos.InstitutionDto;
 import com.api.flux.courseed.projections.dtos.SaveInstitutionDto;
 import com.api.flux.courseed.services.implementations.InstitutionService;
 import com.api.flux.courseed.services.implementations.ValidationService;
@@ -21,9 +19,13 @@ public class InstitutionController {
     private ValidationService validationService;
 
     public Mono<ServerResponse> getAllInstitutions(ServerRequest serverRequest) {
-        return ServerResponse.ok()
-            .contentType(MediaType.APPLICATION_JSON)
-            .body(institutionService.getAllInstitutions(), InstitutionDto.class);
+        return institutionService
+            .getAllInstitutions(
+                Integer.parseInt(serverRequest.queryParam("page").orElse("0")), 
+                Integer.parseInt(serverRequest.queryParam("size").orElse("10"))
+            )
+            .flatMap(institutions -> ServerResponse.ok().bodyValue(institutions))
+            .switchIfEmpty(ServerResponse.notFound().build());
     }
 
     public Mono<ServerResponse> getInstitutionById(ServerRequest serverRequest) {
