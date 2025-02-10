@@ -7,9 +7,7 @@ import jakarta.validation.GroupSequence;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
-import lombok.Data;
 
-@Data
 @GroupSequence({ RegisterUserDto.class, FirstValidationGroup.class, SecondValidationGroup.class })
 public class RegisterUserDto {
 
@@ -23,4 +21,28 @@ public class RegisterUserDto {
 
     @NotBlank(message = "Para proceder, debes completar el campo correspondiente a la confirmación de contraseña del usuario.", groups = FirstValidationGroup.class)
     private String confirmPassword;
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public String getConfirmPassword() {
+        return confirmPassword;
+    }
+
+    public void setConfirmPassword(String confirmPassword) {
+        this.confirmPassword = confirmPassword;
+    }
 }

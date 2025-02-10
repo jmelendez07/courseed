@@ -8,9 +8,7 @@ import com.api.flux.courseed.projections.validators.groups.SecondValidationGroup
 import jakarta.validation.GroupSequence;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import lombok.Data;
 
-@Data
 @GroupSequence({ LoginUserDto.class, FirstValidationGroup.class, SecondValidationGroup.class })
 public class LoginUserDto implements Serializable {
 
@@ -20,4 +18,20 @@ public class LoginUserDto implements Serializable {
 
     @NotBlank(message = "Para proceder, debes completar el campo correspondiente a la contraseña del usuario.", groups = FirstValidationGroup.class)
     private String password;
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
 }

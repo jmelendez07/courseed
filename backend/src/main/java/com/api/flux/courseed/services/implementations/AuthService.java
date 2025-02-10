@@ -28,8 +28,13 @@ import reactor.core.publisher.Mono;
 @Service
 public class AuthService implements InterfaceAuthService {
 
+    @Autowired
     private UserRepository userRepository;
+
+    @Autowired
     private UserMapper userMapper;
+
+    @Autowired
     private ReactiveAuthenticationManager reactiveAuthenticationManager;
 
     @Autowired
@@ -37,15 +42,6 @@ public class AuthService implements InterfaceAuthService {
 
     @Autowired    
     private PasswordEncoder passwordEncoder;
-
-    public AuthService(
-        UserRepository userRepository, UserMapper userMapper, 
-        ReactiveAuthenticationManager reactiveAuthenticationManager
-    ) {
-        this.userRepository = userRepository;
-        this.userMapper = userMapper;
-        this.reactiveAuthenticationManager = reactiveAuthenticationManager;
-    }
 
     @Override
     public Mono<UserDto> getAuthUser(Principal principal) {

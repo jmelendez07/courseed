@@ -12,12 +12,11 @@ public interface CourseMapper {
 
     @Mapping(target = "id", ignore = true)
     Course toCourse(SaveCourseDto saveCourseDto);
-
+    
     @Mapping(target = "category", ignore = true)
-    @Mapping(target = "institution", ignore = true)
     @Mapping(target = "contents", ignore = true)
+    @Mapping(target = "institution", ignore = true)
     @Mapping(target = "likes", ignore = true)
     @Mapping(target = "reviews", ignore = true)
     CourseDto toCourseDto(Course course);
-    
 }

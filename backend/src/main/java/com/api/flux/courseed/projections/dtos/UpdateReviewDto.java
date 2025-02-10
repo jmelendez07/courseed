@@ -11,9 +11,7 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.Data;
 
-@Data
 @GroupSequence({ UpdateReviewDto.class, FirstValidationGroup.class, SecondValidationGroup.class, ThirdValidationGroup.class })
 public class UpdateReviewDto implements Serializable {
 
@@ -24,5 +22,21 @@ public class UpdateReviewDto implements Serializable {
     @Min(value = 1, message = "La calificación debe ser mayor o igual a 1.", groups = { SecondValidationGroup.class })
     @Max(value = 5, message = "La calificación debe ser menor o igual a 5.", groups = { ThirdValidationGroup.class })
     private int rating;
+
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
+    }
+
+    public int getRating() {
+        return rating;
+    }
+
+    public void setRating(int rating) {
+        this.rating = rating;
+    }
     
 }

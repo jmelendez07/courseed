@@ -6,9 +6,7 @@ import com.api.flux.courseed.projections.validators.groups.SecondValidationGroup
 import jakarta.validation.GroupSequence;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import lombok.Data;
 
-@Data
 @GroupSequence({ UpdateUserEmailDto.class, FirstValidationGroup.class, SecondValidationGroup.class })
 public class UpdateUserEmailDto {
 
@@ -16,4 +14,12 @@ public class UpdateUserEmailDto {
     @Email(message = "Asegúrate de que el correo electrónico proporcionado sea correcto y válido.", groups = SecondValidationGroup.class)
     private String email;
 
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+    
 }

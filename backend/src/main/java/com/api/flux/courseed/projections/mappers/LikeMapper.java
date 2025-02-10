@@ -12,9 +12,9 @@ public interface LikeMapper {
     @Mapping(target = "course", ignore = true)
     @Mapping(target = "user", ignore = true)
     LikeDto toLikeDto(Like like);
-
+     
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "userId", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
     Like toLike(SaveLikeDto saveLikeDto);
 }

@@ -10,9 +10,10 @@ import com.api.flux.courseed.projections.dtos.UpdateReviewDto;
 
 @Mapper(componentModel = "spring")
 public interface ReviewMapper {
-    @Mapping(target = "course", ignore = true)
+
     @Mapping(target = "user", ignore = true)
-    ReviewDto toReviewDto(Review review);
+    @Mapping(target = "course", ignore = true)
+    ReviewDto toReviewDto(Review review); 
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
@@ -21,9 +22,9 @@ public interface ReviewMapper {
     Review toReview(CreateReviewDto createReviewDto);
 
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "createdAt", ignore = true)
-    @Mapping(target = "updatedAt", ignore = true)
-    @Mapping(target = "userId", ignore = true)
     @Mapping(target = "courseId", ignore = true)
+    @Mapping(target = "updatedAt", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "userId", ignore = true)
     Review toReview(UpdateReviewDto updateReviewDto);
 }

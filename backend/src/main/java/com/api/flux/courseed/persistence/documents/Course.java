@@ -3,10 +3,7 @@ package com.api.flux.courseed.persistence.documents;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import lombok.Data;
-
 @Document(collection = "courses")
-@Data
 public class Course {
     @Id
     private String id;
@@ -20,4 +17,71 @@ public class Course {
     private String modality;
     private String categoryId;
     private String institutionId;
+
+    public String getId() {
+        return id;
+    }
+    public void setId(String id) {
+        this.id = id;
+    }
+    public String getUrl() {
+        return url;
+    }
+    public void setUrl(String url) {
+        this.url = url;
+    }
+    public String getTitle() {
+        return title;
+    }
+    public void setTitle(String title) {
+        this.title = title;
+    }
+    public String getImage() {
+        return image;
+    }
+    public void setImage(String image) {
+        this.image = image;
+    }
+    public String getDescription() {
+        return description;
+    }
+    public void setDescription(String description) {
+        this.description = description;
+    }
+    public String getPrerequisites() {
+        return prerequisites;
+    }
+    public void setPrerequisites(String prerequisites) {
+        this.prerequisites = prerequisites;
+    }
+    public Double getPrice() {
+        return price;
+    }
+    public void setPrice(Double price) {
+        this.price = price;
+    }
+    public String getDuration() {
+        return duration;
+    }
+    public void setDuration(String duration) {
+        this.duration = duration;
+    }
+    public String getModality() {
+        return modality;
+    }
+    public void setModality(String modality) {
+        this.modality = modality;
+    }
+    public String getCategoryId() {
+        return categoryId;
+    }
+    public void setCategoryId(String categoryId) {
+        this.categoryId = categoryId;
+    }
+    public String getInstitutionId() {
+        return institutionId;
+    }
+    public void setInstitutionId(String institutionId) {
+        this.institutionId = institutionId;
+    }
 }
