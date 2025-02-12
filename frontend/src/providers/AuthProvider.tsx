@@ -1,18 +1,26 @@
-import React, { useState } from "react";
-import axios from "axios";
+import React from "react";
+import axios, { AxiosResponse } from "axios";
 import APIS from "@/enums/apis";
+import TOKEN from "@/enums/token";
+import ROLES from "@/enums/roles";
 
 interface ChildrenProps {
     children: React.ReactElement
 }
 
+interface AuthUserProps {
+    id: string;
+    email: string;
+    roles: string[];
+}
+
 interface AuthContextProps {
     token: string | null;
-    user: object | null;
+    user: AuthUserProps | null;
     loading: boolean;
     handleToken: (newToken: string) => undefined;
     handleUser: () => Promise<any>;
-    setUser: React.Dispatch<React.SetStateAction<null>>;
+    setUser: React.Dispatch<React.SetStateAction<AuthUserProps | null>>;
     setLoading: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
@@ -20,8 +28,8 @@ const AuthContext = React.createContext<AuthContextProps | null>(null);
 
 function AuthProvider({ children }: ChildrenProps) {
     const [token, setToken] = React.useState(localStorage.getItem('token'));
-    const [user, setUser] = useState(null);
-    const [loading, setLoading] = useState(true);
+    const [user, setUser] = React.useState<AuthUserProps | null>(null);
+    const [loading, setLoading] = React.useState<boolean>(true);
 
     const handleToken = function(newToken: string): undefined {
         localStorage.setItem("token", newToken);
@@ -74,5 +82,80 @@ function useAuth() {
     return React.useContext(AuthContext);
 }
 
+function useIsAuth() {
+    const [isAuth, setIsAuth] = React.useState<boolean | null>(null);
+    const auth = useAuth();
+
+    React.useEffect(() => {
+        if (auth?.user) {
+            setIsAuth(true);
+        } else {
+            axios.get(APIS.USER_AUTHENTICATED, {
+                headers: {
+                    Authorization: `${TOKEN.PREFIX} ${localStorage.getItem('token')}`
+                }
+            })
+                .then(response => setIsAuth(typeof response.data === "object"))
+                .catch(() => setIsAuth(false));
+        }
+    }, [auth?.user]);
+
+    return isAuth;
+}
+
+function useIsAdmin() {
+    const [isAdmin, setIsAdmin] = React.useState<boolean | null>(null);
+    const auth = useAuth();
+
+    React.useEffect(() => {
+        if (auth?.user && Array.isArray(auth.user.roles)) {
+            setIsAdmin(auth.user.roles.some(role => role === ROLES.ADMIN));
+        } else {
+            axios.get(APIS.USER_AUTHENTICATED, {
+                headers: {
+                    Authorization: `${TOKEN.PREFIX} ${localStorage.getItem('token')}`
+                }
+            })
+                .then((response: AxiosResponse<AuthUserProps | null>) => {
+                    setIsAdmin(
+                        typeof response.data === "object" && 
+                        Array.isArray(response.data?.roles) &&
+                        response.data.roles.some(role => role === ROLES.ADMIN)
+                    )
+                })
+                .catch(() => setIsAdmin(false));
+        }
+    }, [auth?.user]);
+    
+    return isAdmin;
+}
+
+function useIsUser() {
+    const [isUser, setIsUser] = React.useState<boolean | null>(null);
+    const auth = useAuth();
+
+    React.useEffect(() => {
+        if (auth?.user && Array.isArray(auth.user.roles)) {
+            setIsUser(auth.user.roles.some(role => role === ROLES.USER));
+        } else {
+            axios.get(APIS.USER_AUTHENTICATED, {
+                headers: {
+                    Authorization: `${TOKEN.PREFIX} ${localStorage.getItem('token')}`
+                }
+            })
+                .then((response: AxiosResponse<AuthUserProps | null>) => {
+                    setIsUser(
+                        typeof response.data === "object" && 
+                        Array.isArray(response.data?.roles) &&
+                        response.data.roles.some(role => role === ROLES.USER)
+                    )
+                })
+                .catch(() => setIsUser(false));
+        }
+    }, [auth?.user]);
+
+    return isUser;
+}
+
 export default AuthProvider;
-export { useAuth }
+export { useAuth, useIsAuth, useIsAdmin, useIsUser }

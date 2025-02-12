@@ -9,9 +9,16 @@ import { useNavigate } from "react-router-dom";
 interface CredentialsProps {
     email: string;
     password: string;
+    confirmPassword: string;
 }
 
-interface CredentialsErrorProps {
+interface CredentialsErrorsProps {
+    email: string | null;
+    password: string | null;
+    confirmPassword: string | null;
+}
+
+interface CredentialLoginErrorsProps {
     email: string | null;
     password: string | null;
     auth: string | null;
@@ -21,19 +28,19 @@ interface AuthCredentialsProps {
     roles: Array<String> | null;
 }
 
-function useLogin() {
+function useRegister() {
     const [credentials, setCredentials] = React.useState<CredentialsProps>({
         email: '',
-        password: ''
+        password: '',
+        confirmPassword: ''
     });
-    const [credentialsErrors, setCredentialsErrors] = React.useState<CredentialsErrorProps>({
+    const [credentialsErrors, setCredentialsErrors] = React.useState<CredentialsErrorsProps>({
         email: null,
         password: null,
-        auth: null
-    })
+        confirmPassword: null
+    });
     const [loading, setLoading] = React.useState<boolean>(false);
-    const [token, setToken] = React.useState<string | null>(null);
-
+    
     const auth = useAuth();
     const navigate = useNavigate();
 
@@ -44,42 +51,58 @@ function useLogin() {
         });
     }
 
-    const handleLogin = async () => {
+    const handleRegister = async () => {
         setLoading(true);
-        axios.post(APIS.LOGIN, credentials)
-            .then(response => {
-                if (!response.data) return;
+        axios.post(APIS.REGISTER, credentials)
+            .then((response: AxiosResponse) => {
+                if (response.data) {
+                    setCredentialsErrors({
+                        email: null,
+                        password: null,
+                        confirmPassword: null
+                    });
 
-                setCredentialsErrors({
-                    email: null,
-                    password: null,
-                    auth: null
-                });
-
-                auth?.handleToken(response.data.token);
-                redirectByRole(response.data.token);
+                    handleLogin();
+                }
             })
-            .catch((error: AxiosError<CredentialsErrorProps>) => {
+            .catch((error: AxiosError<CredentialsErrorsProps>) => {
                 if (!error.response?.data) return;
 
-                if (error.response.data.auth) {
+                if (error.response.data.confirmPassword) {
                     setCredentials({
                         ...credentials,
-                        password: ''
+                        confirmPassword: ''
                     });
                 }
 
                 setCredentialsErrors({
                     email: error.response.data.email,
                     password: error.response.data.password,
-                    auth: error.response.data.auth
+                    confirmPassword: error.response.data.confirmPassword
                 });
-
             })
-            .finally(() => {
-                setLoading(false);
+            .finally(() => setLoading(false));
+    }
+
+    const handleLogin = async () => {
+        axios.post(APIS.LOGIN, {
+            email: credentials.email,
+            password: credentials.password
+        })
+            .then((response: AxiosResponse) => {
+                auth?.handleToken(response.data.token);
+                redirectByRole(response.data.token);
+            })
+            .catch((error: AxiosError<CredentialLoginErrorsProps>) => {
+                if (!error.response?.data) return;
+                
+                setCredentialsErrors({
+                    email: error.response.data.email,
+                    password: error.response.data.password,
+                    confirmPassword: error.response.data.auth
+                });
             });
-    };
+    }
 
     const redirectByRole = (token: string) => {
         axios.get(APIS.USER_AUTHENTICATED, {
@@ -97,7 +120,7 @@ function useLogin() {
                 } else {
                     setCredentialsErrors({
                         ...credentialsErrors,
-                        auth: "Le informamos que estamos experimentando problemas técnicos en nuestro servidor."
+                        confirmPassword: "Le informamos que estamos experimentando problemas técnicos en nuestro servidor."
                     });
                 }
             })
@@ -105,7 +128,7 @@ function useLogin() {
                 console.error(error);
                 setCredentialsErrors({
                     ...credentialsErrors,
-                    auth: "Le informamos que estamos experimentando problemas técnicos en nuestro servidor."
+                    confirmPassword: "Le informamos que estamos experimentando problemas técnicos en nuestro servidor."
                 });
             });
     }
@@ -114,14 +137,12 @@ function useLogin() {
         credentials,
         credentialsErrors,
         loading,
-        token,
         setCredentials,
-        setCredential,
         setCredentialsErrors,
         setLoading,
-        setToken,
-        handleLogin
-    };
+        setCredential,
+        handleRegister
+    }
 }
 
-export default useLogin;
+export default useRegister;

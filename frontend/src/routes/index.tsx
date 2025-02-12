@@ -14,6 +14,9 @@ import ReviewsAdmin from "@/pages/auth/admin/Reviews";
 import DashboardUser from "@/pages/auth/user/Dashboard";
 import Likes from "@/pages/auth/user/Likes";
 import ReviewsUser from "@/pages/auth/user/Reviews";
+import ProtectedAuthRoute from "./ProtectedAuthRoute";
+import ProtectedAdminRoute from "./ProtectedAdminRoute";
+import ProtectedUserRoute from "./ProtectedUserRoute";
 
 function Routes() {
 
@@ -43,7 +46,7 @@ function Routes() {
     const routesForAuthenticated = [
         {
             path: '/',
-            // element: '',
+            element: <ProtectedAuthRoute />,
             children: [
                 {
                     path: '/salir',
@@ -60,7 +63,7 @@ function Routes() {
     const routesForAdmin = [
         {
             path: '/administrador',
-            // element: '',
+            // element: <ProtectedAdminRoute />,
             children: [
                 {
                     path: '',
@@ -85,7 +88,7 @@ function Routes() {
     const routesForUser = [
         {
             path: '/usuario',
-            // element: '',
+            element: <ProtectedUserRoute />,
             children: [
                 {
                     path: '',

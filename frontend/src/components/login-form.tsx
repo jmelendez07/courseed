@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import useLogin from "@/hooks/useLogin";
 import { Link } from "react-router-dom";
+import { Info, LoaderCircle } from "lucide-react";
 
 export function LoginForm({
 	className,
@@ -33,22 +34,45 @@ export function LoginForm({
 					<Input 
 						id="email" 
 						type="email" 
-						placeholder="m@example.com" 
+						placeholder="nombre@organizacion.tipo"
+						autoComplete="email" 
 						onChange={login.setCredential}
 						value={login.credentials.email}
+						disabled={login.loading}
 					/>
+					{login.credentialsErrors.email && (
+						<p className="flex items-start gap-1 text-xs text-red-600 line-clamp-2">
+							<Info className="w-3 h-3 min-h-3 min-w-3" />
+							<span>
+								{login.credentialsErrors.email}
+							</span>
+						</p>
+					)}
 				</div>
 				<div className="grid gap-2">
 					<Label htmlFor="password">Contraseña</Label>
 					<Input 
 						id="password" 
 						type="password" 
+						autoComplete="current-password"
 						onChange={login.setCredential}
 						value={login.credentials.password}
+						disabled={login.loading}
 					/>
+					{(login.credentialsErrors.password || login.credentialsErrors.auth) && (
+						<p className="flex items-start gap-1 text-xs text-red-600 line-clamp-2">
+							<Info className="w-3 h-3 min-h-3 min-w-3" />
+							<span>
+								{login.credentialsErrors.password || login.credentialsErrors.auth}
+							</span>
+						</p>
+					)}
 				</div>
-				<Button type="submit" className="w-full">
+				<Button type="submit" className="w-full" disabled={login.loading}>
 					Acceder
+					{login.loading && (
+						<LoaderCircle className="animate-spin" />
+					)}
 				</Button>
 			</div>
 			<div className="text-center text-sm">
