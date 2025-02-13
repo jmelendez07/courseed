@@ -17,7 +17,7 @@ import React from "react";
 import { ColumnDef } from "@tanstack/react-table"
 import DataTable from "@/components/data-table";
 
-import { MoreHorizontal, UserPen, UserX, ArrowUpDown, MessageSquareText, Heart, ChevronDown } from "lucide-react"
+import { MoreHorizontal, UserPen, UserX, ArrowUpDown, MessageSquareText, Heart } from "lucide-react"
  
 import { Button } from "@/components/ui/button"
 import {
@@ -29,6 +29,10 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import dayjs from "dayjs";
+import PieChart from "@/components/pie-chart-test";
+import AreaChart from "@/components/area-chart";
+import BarChart from "@/components/bar-chart";
+import HeadProvider from "@/providers/HeadProvider";
 
 interface User {
     email: string;
@@ -293,6 +297,7 @@ function Users() {
 
     return (
         <SidebarProvider>
+            <HeadProvider title="Administrador | Usuarios" />
             <AppSidebar />
             <SidebarInset>
                 <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
@@ -316,9 +321,9 @@ function Users() {
                 </header>
                 <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
                     <div className="grid auto-rows-min gap-4 md:grid-cols-3">
-                        <div className="aspect-video rounded-xl bg-zinc-100/50 dark:bg-zinc-800/50" />
-                        <div className="aspect-video rounded-xl bg-zinc-100/50 dark:bg-zinc-800/50" />
-                        <div className="aspect-video rounded-xl bg-zinc-100/50 dark:bg-zinc-800/50" />
+                        <PieChart />
+                        <AreaChart />
+                        <BarChart />
                     </div>
                     <DataTable columns={columns} data={users} />
                 </div>

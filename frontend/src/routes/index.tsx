@@ -8,8 +8,8 @@ import Courses from "@/pages/Courses";
 import Course from "@/pages/Course";
 import Profile from "@/pages/auth/Profile";
 import DashboardAdmin from "@/pages/auth/admin/Dashboard";
-import Users from "@/pages/auth/admin/Users";
-import CoursesAdmin from "@/pages/auth/admin/Courses";
+import Users from "@/pages/auth/admin/users/Users";
+import CoursesAdmin from "@/pages/auth/admin/courses/Courses";
 import ReviewsAdmin from "@/pages/auth/admin/Reviews";
 import DashboardUser from "@/pages/auth/user/Dashboard";
 import Likes from "@/pages/auth/user/Likes";
@@ -17,6 +17,7 @@ import ReviewsUser from "@/pages/auth/user/Reviews";
 import ProtectedAuthRoute from "./ProtectedAuthRoute";
 import ProtectedAdminRoute from "./ProtectedAdminRoute";
 import ProtectedUserRoute from "./ProtectedUserRoute";
+import CreateCourse from "@/pages/auth/admin/courses/CreateCourse";
 
 function Routes() {
 
@@ -81,6 +82,10 @@ function Routes() {
                     path: 'reseñas',
                     element: <ReviewsAdmin />
                 },
+                {
+                    path: 'cursos/nuevo',
+                    element: <CreateCourse />
+                }
             ]
         }
     ]
