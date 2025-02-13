@@ -1,8 +1,9 @@
 interface ReviewInterface {
     id: string;
-    userId: string;
     rating: number;
-    comment: string;
+    content: string;
+    createdAt: string;
+    updatedAt: string;
 }
 
 export default ReviewInterface;

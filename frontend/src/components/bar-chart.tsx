@@ -1,4 +1,4 @@
-import { Bar, BarChart, CartesianGrid, XAxis } from "recharts";
+import { Bar, BarChart as BarChartRechart, CartesianGrid, XAxis } from "recharts";
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent } from "@/components/ui/chart";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
 
@@ -22,7 +22,7 @@ const chartConfig = {
     },
 } satisfies ChartConfig
 
-function ChartTest() {
+function BarChart() {
     return (
         <Card
             className="bg-white border border-gray-200 rounded-lg hover:shadow-lg 
@@ -36,7 +36,7 @@ function ChartTest() {
                 className="max-h-full overflow-hidden"
             >
                 <ChartContainer config={chartConfig} className="w-full max-h-[220px] overflow-hidden">
-                    <BarChart accessibilityLayer data={chartData}>
+                    <BarChartRechart accessibilityLayer data={chartData}>
                         <CartesianGrid stroke="#e2e8f0" vertical={false} />
                         <XAxis
                             dataKey="month"
@@ -54,7 +54,7 @@ function ChartTest() {
                         <ChartLegend content={<ChartLegendContent />} />
                         <Bar dataKey="desktop" fill="var(--color-desktop)" radius={4} />
                         <Bar dataKey="mobile" fill="var(--color-mobile)" radius={4} />
-                    </BarChart>
+                    </BarChartRechart>
                 </ChartContainer>
             </CardContent>
         </Card>
@@ -62,4 +62,4 @@ function ChartTest() {
     );
 }
 
-export default ChartTest;
+export default BarChart;

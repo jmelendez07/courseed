@@ -8,12 +8,12 @@ interface CourseInterface {
     id: string;
     url: string;
     title: string;
-    image: string;
-    description: string;
-    prerequisites: string;
-    price: number;
-    duration: string;
-    modality: string;
+    image?: string;
+    description?: string;
+    prerequisites?: string;
+    price?: number;
+    duration?: string;
+    modality?: string;
     category: CategoryInterface;
     institution: InstitutionInterface;
     contents: ContentInterface[];

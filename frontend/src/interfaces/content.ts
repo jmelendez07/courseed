@@ -1,7 +1,7 @@
 interface ContentInterface {
     id: string;
-    title: string;
-    duration: string;
+    courseId: string;
+    description: string;
 }
 
 export default ContentInterface;

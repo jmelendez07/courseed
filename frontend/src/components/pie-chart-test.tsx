@@ -1,4 +1,4 @@
-import { LabelList, Pie, PieChart } from "recharts";
+import { LabelList, Pie, PieChart as PieChartRechart } from "recharts";
 
 import {
     Card,
@@ -49,9 +49,10 @@ const chartConfig = {
     },
 } satisfies ChartConfig
 
-function PieChartTest() {
+function PieChart() {
     return (
-        <Card className="flex flex-col">
+        <Card className="bg-white border border-gray-200 rounded-lg hover:shadow-lg 
+            transition-shadow duration-300 grid grid-rows-[auto_1fr]">
             <CardHeader>
                 <CardTitle>Pie Chart - Label List</CardTitle>
                 <CardDescription>January - June 2024</CardDescription>
@@ -59,9 +60,9 @@ function PieChartTest() {
             <CardContent className="flex-1 pb-0">
                 <ChartContainer
                     config={chartConfig}
-                    className="mx-auto aspect-square max-h-[250px] [&_.recharts-text]:fill-background"
+                    className="mx-auto aspect-square max-h-[220px] [&_.recharts-text]:fill-background"
                 >
-                    <PieChart>
+                    <PieChartRechart>
                         <ChartTooltip
                             content={<ChartTooltipContent nameKey="visitors" hideLabel />}
                         />
@@ -76,11 +77,11 @@ function PieChartTest() {
                                 }
                             />
                         </Pie>
-                    </PieChart>
+                    </PieChartRechart>
                 </ChartContainer>
             </CardContent>
         </Card>
     );
 }
 
-export default PieChartTest;
+export default PieChart;

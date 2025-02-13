@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import CourseInterface from "@/interfaces/course";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./dropdown-menu";
+import { Link } from "react-router-dom";
 
 interface CourseComponentProps {
   course: CourseInterface, 
@@ -21,6 +22,20 @@ function Course({ course, optionsEnable, handleEdit, handleDelete }: CourseCompo
 
         const totalRating = course.reviews.reduce((sum, review) => sum + review.rating, 0);
         return totalRating / course.reviews.length;
+    }
+
+    const getFormatPrice = (): string => {
+
+      if (course.price === 0) return "Gratuito";
+
+      return course.price 
+      ? course.price.toLocaleString('es-CO', {
+        style: 'currency',
+        currency: 'COP',
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      }) + " COP"
+      : "Sin información";
     }
 
     return(
@@ -84,10 +99,16 @@ function Course({ course, optionsEnable, handleEdit, handleDelete }: CourseCompo
                 ))}
                 <span className="text-sm text-gray-600 ml-1">({course.reviews ? course.reviews.length : 0})</span>
               </div>
-              <p className="text-lg font-bold text-gray-900">${course.price.toFixed(2)} COL</p>
+              <p className="text-lg font-bold text-gray-900">
+                {getFormatPrice()}
+              </p>
             </CardContent>
             <CardFooter>
-              <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white">Ver Curso</Button>
+              <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white">
+                <a href={course.url} target="_blank">
+                  Ver Curso
+                </a>
+              </Button>
             </CardFooter>
         </Card>
     );
