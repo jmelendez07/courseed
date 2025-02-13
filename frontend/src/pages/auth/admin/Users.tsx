@@ -17,7 +17,7 @@ import React from "react";
 import { ColumnDef } from "@tanstack/react-table"
 import DataTable from "@/components/data-table";
 
-import { MoreHorizontal, UserPen, UserX } from "lucide-react"
+import { MoreHorizontal, UserPen, UserX, ArrowUpDown, MessageSquareText, Heart, ChevronDown } from "lucide-react"
  
 import { Button } from "@/components/ui/button"
 import {
@@ -28,6 +28,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import dayjs from "dayjs";
 
 interface User {
     email: string;
@@ -40,7 +41,17 @@ interface User {
 const columns: ColumnDef<User>[] = [
     {
         accessorKey: "email",
-        header: "Correo Electronico",
+        header: ({ column }) => {
+          return (
+            <Button
+              variant="ghost"
+              onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+            >
+              Correo Electronico
+              <ArrowUpDown className="ml-2 h-4 w-4" />
+            </Button>
+          )
+        },
     },
     {
         accessorKey: "roles",
@@ -48,15 +59,67 @@ const columns: ColumnDef<User>[] = [
     },
     {
         accessorKey: "reviews",
-        header: "Reseñas",
+        header: ({ column }) => {
+          return (
+            <Button
+              variant="ghost"
+              onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+            >
+              Reseñas
+              <ArrowUpDown className="ml-2 h-4 w-4" />
+            </Button>
+          )
+        },
+        cell: ({ row }) => {
+          const reviews = parseFloat(row.getValue("reviews"))
+     
+          return <div className="flex items-center">
+            {reviews}
+            <MessageSquareText className="ml-2 h-4 w-4" />
+          </div>
+        },
     },
     {
         accessorKey: "likes",
-        header: "Likes",
+        header: ({ column }) => {
+          return (
+            <Button
+              variant="ghost"
+              onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+            >
+              Likes
+              <ArrowUpDown className="ml-2 h-4 w-4" />
+            </Button>
+          )
+        },
+        cell: ({ row }) => {
+          const likes = parseFloat(row.getValue("likes"));
+     
+          return <div className="flex items-center">
+            {likes}
+            <Heart className="ml-2 h-4 w-4" />
+          </div>
+        },
     },
     {
         accessorKey: "createdAt",
-        header: "Cuenta Creada en",
+        header: ({ column }) => {
+          return (
+            <Button
+              variant="ghost"
+              onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+            >
+              Cuenta Creada en
+              <ArrowUpDown className="ml-2 h-4 w-4" />
+            </Button>
+          )
+        },
+        cell: ({ row }) => {
+          const createdAt: string = row.getValue("createdAt");
+          const formatedCreatedAt: string = dayjs(createdAt).format("LLLL");
+
+          return formatedCreatedAt.charAt(0).toUpperCase() + formatedCreatedAt.slice(1);
+        }
     },
     {
         id: "actions",

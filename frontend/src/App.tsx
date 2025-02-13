@@ -1,7 +1,8 @@
-import './App.css'
-import './axios.ts'
-import AuthProvider from './providers/AuthProvider'
-import Routes from './routes'
+import './App.css';
+import './axios.ts';
+import './dayjs.ts';
+import AuthProvider from './providers/AuthProvider';
+import Routes from './routes';
 
 function App() {
   return (
@@ -11,4 +12,4 @@ function App() {
   )
 }
 
-export default App
+export default App;
