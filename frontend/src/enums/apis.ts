@@ -1,4 +1,5 @@
 enum APIS {
+    USERS = 'api/users',
     USER_AUTHENTICATED = 'api/auth',
     LOGIN = 'api/auth/login',
     REGISTER = 'api/auth/register',
@@ -6,6 +7,7 @@ enum APIS {
     COURSES_SEARCH = 'api/courses/search',
     COURSES_BY_INSTITUTION = 'api/courses/institution',
     INSTITUTIONS = 'api/institutions',
+    REVIEWS = 'api/reviews'
 }
 
 export default APIS;

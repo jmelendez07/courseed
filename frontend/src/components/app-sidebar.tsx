@@ -20,7 +20,8 @@ import {
 import React from "react"
 import { DialogContext } from "@/providers/DialogProvider"
 import CreateUserForm from "./create-user-form"
-import CreateCourseForm from "./create-course-form"
+import CourseForm from "./course-form"
+import UpdateReviewForm from "./update-review-form"
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
@@ -37,7 +38,14 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 		title: "Crear Nuevo Curso",
 		description: "description",
 		open: true,
-		dialogChildren: <CreateCourseForm />
+		dialogChildren: <CourseForm />
+	}
+
+	const reviewForm = {
+		title: "Actualizar Reseña",
+		description: "Modifica los detalles de la reseña para reflejar la experiencia más reciente.",
+		open: true,
+		dialogChildren: <UpdateReviewForm />
 	}
 
 	const data = {
@@ -57,6 +65,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 				logo: BookPlus,
 				action: () => dialogContext?.setContext(courseForm)
 			},
+			{
+				name: "Actualizar Reseña",
+				logo: BookPlus,
+				action: () => dialogContext?.setContext(reviewForm)
+			}
 		],
 		navMain: [
 			{

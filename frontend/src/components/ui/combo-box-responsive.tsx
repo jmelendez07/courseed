@@ -23,8 +23,8 @@ import {
 import { ChevronsUpDown } from "lucide-react";
 
 type Status = {
-    id: string | null;
-    name: string;
+    id: string | null | undefined;
+    name: string | undefined;
 }
 
 interface ComboBoxResponsiveProps {
