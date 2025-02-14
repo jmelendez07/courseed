@@ -10,30 +10,41 @@ interface ResponseCourseProps {
     totalElements: number;
 }
 
+interface ParamsProps {
+    pageNumber: number;
+    searchText: string;
+    searchSubmit: boolean;
+    institution: InstitutionInterface | null;
+}
+
 function useCourse() {
     const [courses, setCourses] = React.useState<CourseInterface[]>([]);
     const [loading, setLoading] = React.useState(false);
     const [totalCourses, setTotalCourses] = React.useState<number | null>(null);
     const pageSize: number = 12;
-    const [pageNumber, setPageNumber] = React.useState<number>(0);
-    const [searchText, setSearchText] = React.useState<string>("");
     const [isLastPage, setIsLastPage] = React.useState<boolean>(false);
-    const [institution, setInstitution] = React.useState<InstitutionInterface | null>(null);
 
-    React.useEffect(() => {
-        console.log(institution);
-        
-		setLoading(true);
-		axios.get(institution 
-            ? `${APIS.COURSES_BY_INSTITUTION}/${institution.id}` 
-            : APIS.COURSES, {
+    const [params, setParams] = React.useState<ParamsProps>({
+        pageNumber: 0,
+        searchText: "",
+        searchSubmit: false,
+        institution: null
+    });
+
+    const handleFetch = React.useCallback(() => {
+        setLoading(true);
+		axios.get(params.institution
+            ? `${APIS.COURSES_BY_INSTITUTION}/${params.institution.id}` 
+            : params.searchSubmit
+                ? `${APIS.COURSES_SEARCH}?search=${params.searchText}` 
+                : APIS.COURSES, {
 			params: {
-				page: pageNumber,
+				page: params.pageNumber,
 				size: pageSize
 			},
 		})
 			.then((response: AxiosResponse<ResponseCourseProps>) => {
-				setCourses(currentCourses => pageNumber === 0 
+				setCourses(currentCourses => params.pageNumber === 0 
                     ? response.data.content 
                     : [
 					    ...currentCourses,
@@ -45,28 +56,23 @@ function useCourse() {
 			})
 			.catch((error: AxiosError) => console.error(error))
 			.finally(() => setLoading(false));
-	}, [pageNumber, pageSize, institution]);
+    }, [params.pageNumber, pageSize, params.institution, params.searchText]); 
 
-    React.useEffect(() => {
-
-    })
+    React.useEffect(() => handleFetch(), [params.pageNumber, pageSize, params.institution]);
 
     return {
         courses,
         loading,
         pageSize,
-        pageNumber,
-        searchText,
         isLastPage,
         totalCourses,
-        institution,
+        params,
         setCourses,
         setLoading,
-        setPageNumber,
-        setSearchText,
         setIsLastPage,
         setTotalCourses,
-        setInstitution
+        setParams,
+        handleFetch
     };
 }
 

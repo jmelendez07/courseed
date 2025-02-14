@@ -67,12 +67,27 @@ function Courses() {
 					<div className="grid grid-cols-1 items-center md:grid-cols-[1fr,auto] gap-x-4">
 						<form onSubmit={e => {
 							e.preventDefault();
+							course.setParams({
+								...course.params,
+								searchSubmit: true,
+							});
 						}} className="flex items-center py-4 gap-2">
 							<Input
 								type="text"
-								autoComplete="off"
 								disabled={course.loading}
-								onChange={e => course.setSearchText(e.target.value)}
+								value={course.params.searchText}
+								onChange={e => {
+									if (e.target.value.trim() === "") {
+										course.setParams({
+											...course.params,
+											searchSubmit: false
+										});
+									}
+									course.setParams({
+										...course.params,
+										searchText: e.target.value
+									});
+								}}
 								className="max-w-sm"
 							/>
 							<Button
@@ -85,10 +100,13 @@ function Courses() {
 						<ComboBoxResponsive 
 							placeholder="Buscar Instituciones..." 
 							statuses={institution.institutions}
-							selectedStatus={course.institution}
+							selectedStatus={course.params.institution}
 							setSelectedStatus={i => {
-								course.setInstitution(i);
-								course.setPageNumber(0);
+								course.setParams({
+									...course.params,
+									institution: i,
+									pageNumber: 0
+								});
 							}}
 						/>
 					</div>
@@ -105,7 +123,10 @@ function Courses() {
 								if (course.isLastPage) {
 									window.scrollTo({ top: 0, behavior: "smooth" });
 								} else {
-									course.setPageNumber(course.pageNumber + 1);
+									course.setParams({
+										...course.params,
+										pageNumber: course.params.pageNumber + 1
+									});
 								}
 							}}
 							disabled={course.loading}

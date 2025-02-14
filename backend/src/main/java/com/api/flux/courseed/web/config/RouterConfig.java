@@ -37,7 +37,6 @@ public class RouterConfig {
             .path("/users", () -> userRoutes(userController))
             .path("/roles", () -> roleRoutes(roleController))
             .build();
-
     }
 
     private RouterFunction<ServerResponse> authRoutes(AuthController authController) {
