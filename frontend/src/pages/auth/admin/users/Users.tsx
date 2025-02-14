@@ -33,6 +33,8 @@ import PieChart from "@/components/pie-chart-test";
 import AreaChart from "@/components/area-chart";
 import BarChart from "@/components/bar-chart";
 import HeadProvider from "@/providers/HeadProvider";
+import DialogProvider from "@/providers/DialogProvider";
+import { Link } from "react-router-dom";
 
 interface User {
     email: string;
@@ -297,6 +299,7 @@ function Users() {
 
     return (
         <SidebarProvider>
+          <DialogProvider>
             <HeadProvider title="Administrador | Usuarios" />
             <AppSidebar />
             <SidebarInset>
@@ -307,9 +310,9 @@ function Users() {
                         <Breadcrumb>
                             <BreadcrumbList>
                                 <BreadcrumbItem className="hidden md:block">
-                                    <BreadcrumbLink href="#">
-                                        Administrador
-                                    </BreadcrumbLink>
+                                    <Link to="/administrador" className="hover:text-gray-800">
+                                      Administrador
+                                    </Link>
                                 </BreadcrumbItem>
                                 <BreadcrumbSeparator className="hidden md:block" />
                                 <BreadcrumbItem>
@@ -328,6 +331,7 @@ function Users() {
                     <DataTable columns={columns} data={users} />
                 </div>
             </SidebarInset>
+          </DialogProvider>
         </SidebarProvider>
     );
 }

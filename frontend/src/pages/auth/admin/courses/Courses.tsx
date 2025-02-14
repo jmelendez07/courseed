@@ -5,7 +5,6 @@ import PieChartTest from "@/components/pie-chart-test";
 import {
 	Breadcrumb,
 	BreadcrumbItem,
-	BreadcrumbLink,
 	BreadcrumbList,
 	BreadcrumbPage,
 	BreadcrumbSeparator,
@@ -27,6 +26,7 @@ import DialogProvider from "@/providers/DialogProvider";
 import HeadProvider from "@/providers/HeadProvider";
 
 import { ChevronDown, ChevronUp, LoaderCircle, Search } from "lucide-react";
+import { Link } from "react-router-dom";
 
 function Courses() {
 
@@ -46,9 +46,9 @@ function Courses() {
 							<Breadcrumb>
 								<BreadcrumbList>
 									<BreadcrumbItem className="hidden md:block">
-										<BreadcrumbLink href="#">
+										<Link to="/administrador" className="hover:text-gray-800">
 											Administrador
-										</BreadcrumbLink>
+										</Link>
 									</BreadcrumbItem>
 									<BreadcrumbSeparator className="hidden md:block" />
 									<BreadcrumbItem>
@@ -69,12 +69,31 @@ function Courses() {
 						<div className="grid grid-cols-1 items-center md:grid-cols-[1fr,auto] gap-x-4">
 							<form onSubmit={e => {
 								e.preventDefault();
+								course.setParams({
+									...course.params,
+									institution: null,
+									searchSubmit: true,
+									pageNumber: 0
+								});
+								course.handleFetch();
 							}} className="flex items-center py-4 gap-2">
 								<Input
 									type="text"
-									autoComplete="off"
 									disabled={course.loading}
-									onChange={e => course.setSearchText(e.target.value)}
+									value={course.params.searchText}
+									placeholder="Buscar por titulo, descripción, duracion..."
+									onChange={e => {
+										if (e.target.value.trim() === "") {
+											course.setParams({
+												...course.params,
+												searchSubmit: false
+											});
+										}
+										course.setParams({
+											...course.params,
+											searchText: e.target.value
+										});
+									}}
 									className="max-w-sm"
 								/>
 								<Button
@@ -87,11 +106,16 @@ function Courses() {
 							<ComboBoxResponsive
 								placeholder="Buscar Instituciones..."
 								statuses={institution.institutions}
-								selectedStatus={course.institution}
+								selectedStatus={course.params.institution}
 								setSelectedStatus={i => {
-									course.setInstitution(i);
-									course.setPageNumber(0);
+									course.setParams({
+										...course.params,
+										institution: i,
+										pageNumber: 0
+									});
 								}}
+								pagination={!institution.isLastPage}
+								onPaginate={() => institution.setPageNumber(institution.pageNumber + 1)}
 							/>
 						</div>
 						<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -107,7 +131,10 @@ function Courses() {
 									if (course.isLastPage) {
 										window.scrollTo({ top: 0, behavior: "smooth" });
 									} else {
-										course.setPageNumber(course.pageNumber + 1);
+										course.setParams({
+											...course.params,
+											pageNumber: course.params.pageNumber + 1
+										});
 									}
 								}}
 								disabled={course.loading}

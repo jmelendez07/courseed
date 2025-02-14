@@ -23,7 +23,7 @@ import {
 import { ChevronsUpDown } from "lucide-react";
 
 type Status = {
-    id: string;
+    id: string | null;
     name: string;
 }
 
@@ -32,13 +32,17 @@ interface ComboBoxResponsiveProps {
     statuses: Status[];
     selectedStatus: Status | null;
     setSelectedStatus: (status: Status | null) => void;
+    pagination: boolean;
+    onPaginate: () => void;
 }
 
 function ComboBoxResponsive({ 
     placeholder, 
     statuses,
     setSelectedStatus,
-    selectedStatus
+    selectedStatus,
+    pagination,
+    onPaginate
 }: ComboBoxResponsiveProps) {
     const [isOpen, setIsOpen] = React.useState<boolean>(false);
     const isDesktop = useMediaQuery("(min-width: 768px)");
@@ -53,7 +57,13 @@ function ComboBoxResponsive({
                     </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-[250px] p-0" align="start">
-                    <StatusList statuses={statuses} setOpen={setIsOpen} setSelectedStatus={setSelectedStatus} />
+                    <StatusList 
+                        pagination={pagination} 
+                        statuses={statuses} 
+                        onPaginate={onPaginate}
+                        setOpen={setIsOpen} 
+                        setSelectedStatus={setSelectedStatus} 
+                    />
                 </PopoverContent>
             </Popover>
         );
@@ -69,22 +79,30 @@ function ComboBoxResponsive({
             </DrawerTrigger>
             <DrawerContent>
                 <div className="mt-4 border-t">
-                    <StatusList statuses={statuses} setOpen={setIsOpen} setSelectedStatus={setSelectedStatus} />
+                    <StatusList 
+                        pagination={pagination} 
+                        statuses={statuses} 
+                        onPaginate={onPaginate}
+                        setOpen={setIsOpen} 
+                        setSelectedStatus={setSelectedStatus}
+                     />
                 </div>
             </DrawerContent>
         </Drawer>
     );
 }
 
-function StatusList({setOpen, setSelectedStatus, statuses}: {
+function StatusList({setOpen, setSelectedStatus, statuses, pagination, onPaginate}: {
     setOpen: (open: boolean) => void
     setSelectedStatus: (status: Status | null) => void
     statuses: Status[]
+    pagination: boolean,
+    onPaginate: () => void
 }) {
     return (
         <Command>
             <CommandInput placeholder="Buscar..." />
-            <CommandList>
+                <CommandList>
                 <CommandEmpty>No se encontraron resultados.</CommandEmpty>
                 <CommandGroup>
                     {statuses.map((status) => (
@@ -101,6 +119,16 @@ function StatusList({setOpen, setSelectedStatus, statuses}: {
                             {status.name}
                         </CommandItem>
                     ))}
+                    {pagination && (
+                        <CommandItem
+                            key="pagination"
+                            value="..."
+                            onSelect={() => onPaginate()}
+                            className="flex items-center justify-center"
+                        >
+                            ...
+                        </CommandItem>
+                    )}
                 </CommandGroup>
             </CommandList>
         </Command>

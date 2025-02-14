@@ -7,6 +7,7 @@ import React from "react";
 interface ResponseCourseProps {
 	content: CourseInterface[];
 	last: boolean;
+	empty: boolean;
     totalElements: number;
 }
 
@@ -33,10 +34,11 @@ function useCourse() {
 
     const handleFetch = React.useCallback(() => {
         setLoading(true);
-		axios.get(params.institution
+
+		axios.get((params.institution && params.institution.id)
             ? `${APIS.COURSES_BY_INSTITUTION}/${params.institution.id}` 
             : params.searchSubmit
-                ? `${APIS.COURSES_SEARCH}?search=${params.searchText}` 
+                ? `${APIS.COURSES_SEARCH}?text=${params.searchText}` 
                 : APIS.COURSES, {
 			params: {
 				page: params.pageNumber,
@@ -51,12 +53,15 @@ function useCourse() {
 					    ...response.data.content
                     ]
                 );
-				setIsLastPage(response.data.last);
+				setIsLastPage(response.data.last || response.data.empty);
                 setTotalCourses(response.data.totalElements);
 			})
-			.catch((error: AxiosError) => console.error(error))
+			.catch((error: AxiosError) => {
+                console.error(error);
+                setIsLastPage(true);
+            })
 			.finally(() => setLoading(false));
-    }, [params.pageNumber, pageSize, params.institution, params.searchText]); 
+    }, [params.pageNumber, pageSize, params.institution, params.searchText, params.searchSubmit]); 
 
     React.useEffect(() => handleFetch(), [params.pageNumber, pageSize, params.institution]);
 

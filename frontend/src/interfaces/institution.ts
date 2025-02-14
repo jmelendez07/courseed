@@ -1,5 +1,5 @@
 interface InstitutionInterface {
-    id: string;
+    id: string | null;
     name: string;
 }
 
