@@ -60,7 +60,7 @@ function ReviewLarge({ review, handleEdit, handleDelete }: ReviewComponentProps)
                   />
                 ))}
               </div>
-              <p className="text-sm text-gray-600 mb-2 line-clamp-2">{review.comment}</p>
+              <p className="text-sm text-gray-600 mb-2 line-clamp-2">{review.content}</p>
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>

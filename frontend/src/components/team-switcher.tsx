@@ -1,13 +1,11 @@
 import * as React from "react"
-import { ChevronsUpDown, GalleryVerticalEnd, Plus } from "lucide-react"
+import { ChevronRight, ChevronsUpDown, GalleryVerticalEnd } from "lucide-react"
 
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import {
@@ -22,8 +20,8 @@ export function TeamSwitcher({
 }: {
   teams: {
     name: string
-    logo: React.ElementType
-    plan: string
+    logo: React.ElementType,
+    action?: () => void
   }[]
 }) {
   const { isMobile } = useSidebar()
@@ -58,25 +56,23 @@ export function TeamSwitcher({
             <DropdownMenuLabel className="text-xs text-zinc-500 dark:text-zinc-400">
               Acciones Rapidas
             </DropdownMenuLabel>
-            {teams.map((team, index) => (
+            {teams.map((team, _) => (
               <DropdownMenuItem
                 key={team.name}
-                className="gap-2 p-2"
+                onClick={() => {
+                  if(team.action) team.action()
+                }}
+                className="gap-2 p-2 flex justify-between"
               >
-                <div className="flex size-6 items-center justify-center rounded-sm border">
-                  <team.logo className="size-4 shrink-0" />
+                <div className="flex gap-2">
+                  <div className="flex size-6 items-center justify-center rounded-sm border">
+                    <team.logo className="size-4 shrink-0" />
+                  </div>
+                  {team.name}
                 </div>
-                {team.name}
-                <DropdownMenuShortcut>⌘{index + 1}</DropdownMenuShortcut>
+                <ChevronRight />
               </DropdownMenuItem>
             ))}
-            <DropdownMenuSeparator />
-            <DropdownMenuItem className="gap-2 p-2">
-              <div className="flex size-6 items-center justify-center rounded-md border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-950">
-                <Plus className="size-4" />
-              </div>
-              <div className="font-medium text-zinc-500 dark:text-zinc-400">Add team</div>
-            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </SidebarMenuItem>

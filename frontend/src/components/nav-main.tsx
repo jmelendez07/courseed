@@ -27,7 +27,8 @@ export function NavMain({
     icon?: LucideIcon
     items?: {
       title: string
-      url: string
+      url?: string
+      action?: () => void
     }[]
   }[]
 }) {
@@ -57,10 +58,19 @@ export function NavMain({
                 <SidebarMenuSub>
                   {item.items?.map((subItem) => (
                     <SidebarMenuSubItem key={subItem.title}>
-                      <SidebarMenuSubButton asChild>
-                        <Link to={subItem.url}>
-                          <span>{subItem.title}</span>
-                        </Link>
+                      <SidebarMenuSubButton 
+                        onClick={() => {
+                          if (subItem.action) subItem.action()
+                        }}
+                        asChild
+                      >
+                        {(subItem.action || !subItem.url) ? (
+                          <span className="cursor-pointer">{subItem.title}</span>
+                        ) : (
+                          <Link to={subItem.url}>
+                            <span>{subItem.title}</span>
+                          </Link>
+                        )}
                       </SidebarMenuSubButton>
                     </SidebarMenuSubItem>
                   ))}
