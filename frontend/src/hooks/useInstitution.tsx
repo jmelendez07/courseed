@@ -3,17 +3,21 @@ import React from "react";
 import APIS from "@/enums/apis";
 import axios, { AxiosError, AxiosResponse } from "axios";
 
+interface UseInstitutionProps {
+	size?: number
+}
+
 interface ResponseInstitutionProps {
 	content: InstitutionInterface[];
 	last: boolean;
 }
 
-function useInstitution() {
+function useInstitution({ size }: UseInstitutionProps) {
 	const [institutions, setInstitutions] = React.useState<InstitutionInterface[]>([]);
-	const [loading, setLoading] = React.useState(false);
+	const [loading, setLoading] = React.useState<boolean>(false);
 	const [selected, setSelected] = React.useState<InstitutionInterface | null>(null);
 	const [isLastPage, setIsLastPage] = React.useState<boolean>(false);
-	const pageSize: number = 10;
+	const pageSize: number = size ?? 10;
 	const [pageNumber, setPageNumber] = React.useState<number>(0);
 
 	React.useEffect(() => {
@@ -25,14 +29,9 @@ function useInstitution() {
 			}
 		})
 			.then((response: AxiosResponse<ResponseInstitutionProps>) => {
-				setInstitutions(currentInstitutions => pageNumber === 0 
-					? response.data.content	
-					: [
-						{
-							id: null,
-							name: "Todas las Instituciones"
-						},
-						...currentInstitutions,
+				setInstitutions(currentInstitutions => 
+					[
+						...pageNumber > 0 ? currentInstitutions: [],
 						...response.data.content
 					]
 				);

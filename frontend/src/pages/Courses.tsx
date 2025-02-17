@@ -1,6 +1,20 @@
+import { BlogCourses } from "@/components/ui/blog-courses";
+import { Footer } from "@/components/ui/footer";
+import { Navbar } from "@/components/ui/navbar";
+import HeadProvider from "@/providers/HeadProvider";
+
 function Courses() {
     return (
-        <h1>Courses</h1>
+        <>
+            <HeadProvider title="Courseed | Educación Continuada" />
+            <Navbar />
+            <BlogCourses
+                tagline="Cursos, Diplomados y Talleres"
+                heading="Educación Continuada"
+                description="Explora nuestra amplia gama de cursos y diplomados para seguir aprendiendo y creciendo profesionalmente."
+            />
+            <Footer />
+        </>
     );
 }
 

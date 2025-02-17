@@ -10,7 +10,7 @@ import Profile from "@/pages/auth/Profile";
 import DashboardAdmin from "@/pages/auth/admin/Dashboard";
 import Users from "@/pages/auth/admin/users/Users";
 import CoursesAdmin from "@/pages/auth/admin/courses/Courses";
-import ReviewsAdmin from "@/pages/auth/admin/Reviews";
+import ReviewsAdmin from "@/pages/auth/admin/reviews/Reviews";
 import DashboardUser from "@/pages/auth/user/Dashboard";
 import Likes from "@/pages/auth/user/Likes";
 import ReviewsUser from "@/pages/auth/user/Reviews";
@@ -41,6 +41,10 @@ function Routes() {
         {
             path: '/curso/:id',
             element: <Course />
+        },
+        {
+            path: '/404',
+            element: <Page404 />
         }
     ];
 
@@ -64,7 +68,7 @@ function Routes() {
     const routesForAdmin = [
         {
             path: '/administrador',
-            // element: <ProtectedAdminRoute />,
+            element: <ProtectedAdminRoute />,
             children: [
                 {
                     path: '',

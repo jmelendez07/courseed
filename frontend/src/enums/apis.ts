@@ -7,7 +7,8 @@ enum APIS {
     COURSES_SEARCH = 'api/courses/search',
     COURSES_BY_INSTITUTION = 'api/courses/institution',
     INSTITUTIONS = 'api/institutions',
-    REVIEWS = 'api/reviews'
+    REVIEWS = 'api/reviews',
+    FACULTIES = 'api/categories'
 }
 
 export default APIS;

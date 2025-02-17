@@ -19,7 +19,7 @@ import {
 	SidebarProvider,
 	SidebarTrigger,
 } from "@/components/ui/sidebar";
-import useCourse from "@/hooks/useCourse";
+import useCourses from "@/hooks/useCourses";
 import useInstitution from "@/hooks/useInstitution";
 import DialogProvider from "@/providers/DialogProvider";
 
@@ -30,8 +30,8 @@ import { Link } from "react-router-dom";
 
 function Courses() {
 
-	const course = useCourse();
-	const institution = useInstitution();
+	const course = useCourses();
+	const institution = useInstitution({});
 
 	return (
 		<SidebarProvider>
@@ -104,7 +104,8 @@ function Courses() {
 								</Button>
 							</form>
 							<ComboBoxResponsive
-								placeholder="Buscar Instituciones..."
+								placeholder="Filtrar por Institución..."
+								labelAll="Todas las instituciones"
 								statuses={institution.institutions}
 								selectedStatus={course.params.institution}
 								setSelectedStatus={i => {

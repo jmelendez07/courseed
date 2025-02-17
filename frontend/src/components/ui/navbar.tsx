@@ -23,6 +23,8 @@ import {
     SheetTrigger,
 } from "@/components/ui/sheet";
 import { Link } from "react-router-dom";
+import useInstitution from "@/hooks/useInstitution";
+import useFaculty from "@/hooks/useFaculty";
 
 interface MenuItem {
     title: string;
@@ -40,10 +42,6 @@ interface NavbarProps {
         title: string;
     };
     menu?: MenuItem[];
-    mobileExtraLinks?: {
-        name: string;
-        url: string;
-    }[];
     auth?: {
         login: {
             text: string;
@@ -58,15 +56,15 @@ interface NavbarProps {
 
 const Navbar = ({
     logo = {
-        url: "https://www.shadcnblocks.com",
-        src: "https://www.shadcnblocks.com/images/block/block-1.svg",
-        alt: "logo",
+        url: "/",
+        src: "/logo.png",
+        alt: "Courseed",
         title: "Courseed",
     },
     menu = [
-        { title: "Home", url: "#" },
+        { title: "Educacion continuada", url: "/cursos" },
         {
-            title: "Products",
+            title: "Instituciones",
             url: "#",
             items: [
                 {
@@ -97,7 +95,7 @@ const Navbar = ({
             ],
         },
         {
-            title: "Resources",
+            title: "Facultades",
             url: "#",
             items: [
                 {
@@ -135,26 +133,26 @@ const Navbar = ({
             url: "#",
         },
     ],
-    mobileExtraLinks = [
-        { name: "Press", url: "#" },
-        { name: "Contact", url: "#" },
-        { name: "Imprint", url: "#" },
-        { name: "Sitemap", url: "#" },
-    ],
     auth = {
         login: { text: "Acceder", url: "/acceso" },
         signup: { text: "Registrarse", url: "/registro" },
     },
 }: NavbarProps) => {
+
+    const institutionHook = useInstitution({ size:7 });
+    const facultyHook = useFaculty({ size: 7 });
+
+    console.log(facultyHook);
+
     return (
         <section className="py-4 flex justify-center">
-            <div className="container px-4 md:px-0">
+            <div className="container px-4 md:px-8 xl:px-12 2xl:px-16">
                 <nav className="hidden justify-between lg:flex">
                     <div className="flex items-center gap-6">
-                        <a href={logo.url} className="flex items-center gap-2">
+                        <Link to={logo.url} className="flex items-center gap-2">
                             <img src={logo.src} className="w-8" alt={logo.alt} />
                             <span className="text-lg font-semibold">{logo.title}</span>
-                        </a>
+                        </Link>
                         <div className="flex items-center">
                             <NavigationMenu>
                                 <NavigationMenuList>
@@ -184,10 +182,10 @@ const Navbar = ({
                 </nav>
                 <div className="block lg:hidden">
                     <div className="flex items-center justify-between">
-                        <a href={logo.url} className="flex items-center gap-2">
+                        <Link to={logo.url} className="flex items-center gap-2">
                             <img src={logo.src} className="w-8" alt={logo.alt} />
                             <span className="text-lg font-semibold">{logo.title}</span>
-                        </a>
+                        </Link>
                         <Sheet>
                             <SheetTrigger asChild>
                                 <Button variant="outline" size="icon">
@@ -213,25 +211,18 @@ const Navbar = ({
                                     >
                                         {menu.map((item) => renderMobileMenuItem(item))}
                                     </Accordion>
-                                    <div className="border-t py-4">
-                                        <div className="grid grid-cols-2 justify-start">
-                                            {mobileExtraLinks.map((link, idx) => (
-                                                <a
-                                                    key={idx}
-                                                    className="inline-flex h-10 items-center gap-2 whitespace-nowrap rounded-md px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-accent-foreground"
-                                                    href={link.url}
-                                                >
-                                                    {link.name}
-                                                </a>
-                                            ))}
-                                        </div>
-                                    </div>
-                                    <div className="flex flex-col gap-3">
+                                    <div className="flex flex-col gap-3 border-t py-4">
                                         <Button asChild variant="outline">
-                                            <a href={auth.login.url}>{auth.login.text}</a>
+                                            <Link to={auth.login.url}>
+                                                {auth.login.text}
+                                                <LogIn />
+                                            </Link>
                                         </Button>
                                         <Button asChild>
-                                            <a href={auth.signup.url}>{auth.signup.text}</a>
+                                            <Link to={auth.signup.url}>
+                                                {auth.signup.text}
+                                                <UserPlus />
+                                            </Link>
                                         </Button>
                                     </div>
                                 </div>
@@ -254,9 +245,9 @@ const renderMenuItem = (item: MenuItem) => {
                         <NavigationMenuLink>
                             {item.items.map((subItem) => (
                                 <li key={subItem.title}>
-                                    <a
+                                    <Link
                                         className="flex select-none gap-4 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-muted hover:text-accent-foreground"
-                                        href={subItem.url}
+                                        to={subItem.url}
                                     >
                                         {subItem.icon}
                                         <div>
@@ -269,7 +260,7 @@ const renderMenuItem = (item: MenuItem) => {
                                                 </p>
                                             )}
                                         </div>
-                                    </a>
+                                    </Link>
                                 </li>
                             ))}
                         </NavigationMenuLink>
@@ -280,13 +271,13 @@ const renderMenuItem = (item: MenuItem) => {
     }
 
     return (
-        <a
+        <Link
             key={item.title}
             className="group inline-flex h-10 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-accent-foreground"
-            href={item.url}
+            to={item.url}
         >
             {item.title}
-        </a>
+        </Link>
     );
 };
 
@@ -299,10 +290,10 @@ const renderMobileMenuItem = (item: MenuItem) => {
                 </AccordionTrigger>
                 <AccordionContent className="mt-2">
                     {item.items.map((subItem) => (
-                        <a
+                        <Link
                             key={subItem.title}
                             className="flex select-none gap-4 rounded-md p-3 leading-none outline-none transition-colors hover:bg-muted hover:text-accent-foreground"
-                            href={subItem.url}
+                            to={subItem.url}
                         >
                             {subItem.icon}
                             <div>
@@ -313,7 +304,7 @@ const renderMobileMenuItem = (item: MenuItem) => {
                                     </p>
                                 )}
                             </div>
-                        </a>
+                        </Link>
                     ))}
                 </AccordionContent>
             </AccordionItem>
@@ -321,9 +312,9 @@ const renderMobileMenuItem = (item: MenuItem) => {
     }
 
     return (
-        <a key={item.title} href={item.url} className="font-semibold">
+        <Link key={item.title} to={item.url} className="font-semibold">
             {item.title}
-        </a>
+        </Link>
     );
 };
 

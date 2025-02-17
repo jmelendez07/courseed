@@ -1,6 +1,6 @@
 interface InstitutionInterface {
-    id: string | null;
-    name: string;
+    id: string | null | undefined;
+    name: string | undefined;
 }
 
 export default InstitutionInterface;

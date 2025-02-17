@@ -29,7 +29,7 @@ import { Link } from "react-router-dom";
 function Reviews() {
 
 	const review = useReview();
-	const user = useUser();
+	const user = useUser({});
 
 	return (
 		<SidebarProvider>
@@ -105,13 +105,17 @@ function Reviews() {
 								</Button>
 							</form>
 							<ComboBoxResponsive
-								placeholder="Buscar Instituciones..."
+								placeholder="Filtrar por Usuario..."
+								labelAll="Todos los usuarios"
 								statuses={user.users.map(u => { return { id: u.id, name: u.email } })}
-								selectedStatus={{id: review.params.user?.id, name: review.params.user?.email}}
+								selectedStatus={ review.params.user 
+									? {id: review.params.user.id, name: review.params.user.email}
+									: null
+								}
 								setSelectedStatus={u => {
 									review.setParams({
 										...review.params,
-										user: { id: u?.id, email: u?.name },
+										user: { id: u?.id, email: u?.name ? u.name : '' },
 										pageNumber: 0
 									});
 								}}

@@ -40,17 +40,16 @@ function AuthProvider({ children }: ChildrenProps) {
         try {
             const res = await axios.get(APIS.USER_AUTHENTICATED);
             setUser(typeof res.data === "object" ? res.data : null);
-            return res.data;
         } catch (error) {
             console.error(error);
-            return null;
         }
     }
 
     React.useEffect(() => {
         if (token) {
-            axios.defaults.headers.common['Authorization'] = "" + token;
+            axios.defaults.headers.common['Authorization'] = `${TOKEN.PREFIX} ${token}`;
             localStorage.setItem('token', token);
+            handleUser();
             setTimeout(() => setLoading(false), 300);
         } else {
             delete axios.defaults.headers.common['Authorization'];

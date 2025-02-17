@@ -1,6 +1,8 @@
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { GraduationCap, LucideProps } from "lucide-react";
+import { Link } from "react-router-dom";
 
 interface Testimonial {
     quote: string;
@@ -18,6 +20,7 @@ interface HeroProps {
     description?: string;
     button?: {
         text: string;
+        icon: React.ForwardRefExoticComponent<Omit<LucideProps, "ref"> & React.RefAttributes<SVGSVGElement>>
         url: string;
     };
     testimonial?: Testimonial;
@@ -30,11 +33,12 @@ interface HeroProps {
 }
 
 const Hero = ({
-    heading = "Blocks built with Shadcn & Tailwind",
-    description = "Finely crafted components built with React, Tailwind and Shadcn UI. Developers can copy and paste these blocks directly into their project.",
+    heading = "Tu educación continuada en un solo lugar.",
+    description = "¡Bienvenido a CourSeed! Navega entre cursos, talleres y diplomados. Lleva tu educación al siguiente nivel.",
     button = {
-        text: "Get Started",
-        url: "#",
+        text: "Explorar Educación",
+        icon: GraduationCap,
+        url: "/cursos",
     },
     testimonial = {
         quote: "Focused strategy, swift delivery",
@@ -56,7 +60,7 @@ const Hero = ({
 }: HeroProps) => {
     return (
         <section className="py-12 md:py-20 flex justify-center">
-            <div className="container px-4 md:px-0">
+            <div className="container px-4 md:px-8 xl:px-12 2xl:px-16">
                 <div className="flex flex-col items-center gap-8 md:flex-row">
                     <div className="flex-1">
                         <div className="flex flex-col gap-4 lg:gap-8">
@@ -69,7 +73,7 @@ const Hero = ({
                         </div>
                         <div className="my-6 lg:my-10">
                             <Button asChild size="lg">
-                                <a href={button.url}>{button.text}</a>
+                                <Link to={button.url}>{button.text}<button.icon /></Link>
                             </Button>
                         </div>
                         <div className="flex flex-wrap items-center gap-3">

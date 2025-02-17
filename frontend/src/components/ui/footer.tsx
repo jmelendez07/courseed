@@ -76,8 +76,8 @@ const Footer = ({
     ],
 }: FooterProps) => {
     return (
-        <section className="py-32 flex justify-center">
-            <div className="container px-4 md:px-0">
+        <section className="py-12 flex justify-center">
+            <div className="container px-4 md:px-8 xl:px-12 2xl:px-16">
                 <footer>
                     <div className="grid grid-cols-2 gap-8 lg:grid-cols-6">
                         <div className="col-span-2 mb-8 lg:mb-0">

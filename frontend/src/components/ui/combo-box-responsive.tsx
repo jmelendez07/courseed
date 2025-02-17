@@ -34,6 +34,7 @@ interface ComboBoxResponsiveProps {
     setSelectedStatus: (status: Status | null) => void;
     pagination: boolean;
     onPaginate: () => void;
+    labelAll: string | null;
 }
 
 function ComboBoxResponsive({ 
@@ -42,7 +43,8 @@ function ComboBoxResponsive({
     setSelectedStatus,
     selectedStatus,
     pagination,
-    onPaginate
+    onPaginate,
+    labelAll
 }: ComboBoxResponsiveProps) {
     const [isOpen, setIsOpen] = React.useState<boolean>(false);
     const isDesktop = useMediaQuery("(min-width: 768px)");
@@ -62,7 +64,8 @@ function ComboBoxResponsive({
                         statuses={statuses} 
                         onPaginate={onPaginate}
                         setOpen={setIsOpen} 
-                        setSelectedStatus={setSelectedStatus} 
+                        setSelectedStatus={setSelectedStatus}
+                        labelAll={labelAll}
                     />
                 </PopoverContent>
             </Popover>
@@ -85,6 +88,7 @@ function ComboBoxResponsive({
                         onPaginate={onPaginate}
                         setOpen={setIsOpen} 
                         setSelectedStatus={setSelectedStatus}
+                        labelAll={labelAll}
                      />
                 </div>
             </DrawerContent>
@@ -92,12 +96,13 @@ function ComboBoxResponsive({
     );
 }
 
-function StatusList({setOpen, setSelectedStatus, statuses, pagination, onPaginate}: {
+function StatusList({setOpen, setSelectedStatus, statuses, pagination, onPaginate, labelAll}: {
     setOpen: (open: boolean) => void
     setSelectedStatus: (status: Status | null) => void
     statuses: Status[]
     pagination: boolean,
-    onPaginate: () => void
+    onPaginate: () => void,
+    labelAll: string | null
 }) {
     return (
         <Command>
@@ -105,6 +110,18 @@ function StatusList({setOpen, setSelectedStatus, statuses, pagination, onPaginat
                 <CommandList>
                 <CommandEmpty>No se encontraron resultados.</CommandEmpty>
                 <CommandGroup>
+                    {labelAll && (
+                        <CommandItem
+                            key={labelAll}
+                            value={labelAll}
+                            onSelect={() => {
+                                setSelectedStatus(null);
+                                setOpen(false);
+                            }}
+                        >
+                            {labelAll}
+                        </CommandItem>
+                    )}
                     {statuses.map((status) => (
                         <CommandItem
                             key={status.id}

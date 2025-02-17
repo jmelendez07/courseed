@@ -8,8 +8,12 @@ interface ResponseUserProps {
 	last: boolean;
 }
 
-function useUser() {
-    const pageSize: number = 10;
+interface useUserProps {
+	replaceUsers?: boolean;
+}
+
+function useUser({ replaceUsers = false }: useUserProps) {
+    const pageSize: number = 2;
     const [users, setUsers] = React.useState<UserInterface[]>([]);
     const [loading, setLoading] = React.useState<boolean>(false);
     const [isLastPage, setIsLastPage] = React.useState<boolean>(false);
@@ -24,14 +28,9 @@ function useUser() {
 			}
 		})
 			.then((response: AxiosResponse<ResponseUserProps>) => {
-				setUsers(currentUsers => pageNumber === 0 
-					? response.data.content
-					: [
-						{
-							id: null,
-							email: "Todas los usuarios"
-						},
-						...currentUsers,
+				setUsers(currentUsers => 
+					[
+						...(!replaceUsers && pageNumber > 0) ? currentUsers : [],
 						...response.data.content
 					]
 				);

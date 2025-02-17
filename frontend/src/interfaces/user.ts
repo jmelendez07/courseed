@@ -1,6 +1,6 @@
 interface UserInterface {
     id: string | null | undefined,
-    email: string | undefined,
+    email: string,
     createdAt?: string,
     updatedAt?: string
 }
