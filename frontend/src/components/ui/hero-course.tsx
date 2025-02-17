@@ -1,61 +1,61 @@
-import { ArrowUpRight, MessageSquareText, Star } from "lucide-react";
+import { ArrowUpRight, BookMarked, CalendarClock, Check, DollarSign, Landmark, MessageSquareText, SquareStack, Star } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button, buttonVariants } from "@/components/ui/button";
-import ReviewInterface from "@/interfaces/review";
 import { cn } from "@/lib/utils";
+import CourseInterface from "@/interfaces/course";
 
 interface HeroCourseProps {
-    url?: string;
-    image?: string;
-    heading?: string;
-    description?: string;
-    buttons?: {
-        primary: {
-            text: string;
-            url: string;
-        };
-        secondary?: {
-            text: string;
-            url: string;
-        };
-    };
-    reviews?: ReviewInterface[];
+    course: CourseInterface;
     handlePrimaryButton?: () => void;
-    duration?: string,
-    price?: number,
-    modality?: string
 }
 
-const HeroCourse = ({
-    url,
-    image,
-    heading,
-    description,
-    reviews,
-    handlePrimaryButton,
-    duration,
-    price,
-    modality
-}: HeroCourseProps) => {
+const HeroCourse = ({ course, handlePrimaryButton }: HeroCourseProps) => {
 
     function getAverageRating(): number {
-        if (!reviews) return 0;
-        const totalRating = reviews.reduce((sum, review) => sum + review.rating, 0);
-        return reviews.length > 0 ? totalRating / reviews.length : 0;
+        if (!course.reviews) return 0;
+        const totalRating = course.reviews.reduce((sum, review) => sum + review.rating, 0);
+        return course.reviews.length > 0 ? totalRating / course.reviews.length : 0;
     }
+
+    const getFormatPrice = (): string => {
+
+		if (course.price === 0) return "Gratuito";
+
+		return course.price
+			? course.price.toLocaleString('es-CO', {
+				style: 'currency',
+				currency: 'COP',
+				minimumFractionDigits: 2,
+				maximumFractionDigits: 2
+			}) + " COP"
+			: "Sin información";
+	}
 
     const options = [
         {
+            "icon": Landmark,
+            "name": "Institución",
+            "value": course.institution.name
+        },
+        {
+            "icon": SquareStack,
+            "name": "Facultad",
+            "value": course.category.name
+        },
+        {
+            "icon": CalendarClock,
             "name": "Duración",
-            "value": duration
+            "value": course.duration
         },
         {
+            "icon": BookMarked,
             "name": "Modalidad",
-            "value": modality
+            "value": course.modality
         },
         {
+            "icon": DollarSign,
             "name": "Precio",
-            "value": price
+            "value": getFormatPrice()
         }
     ];
 
@@ -64,17 +64,17 @@ const HeroCourse = ({
             <div className="container grid items-start px-4 md:px-8 xl:px-12 2xl:px-16 gap-10 lg:grid-cols-2 lg:gap-20">
                 <div
                     className="mx-auto flex flex-col items-center text-center md:ml-auto lg:max-w-3xl 
-                    lg:items-start lg:text-left top-0 h-fit md:sticky"
+                    lg:items-start lg:text-left top-0 h-fit lg:sticky"
                 >
                     <h1 className="my-6 text-pretty text-4xl font-bold lg:text-6xl xl:text-7xl">
-                        {heading}
+                        {course.title}
                     </h1>
                     <p className="mb-8 max-w-xl text-muted-foreground lg:text-xl text-justify line-clamp-3">
-                        {description}
+                        {course.description}
                     </p>
                     <div className="mb-12 flex w-fit flex-col items-center gap-4 sm:flex-row">
                         <span className="inline-flex items-center -space-x-4">
-                            {reviews && reviews.map((review, index) => (
+                            {course.reviews && course.reviews.map((review, index) => (
                                 <Avatar key={index} className="size-12 border">
                                     <AvatarFallback className="rounded-lg">{review.user.email.slice(0, 2).toUpperCase()}</AvatarFallback>
                                 </Avatar>
@@ -93,8 +93,8 @@ const HeroCourse = ({
                                 ))}
                             </div>
                             <p className="text-left font-medium text-muted-foreground">
-                                {(reviews && reviews.length > 0) ? (
-                                    <>{reviews.length} Reseñas de Usuarios</>
+                                {(course.reviews && course.reviews.length > 0) ? (
+                                    <>{course.reviews.length} Reseñas de Usuarios</>
                                 ) : (
                                     <>Aun no hay reseñas</>
                                 )}
@@ -110,7 +110,7 @@ const HeroCourse = ({
                         </Button>
                         <Button asChild variant="outline" className="w-full sm:w-auto">
                             <a
-                                href={url}
+                                href={course.url}
                                 target="_blank"
                             >
                                 Visitar Sitio Oficial
@@ -122,12 +122,12 @@ const HeroCourse = ({
                 <div className="flex flex-col gap-12 md:gap-20">
                     <div className="flex bg-muted">
                         <img
-                            src={image}
-                            alt={heading}
+                            src={course.image}
+                            alt={course.title}
                             className="min-h-[350px] max-h-[600px] w-full rounded-md object-cover lg:h-[600px] lg:max-h-[800px]"
                         />
                     </div>
-                    <section className="py-12">
+                    <section className="pt-12">
                         <div className="text-center lg:text-left">
                             <h1 className="text-left text-3xl font-medium md:text-4xl">
                                 Caracteristicas
@@ -138,8 +138,9 @@ const HeroCourse = ({
                                 <div
                                     className="flex items-center justify-between border-b py-6"
                                 >
-                                    <p className="font-semibold">
-                                        {option.name}
+                                    <p className="font-semibold inline-flex gap-2">
+                                        <option.icon className="min-w-6" />
+                                        {option.value}
                                     </p>
                                     <div
                                         className={cn(
@@ -147,12 +148,27 @@ const HeroCourse = ({
                                                 variant: "outline",
                                                 size: "sm",
                                             }),
-                                            "pointer-events-none rounded-full",
+                                            "pointer-events-none rounded-full text-wrap",
                                         )}
                                     >
-                                        {option.value}
+                                        {option.name}
                                     </div>
                                 </div>
+                            ))}
+                        </div>
+                    </section>
+                    <section className="py-12">
+                        <div className="text-center lg:text-left">
+                            <h1 className="text-left text-3xl font-medium md:text-4xl">
+                                Contenidos
+                            </h1>
+                        </div>
+                        <div className="mx-auto flex flex-col">
+                            {course.contents.slice(0, 4).map((content, _) => (
+                                <p className="pt-6 text-muted-foreground lg:text-xl inline-flex">
+                                    <Check className="size-5 min-w-5 min-h-5 mr-1 mt-1" />
+                                    <span className="line-clamp-3">{content.description}</span>
+                                </p>
                             ))}
                         </div>
                     </section>

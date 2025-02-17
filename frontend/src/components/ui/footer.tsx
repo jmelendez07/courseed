@@ -24,10 +24,10 @@ interface FooterProps {
 
 const Footer = ({
     logo = {
-        src: "https://www.shadcnblocks.com/images/block/block-1.svg",
-        alt: "blocks for shadcn/ui",
+        src: "/logo.png",
+        alt: "Courseed",
         title: "Courseed",
-        url: "https://www.shadcnblocks.com",
+        url: "/",
     },
     tagline = "Components made easy.",
     menuItems = [

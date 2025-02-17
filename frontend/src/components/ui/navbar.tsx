@@ -1,4 +1,4 @@
-import { Book, LogIn, Menu, Sunset, Trees, UserPlus, Zap } from "lucide-react";
+import { ArrowUpRight, LogIn, Menu, UserPlus } from "lucide-react";
 
 import {
     Accordion,
@@ -25,13 +25,15 @@ import {
 import { Link } from "react-router-dom";
 import useInstitution from "@/hooks/useInstitution";
 import useFaculty from "@/hooks/useFaculty";
+import InstitutionInterface from "@/interfaces/institution";
+import CategoryInterface from "@/interfaces/category";
 
 interface MenuItem {
     title: string;
     url: string;
+    items?: InstitutionInterface[] | CategoryInterface[];
     description?: string;
     icon?: JSX.Element;
-    items?: MenuItem[];
 }
 
 interface NavbarProps {
@@ -41,7 +43,6 @@ interface NavbarProps {
         alt: string;
         title: string;
     };
-    menu?: MenuItem[];
     auth?: {
         login: {
             text: string;
@@ -61,88 +62,36 @@ const Navbar = ({
         alt: "Courseed",
         title: "Courseed",
     },
-    menu = [
-        { title: "Educacion continuada", url: "/cursos" },
-        {
-            title: "Instituciones",
-            url: "#",
-            items: [
-                {
-                    title: "Blog",
-                    description: "The latest industry news, updates, and info",
-                    icon: <Book className="size-5 shrink-0" />,
-                    url: "#",
-                },
-                {
-                    title: "Company",
-                    description: "Our mission is to innovate and empower the world",
-                    icon: <Trees className="size-5 shrink-0" />,
-                    url: "#",
-                },
-                {
-                    title: "Careers",
-                    description: "Browse job listing and discover our workspace",
-                    icon: <Sunset className="size-5 shrink-0" />,
-                    url: "#",
-                },
-                {
-                    title: "Support",
-                    description:
-                        "Get in touch with our support team or visit our community forums",
-                    icon: <Zap className="size-5 shrink-0" />,
-                    url: "#",
-                },
-            ],
-        },
-        {
-            title: "Facultades",
-            url: "#",
-            items: [
-                {
-                    title: "Help Center",
-                    description: "Get all the answers you need right here",
-                    icon: <Zap className="size-5 shrink-0" />,
-                    url: "#",
-                },
-                {
-                    title: "Contact Us",
-                    description: "We are here to help you with any questions you have",
-                    icon: <Sunset className="size-5 shrink-0" />,
-                    url: "#",
-                },
-                {
-                    title: "Status",
-                    description: "Check the current status of our services and APIs",
-                    icon: <Trees className="size-5 shrink-0" />,
-                    url: "#",
-                },
-                {
-                    title: "Terms of Service",
-                    description: "Our terms and conditions for using our services",
-                    icon: <Book className="size-5 shrink-0" />,
-                    url: "#",
-                },
-            ],
-        },
-        {
-            title: "Pricing",
-            url: "#",
-        },
-        {
-            title: "Blog",
-            url: "#",
-        },
-    ],
     auth = {
         login: { text: "Acceder", url: "/acceso" },
         signup: { text: "Registrarse", url: "/registro" },
     },
 }: NavbarProps) => {
 
-    const institutionHook = useInstitution({ size:7 });
+    const institutionHook = useInstitution({ size: 7 });
     const facultyHook = useFaculty({ size: 7 });
 
-    console.log(facultyHook);
+    const menu: MenuItem[] = [
+        { title: "Educacion continuada", url: "/cursos" },
+        {
+            title: "Instituciones",
+            url: "#",
+            items: institutionHook.institutions
+        },
+        {
+            title: "Facultades",
+            url: "#",
+            items: facultyHook.faculties
+        },
+        // {
+        //     title: "Pricing",
+        //     url: "#",
+        // },
+        // {
+        //     title: "Blog",
+        //     url: "#",
+        // },
+    ];
 
     return (
         <section className="py-4 flex justify-center">
@@ -243,22 +192,17 @@ const renderMenuItem = (item: MenuItem) => {
                 <NavigationMenuContent>
                     <ul className="w-80 p-3">
                         <NavigationMenuLink>
-                            {item.items.map((subItem) => (
-                                <li key={subItem.title}>
+                            {item.items.map((subItem, _) => (
+                                <li key={subItem.id}>
                                     <Link
-                                        className="flex select-none gap-4 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-muted hover:text-accent-foreground"
-                                        to={subItem.url}
+                                        className="flex select-none gap-4 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-muted hover:text-accent-foreground group"
+                                        to={`cursos/?prop=${subItem.id}`}
                                     >
-                                        {subItem.icon}
+                                        <ArrowUpRight className="w-5 min-w-5 transition-transform group-hover:translate-x-1" />
                                         <div>
-                                            <div className="text-sm font-semibold">
-                                                {subItem.title}
-                                            </div>
-                                            {subItem.description && (
-                                                <p className="text-sm leading-snug text-muted-foreground">
-                                                    {subItem.description}
-                                                </p>
-                                            )}
+                                            <p className="text-sm leading-snug text-muted-foreground">
+                                                {subItem.name}
+                                            </p>
                                         </div>
                                     </Link>
                                 </li>
@@ -289,20 +233,17 @@ const renderMobileMenuItem = (item: MenuItem) => {
                     {item.title}
                 </AccordionTrigger>
                 <AccordionContent className="mt-2">
-                    {item.items.map((subItem) => (
+                    {item.items.map((subItem, _) => (
                         <Link
-                            key={subItem.title}
-                            className="flex select-none gap-4 rounded-md p-3 leading-none outline-none transition-colors hover:bg-muted hover:text-accent-foreground"
-                            to={subItem.url}
+                            key={subItem.id}
+                            className="flex select-none gap-4 rounded-md p-3 leading-none outline-none transition-colors hover:bg-muted hover:text-accent-foreground group"
+                            to={`cursos/?prop=${subItem.id}`}
                         >
-                            {subItem.icon}
+                            <ArrowUpRight className="w-5 min-w-5 transition-transform group-hover:translate-x-1" />
                             <div>
-                                <div className="text-sm font-semibold">{subItem.title}</div>
-                                {subItem.description && (
-                                    <p className="text-sm leading-snug text-muted-foreground">
-                                        {subItem.description}
-                                    </p>
-                                )}
+                                <p className="text-sm leading-snug text-muted-foreground">
+                                    {subItem.name}
+                                </p>
                             </div>
                         </Link>
                     ))}

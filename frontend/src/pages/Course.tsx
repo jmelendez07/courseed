@@ -24,19 +24,14 @@ function Course() {
         <>
             <HeadProvider title={`Courseed ${courseHook.course && '| ' + courseHook.course.title}`} />
             <Navbar />
-            <HeroCourse 
-                url={courseHook.course?.url}
-                heading={courseHook.course?.title} 
-                description={courseHook.course?.description}  
-                reviews={courseHook.course?.reviews}
-                handlePrimaryButton={() => {
-                    if (BlogReviewsRef.current) BlogReviewsRef.current.scrollIntoView({ behavior: 'smooth' });
-                }}
-                image={courseHook.course?.image}
-                duration={courseHook.course?.duration}
-                modality={courseHook.course?.modality}
-                price={courseHook.course?.price}
-            />
+            {courseHook.course && (
+                <HeroCourse 
+                    course={courseHook.course}
+                    handlePrimaryButton={() => {
+                        if (BlogReviewsRef.current) BlogReviewsRef.current.scrollIntoView({ behavior: 'smooth' });
+                    }}
+                />
+            )}
             <BlogReviews
                 ref={BlogReviewsRef}
                 reviews={courseHook.course?.reviews ? courseHook.course.reviews : []}
