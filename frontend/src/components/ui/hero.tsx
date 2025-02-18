@@ -1,19 +1,10 @@
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import useCourses from "@/hooks/useCourses";
+import useInstitution from "@/hooks/useInstitution";
 import { GraduationCap, LucideProps } from "lucide-react";
 import { Link } from "react-router-dom";
-
-interface Testimonial {
-    quote: string;
-    author: string;
-    role: string;
-    company: string;
-    avatars: Array<{
-        image: string;
-        fallback: string;
-    }>;
-}
 
 interface HeroProps {
     heading?: string;
@@ -22,13 +13,6 @@ interface HeroProps {
         text: string;
         icon: React.ForwardRefExoticComponent<Omit<LucideProps, "ref"> & React.RefAttributes<SVGSVGElement>>
         url: string;
-    };
-    testimonial?: Testimonial;
-    images?: {
-        first: string;
-        second: string;
-        third: string;
-        fourth: string;
     };
 }
 
@@ -40,24 +24,11 @@ const Hero = ({
         icon: GraduationCap,
         url: "/cursos",
     },
-    testimonial = {
-        quote: "Focused strategy, swift delivery",
-        author: "John Doe",
-        role: "CEO",
-        company: "Company",
-        avatars: [
-            { image: "https://shadcnblocks.com/images/block/avatar-1.webp", fallback: "AB" },
-            { image: "https://shadcnblocks.com/images/block/avatar-2.webp", fallback: "CD" },
-            { image: "https://shadcnblocks.com/images/block/avatar-3.webp", fallback: "EF" },
-        ],
-    },
-    images = {
-        first: "https://shadcnblocks.com/images/block/placeholder-1.svg",
-        second: "https://shadcnblocks.com/images/block/placeholder-dark-2.svg",
-        third: "https://shadcnblocks.com/images/block/placeholder-dark-3.svg",
-        fourth: "https://shadcnblocks.com/images/block/placeholder-dark-7-tall.svg",
-    },
 }: HeroProps) => {
+
+    const institutionHook = useInstitution({ size: 3 });
+    const courseHook = useCourses({ size: 4 });
+
     return (
         <section className="py-12 md:py-20 flex justify-center">
             <div className="container px-4 md:px-8 xl:px-12 2xl:px-16">
@@ -78,23 +49,22 @@ const Hero = ({
                         </div>
                         <div className="flex flex-wrap items-center gap-3">
                             <div className="relative flex -space-x-[1.5rem]">
-                                {testimonial.avatars.map((avatar, index) => (
+                                {institutionHook.institutions.map((institution, index) => (
                                     <Avatar
                                         key={index}
                                         className={`relative z-${index + 1}0 flex h-12 w-12 flex-shrink-0 rounded-full border-2 border-white object-cover`}
                                     >
-                                        <AvatarImage src={avatar.image} alt="" />
-                                        <AvatarFallback>{avatar.fallback}</AvatarFallback>
+                                        <AvatarImage src={institution.name} alt="" />
+                                        <AvatarFallback>{institution.name?.slice(0, 2).toUpperCase()}</AvatarFallback>
                                     </Avatar>
                                 ))}
                             </div>
                             <div>
                                 <p className="mb-1 text-sm italic text-muted2-foreground">
-                                    &quot;{testimonial.quote}&quot;
+                                    &quot;Cursos diseñados para tu éxito&quot;
                                 </p>
-                                <p className="text-sm font-medium text-muted2-foreground">
-                                    {testimonial.author}, {testimonial.role} @
-                                    {testimonial.company}
+                                <p className="text-sm font-medium text-muted2-foreground xl:max-w-[70%]">
+                                    {institutionHook.institutions.map(i => i.name).join(", ")}.
                                 </p>
                             </div>
                         </div>
@@ -103,36 +73,42 @@ const Hero = ({
                         <div className="w-full max-w-[50rem]">
                             <AspectRatio ratio={1 / 1} className="h-full w-full">
                                 <div className="grid h-full w-full grid-cols-2 grid-rows-2 gap-[3.5%]">
-                                    <div className="overflow-hidden rounded-[5.2%] border border-muted bg-muted">
-                                        <img
-                                            src={images.first}
-                                            alt=""
-                                            className="object-fit h-full w-full object-center"
-                                        />
+                                    <div className="overflow-hidden rounded-[5.2%] bg-gray-100">
+                                        {courseHook.courses.length > 0 && (
+                                            <img
+                                                src={courseHook.courses[0].image}
+                                                alt=""
+                                                className="object-cover h-full w-full object-center"
+                                            />
+                                        )}
                                     </div>
-                                    <div className="relative overflow-hidden rounded-[5.2%] border border-muted bg-muted">
-                                        <div className="absolute left-[5%] top-1/2 w-[110%] max-w-[25rem] -translate-y-1/2 overflow-hidden rounded-md">
-                                            <AspectRatio ratio={1.739130435 / 1}>
-                                                <img
-                                                    src={images.second}
-                                                    alt=""
-                                                    className="size-full object-cover object-center"
-                                                />
-                                            </AspectRatio>
-                                        </div>
+                                    <div className="relative overflow-hidden rounded-[5.2%] bg-gray-100">
+                                        {courseHook.courses.length > 1 && (
+                                            <div className="absolute left-[5%] top-1/2 w-[110%] max-w-[25rem] -translate-y-1/2 overflow-hidden rounded-md">
+                                                <AspectRatio ratio={1.739130435 / 1}>
+                                                    <img
+                                                        src={courseHook.courses[1].image}
+                                                        alt=""
+                                                        className="size-full object-cover object-center"
+                                                    />
+                                                </AspectRatio>
+                                            </div>
+                                        )}
                                     </div>
-                                    <div className="relative overflow-hidden rounded-[5.2%] border border-muted bg-muted">
-                                        <div className="absolute left-[9%] top-[9%] w-[200%] max-w-[37.5rem] overflow-hidden rounded-md">
-                                            <AspectRatio ratio={1.6 / 1}>
-                                                <img
-                                                    src={images.third}
-                                                    alt=""
-                                                    className="size-full object-cover object-center"
-                                                />
-                                            </AspectRatio>
-                                        </div>
+                                    <div className="relative overflow-hidden rounded-[5.2%] bg-gray-100">
+                                        {courseHook.courses.length > 2 && (
+                                            <div className="absolute left-[9%] top-[9%] w-[200%] max-w-[37.5rem] overflow-hidden rounded-md">
+                                                <AspectRatio ratio={1.6 / 1}>
+                                                    <img
+                                                        src={courseHook.courses[2].image}
+                                                        alt=""
+                                                        className="size-full object-cover object-center"
+                                                    />
+                                                </AspectRatio>
+                                            </div>
+                                        )}
                                     </div>
-                                    <div className="relative overflow-hidden rounded-[5.2%] border border-muted bg-muted">
+                                    <div className="relative overflow-hidden rounded-[5.2%] bg-gray-100">
                                         <div className="relative left-[50%] top-[12%] w-[70%] max-w-[17.5rem] -translate-x-[50%]">
                                             <AspectRatio ratio={0.52 / 1}>
                                                 <img
@@ -140,11 +116,13 @@ const Hero = ({
                                                     alt=""
                                                     className="absolute z-20 w-full"
                                                 />
+                                                {courseHook.courses.length > 3 && (
                                                 <img
-                                                    src={images.fourth}
+                                                    src={courseHook.courses[3].image}
                                                     alt=""
-                                                    className="absolute z-10 w-full rounded-[16%]"
+                                                    className="absolute z-10 w-full rounded-[16%] bg-red-100 h-full object-cover"
                                                 />
+                                                )}
                                             </AspectRatio>
                                         </div>
                                     </div>

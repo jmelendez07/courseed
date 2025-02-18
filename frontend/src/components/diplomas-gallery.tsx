@@ -2,7 +2,7 @@ import { GalleryCourseItems } from "./ui/gallery-course-items";
 import useCourses from "@/hooks/useCourses";
 
 function DiplomasGallery() {
-    const courseHook = useCourses();
+    const courseHook = useCourses({});
 
     return (
         <GalleryCourseItems

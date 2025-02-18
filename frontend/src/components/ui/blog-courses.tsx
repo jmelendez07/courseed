@@ -16,13 +16,11 @@ const BlogCourses = ({
     description,
 }: BlogCoursesProps) => {
 
-    const courseHook = useCourses();
-
-    console.log(courseHook);
+    const courseHook = useCourses({});
 
     return (
-        <section className="py-32">
-            <div className="container mx-auto flex flex-col items-center gap-16 lg:px-16">
+        <section className="py-20 lg:py-32">
+            <div className="container mx-auto flex flex-col items-center gap-16 px-4 md:px-8 lg:px-16">
                 <div className="text-center">
                     <Badge variant="secondary" className="mb-6">
                         {tagline}

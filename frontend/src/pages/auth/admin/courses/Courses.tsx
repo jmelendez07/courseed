@@ -30,7 +30,7 @@ import { Link } from "react-router-dom";
 
 function Courses() {
 
-	const course = useCourses();
+	const course = useCourses({});
 	const institution = useInstitution({});
 
 	return (

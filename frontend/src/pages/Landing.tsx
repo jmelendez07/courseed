@@ -6,8 +6,15 @@ import { Logos } from "@/components/ui/logos";
 import { Navbar } from "@/components/ui/navbar";
 import WorkShopsGallery from "@/components/workshops-gallery";
 import HeadProvider from "@/providers/HeadProvider";
+import React from "react";
+import { useLocation } from "react-router-dom";
 
 function Landing() {
+    const location = useLocation();
+    React.useLayoutEffect(() => {
+        document.documentElement.scrollTo({ top:0, left:0, behavior: "smooth" });
+    }, [location.pathname]);
+
     return (
         <>
             <HeadProvider title="Courseed" />
@@ -16,7 +23,7 @@ function Landing() {
             <CoursesGallery />
             <DiplomasGallery />
             <WorkShopsGallery />
-            <Logos />
+            <Logos heading="Con la confianza de estas instituciones" />
             <Footer />
         </>
     );

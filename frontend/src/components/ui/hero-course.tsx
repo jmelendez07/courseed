@@ -27,7 +27,7 @@ const HeroCourse = ({ course, handlePrimaryButton }: HeroCourseProps) => {
 				currency: 'COP',
 				minimumFractionDigits: 2,
 				maximumFractionDigits: 2
-			}) + " COP"
+			}).replace("$", "").trim() + " COP"
 			: "Sin información";
 	}
 

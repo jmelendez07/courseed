@@ -5,7 +5,7 @@ import TOKEN from "@/enums/token";
 import ROLES from "@/enums/roles";
 
 interface ChildrenProps {
-    children: React.ReactElement
+    children: React.ReactNode
 }
 
 interface AuthUserProps {

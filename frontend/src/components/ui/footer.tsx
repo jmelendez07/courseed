@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+
 interface MenuItem {
     title: string;
     links: {
@@ -29,44 +31,43 @@ const Footer = ({
         title: "Courseed",
         url: "/",
     },
-    tagline = "Components made easy.",
+    tagline = "Todo en un solo lugar.",
     menuItems = [
         {
-            title: "Product",
+            title: "Producto",
             links: [
-                { text: "Overview", url: "#" },
-                { text: "Pricing", url: "#" },
-                { text: "Marketplace", url: "#" },
-                { text: "Features", url: "#" },
-                { text: "Integrations", url: "#" },
-                { text: "Pricing", url: "#" },
+                { text: "Descripción General", url: "#" },
+                { text: "Precios", url: "#" },
+                { text: "Mercado", url: "#" },
+                { text: "Características", url: "#" },
+                { text: "Integraciones", url: "#" },
             ],
         },
         {
-            title: "Company",
+            title: "Compañia",
             links: [
-                { text: "About", url: "#" },
-                { text: "Team", url: "#" },
+                { text: "Acerca de ", url: "#" },
+                { text: "Equipo", url: "#" },
                 { text: "Blog", url: "#" },
-                { text: "Careers", url: "#" },
-                { text: "Contact", url: "#" },
-                { text: "Privacy", url: "#" },
+                { text: "Trabajos", url: "#" },
+                { text: "Contacto", url: "#" },
+                { text: "Privacidad", url: "#" },
             ],
         },
         {
-            title: "Resources",
+            title: "Recursos",
             links: [
-                { text: "Help", url: "#" },
-                { text: "Sales", url: "#" },
-                { text: "Advertise", url: "#" },
+                { text: "Ayuda", url: "#" },
+                { text: "Ventas", url: "#" },
+                { text: "Publicidad", url: "#" },
             ],
         },
         {
-            title: "Social",
+            title: "Redes Sociales",
             links: [
-                { text: "Twitter", url: "#" },
+                { text: "X", url: "#" },
                 { text: "Instagram", url: "#" },
-                { text: "LinkedIn", url: "#" },
+                { text: "Facebook", url: "#" },
             ],
         },
     ],
@@ -82,14 +83,14 @@ const Footer = ({
                     <div className="grid grid-cols-2 gap-8 lg:grid-cols-6">
                         <div className="col-span-2 mb-8 lg:mb-0">
                             <div className="flex items-center gap-2 lg:justify-start">
-                                <a href="https://shadcnblocks.com">
+                                <Link to="/">
                                     <img
                                         src={logo.src}
                                         alt={logo.alt}
                                         title={logo.title}
                                         className="h-10"
                                     />
-                                </a>
+                                </Link>
                                 <p className="text-xl font-semibold">{logo.title}</p>
                             </div>
                             <p className="mt-4 font-bold">{tagline}</p>

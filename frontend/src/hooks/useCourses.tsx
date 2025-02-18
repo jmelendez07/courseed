@@ -18,11 +18,11 @@ interface ParamsProps {
     institution: InstitutionInterface | null;
 }
 
-function useCourses() {
+function useCourses({ size }: { size?: number }) {
     const [courses, setCourses] = React.useState<CourseInterface[]>([]);
     const [loading, setLoading] = React.useState(false);
     const [totalCourses, setTotalCourses] = React.useState<number | null>(null);
-    const pageSize: number = 12;
+    const pageSize: number = size ?? 12;
     const [isLastPage, setIsLastPage] = React.useState<boolean>(false);
 
     const [params, setParams] = React.useState<ParamsProps>({
