@@ -2,7 +2,11 @@ import { Badge } from "@/components/ui/badge";
 import useCourses from "@/hooks/useCourses";
 import Course from "./course";
 import { Button } from "./button";
-import { ChevronDown, ChevronUp, LoaderCircle } from "lucide-react";
+import { ChevronDown, ChevronUp, LoaderCircle, Search } from "lucide-react";
+import { Input } from "./input";
+import useInstitution from "@/hooks/useInstitution";
+import useFaculty from "@/hooks/useFaculty";
+import ComboBoxResponsive from "./combo-box-responsive";
 
 interface BlogCoursesProps {
     tagline: string;
@@ -17,21 +21,97 @@ const BlogCourses = ({
 }: BlogCoursesProps) => {
 
     const courseHook = useCourses({});
+    const institutionHook = useInstitution({ size: 7 });
+    const facultyHook = useFaculty({ size: 7 });
 
     return (
         <section className="py-20 lg:py-32">
             <div className="container mx-auto flex flex-col items-center gap-16 px-4 md:px-8 lg:px-16">
-                <div className="text-center">
+                <div className="flex flex-col items-center">
                     <Badge variant="secondary" className="mb-6">
                         {tagline}
                     </Badge>
-                    <h2 className="mb-3 text-pretty text-3xl font-semibold md:mb-4 md:text-4xl lg:mb-6 lg:max-w-3xl lg:text-5xl">
+                    <h2 className="mb-3 text-pretty text-3xl font-semibold md:mb-4 md:text-4xl lg:mb-6 lg:max-w-3xl lg:text-5xl text-center">
                         {heading}
                     </h2>
-                    <p className="mb-8 text-muted-foreground md:text-base lg:max-w-2xl lg:text-lg">
+                    <p className="mb-8 text-muted-foreground md:text-base lg:max-w-2xl lg:text-lg text-center">
                         {description}
                     </p>
+                    <div className="w-full max-w-full sm:max-w-4xl">
+                        <div className="flex flex-col md:flex-row justify-center items-center gap-2">
+                            <form onSubmit={e => {
+								e.preventDefault();
+								courseHook.setParams({
+									...courseHook.params,
+									institution: null,
+                                    faculty: null,
+									searchSubmit: true,
+									pageNumber: 0
+								});
+								courseHook.handleFetch();
+							}} className="relative w-full lg:w-[28rem] lg:max-w-md">
+                                <Input
+                                    type="text"
+                                    placeholder="Buscar por titulo, descripción, duración..."
+                                    value={courseHook.params.searchText}
+                                    onChange={e => {
+										if (e.target.value.trim() === "") {
+											courseHook.setParams({
+												...courseHook.params,
+												searchSubmit: false
+											});
+										}
+										courseHook.setParams({
+											...courseHook.params,
+											searchText: e.target.value
+										});
+									}}
+                                    className="pr-10 w-full"
+                                />
+                                <Button size="icon" variant="ghost" className="absolute right-0 top-0 h-full">
+                                    <Search className="h-4 w-4" />
+                                    <span className="sr-only">Buscar</span>
+                                </Button>
+                            </form>
+                            <ComboBoxResponsive 
+                                placeholder="Filtrar por Institución..."
+								labelAll="Todas las instituciones"
+								statuses={institutionHook.institutions}
+								selectedStatus={courseHook.params.institution}
+								setSelectedStatus={i => {
+									courseHook.setParams({
+										...courseHook.params,
+										institution: i,
+										pageNumber: 0,
+                                        faculty: null,
+                                        searchSubmit: false
+									});
+								}}
+								pagination={!institutionHook.isLastPage}
+								onPaginate={() => institutionHook.setPageNumber(institutionHook.pageNumber + 1)}
+                            />
+                            <ComboBoxResponsive 
+                                placeholder="Filtrar por Facultad..."
+								labelAll="Todas las facultades"
+								statuses={facultyHook.faculties}
+								selectedStatus={courseHook.params.faculty}
+								setSelectedStatus={f => {
+									courseHook.setParams({
+										...courseHook.params,
+										faculty: f,
+                                        institution: null,
+										pageNumber: 0,
+                                        searchSubmit: false
+									});
+								}}
+								pagination={!facultyHook.isLastPage}
+								onPaginate={() => facultyHook.setPageNumber(facultyHook.pageNumber + 1)}
+                            />
+                        </div>
+                    </div>
                 </div>
+
+
                 <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 lg:gap-8">
                     {courseHook.courses.map((course) => (
                         <Course

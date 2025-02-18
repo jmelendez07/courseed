@@ -1,6 +1,6 @@
 interface CategoryInterface {
-    id: string;
-    name: string;
+    id: string | null | undefined;
+    name: string | undefined;
 }
 
 export default CategoryInterface;

@@ -6,6 +6,7 @@ enum APIS {
     COURSES = 'api/courses',
     COURSES_SEARCH = 'api/courses/search',
     COURSES_BY_INSTITUTION = 'api/courses/institution',
+    COURSES_BY_FACULTY = 'api/courses/category',
     INSTITUTIONS = 'api/institutions',
     REVIEWS = 'api/reviews',
     FACULTIES = 'api/categories'

@@ -1,4 +1,5 @@
 import APIS from "@/enums/apis";
+import CategoryInterface from "@/interfaces/category";
 import CourseInterface from "@/interfaces/course";
 import InstitutionInterface from "@/interfaces/institution";
 import axios, { AxiosError, AxiosResponse } from "axios";
@@ -16,6 +17,7 @@ interface ParamsProps {
     searchText: string;
     searchSubmit: boolean;
     institution: InstitutionInterface | null;
+    faculty: CategoryInterface | null;
 }
 
 function useCourses({ size }: { size?: number }) {
@@ -29,17 +31,23 @@ function useCourses({ size }: { size?: number }) {
         pageNumber: 0,
         searchText: "",
         searchSubmit: false,
-        institution: null
+        institution: null,
+        faculty: null
     });
 
     const handleFetch = React.useCallback(() => {
         setLoading(true);
 
-		axios.get(params.institution
-            ? `${APIS.COURSES_BY_INSTITUTION}/${params.institution.id}` 
-            : params.searchSubmit
-                ? `${APIS.COURSES_SEARCH}?text=${params.searchText}` 
-                : APIS.COURSES, {
+        let url: string = APIS.COURSES;
+        if (params.institution) {
+            url = `${APIS.COURSES_BY_INSTITUTION}/${params.institution.id}`;
+        } else if (params.faculty) {
+            url = `${APIS.COURSES_BY_FACULTY}/${params.faculty.id}`;
+        } else if (params.searchSubmit) {
+            url = `${APIS.COURSES_SEARCH}?text=${params.searchText}`;
+        }
+
+		axios.get(url, {
 			params: {
 				page: params.pageNumber,
 				size: pageSize
@@ -61,9 +69,9 @@ function useCourses({ size }: { size?: number }) {
                 setIsLastPage(true);
             })
 			.finally(() => setLoading(false));
-    }, [params.pageNumber, pageSize, params.institution, params.searchText, params.searchSubmit]); 
+    }, [params.pageNumber, pageSize, params.institution, params.searchText, params.searchSubmit, params.faculty]); 
 
-    React.useEffect(() => handleFetch(), [params.pageNumber, pageSize, params.institution]);
+    React.useEffect(() => handleFetch(), [params.pageNumber, pageSize, params.institution, params.faculty]);
 
     return {
         courses,
