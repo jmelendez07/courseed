@@ -55,7 +55,7 @@ function ComboBoxResponsive({
                 <PopoverTrigger asChild>
                     <Button variant="outline" className="justify-between items-center">
                         <p className="max-w-[150px] truncate">
-                            {selectedStatus ? <>{selectedStatus.name}</> : placeholder}
+                            {(selectedStatus && selectedStatus.name) ? <>{selectedStatus.name}</> : placeholder}
                         </p>
                         <ChevronsUpDown />
                     </Button>
@@ -79,7 +79,7 @@ function ComboBoxResponsive({
             <DrawerTrigger asChild>
                 <Button variant="outline" className="justify-between items-center w-full">
                     <p className="max-w-[250px] truncate">
-                        {selectedStatus ? <>{selectedStatus.name}</> : placeholder}
+                        {(selectedStatus && selectedStatus.name) ? <>{selectedStatus.name}</> : placeholder}
                     </p>
                     <ChevronsUpDown />
                 </Button>

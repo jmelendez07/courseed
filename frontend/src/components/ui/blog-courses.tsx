@@ -7,29 +7,45 @@ import { Input } from "./input";
 import useInstitution from "@/hooks/useInstitution";
 import useFaculty from "@/hooks/useFaculty";
 import ComboBoxResponsive from "./combo-box-responsive";
+import { useSearchParams } from "react-router-dom";
+import React from "react";
 
 interface BlogCoursesProps {
-    tagline: string;
     heading: string;
     description: string;
 }
 
 const BlogCourses = ({
-    tagline,
     heading,
     description,
 }: BlogCoursesProps) => {
 
-    const courseHook = useCourses({});
+    const [searchParams] = useSearchParams();
+    const courseHook = useCourses({ 
+        institutionParam: {id: searchParams.get('institucion'), name: undefined},
+        facultyParam: {id: searchParams.get('facultad'), name: undefined}
+    });
     const institutionHook = useInstitution({ size: 7 });
     const facultyHook = useFaculty({ size: 7 });
+
+    React.useEffect(() => {
+        const institutionParamId = searchParams.get('institucion');
+        const facultyParamId = searchParams.get('facultad');
+
+        courseHook.setParams({
+            ...courseHook.params,
+            institution: institutionParamId ? {id: institutionParamId, name: undefined} : null,
+            faculty: facultyParamId ? {id: facultyParamId, name: undefined} : null,
+            pageNumber: 0,
+        });
+    }, [searchParams.get('institucion'), searchParams.get('facultad')]);
 
     return (
         <section className="py-20 lg:py-32">
             <div className="container mx-auto flex flex-col items-center gap-16 px-4 md:px-8 lg:px-16">
                 <div className="flex flex-col items-center">
                     <Badge variant="secondary" className="mb-6">
-                        {tagline}
+                        {courseHook.totalCourses} Cursos, Diplomados y Talleres
                     </Badge>
                     <h2 className="mb-3 text-pretty text-3xl font-semibold md:mb-4 md:text-4xl lg:mb-6 lg:max-w-3xl lg:text-5xl text-center">
                         {heading}
@@ -41,26 +57,13 @@ const BlogCourses = ({
                         <div className="flex flex-col md:flex-row justify-center items-center gap-2">
                             <form onSubmit={e => {
 								e.preventDefault();
-								courseHook.setParams({
-									...courseHook.params,
-									institution: null,
-                                    faculty: null,
-									searchSubmit: true,
-									pageNumber: 0
-								});
-								courseHook.handleFetch();
+                                courseHook.handleSearch();
 							}} className="relative w-full lg:w-[28rem] lg:max-w-md">
                                 <Input
                                     type="text"
                                     placeholder="Buscar por titulo, descripción, duración..."
                                     value={courseHook.params.searchText}
                                     onChange={e => {
-										if (e.target.value.trim() === "") {
-											courseHook.setParams({
-												...courseHook.params,
-												searchSubmit: false
-											});
-										}
 										courseHook.setParams({
 											...courseHook.params,
 											searchText: e.target.value
@@ -83,8 +86,7 @@ const BlogCourses = ({
 										...courseHook.params,
 										institution: i,
 										pageNumber: 0,
-                                        faculty: null,
-                                        searchSubmit: false
+                                        faculty: null
 									});
 								}}
 								pagination={!institutionHook.isLastPage}
@@ -101,7 +103,6 @@ const BlogCourses = ({
 										faculty: f,
                                         institution: null,
 										pageNumber: 0,
-                                        searchSubmit: false
 									});
 								}}
 								pagination={!facultyHook.isLastPage}

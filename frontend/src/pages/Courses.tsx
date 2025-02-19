@@ -9,7 +9,6 @@ function Courses() {
             <HeadProvider title="Courseed | Educación Continuada" />
             <Navbar />
             <BlogCourses
-                tagline="Cursos, Diplomados y Talleres"
                 heading="Educación Continuada"
                 description="Explora nuestra amplia gama de cursos y diplomados para seguir aprendiendo y creciendo profesionalmente."
             />
