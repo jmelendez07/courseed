@@ -3,8 +3,10 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import useCourses from "@/hooks/useCourses";
 import useInstitution from "@/hooks/useInstitution";
-import { GraduationCap, LucideProps, Search } from "lucide-react";
+import { GraduationCap, LucideProps} from "lucide-react";
 import { Link } from "react-router-dom";
+import DialogCourses from "../dialog-courses";
+import React from "react";
 
 interface HeroProps {
     heading?: string;
@@ -46,9 +48,7 @@ const Hero = ({
                             <Button asChild size="lg">
                                 <Link to={button.url}>{button.text}<button.icon /></Link>
                             </Button>
-                            <Button size="icon">
-                                <Search />
-                            </Button>
+                            <DialogCourses />
                         </div>
                         <div className="flex flex-wrap items-center gap-3">
                             <div className="relative flex -space-x-[1.5rem]">
