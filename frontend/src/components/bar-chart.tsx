@@ -2,21 +2,12 @@ import { Bar, BarChart as BarChartRechart, CartesianGrid, XAxis } from "recharts
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent } from "@/components/ui/chart";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
 
-const chartConfig = {
-    bar1: {
-        label: "Desktop",
-        color: "rgba(2, 132, 199)",
-    },
-    bar2: {
-        label: "Mobile",
-        color: "#0ea5e9",
-    },
-} satisfies ChartConfig
-
 interface BarChartProps {
     title?: string;
     chartData: ChartItem[];
     description?: string;
+    labelBar1?: string;
+    labelBar2?: string;
     className?: string;
 }
 
@@ -30,8 +21,22 @@ function BarChart({
     title="Bar Chart - Multiple",
     description="January - June 2024",
     chartData,
-    className 
+    labelBar1="Desktop",
+    labelBar2="Mobile",
+    className
 }: BarChartProps) {
+
+    const chartConfig = {
+        bar1: {
+            label: labelBar1,
+            color: "rgba(2, 132, 199)",
+        },
+        bar2: {
+            label: labelBar2,
+            color: "#0ea5e9",
+        },
+    } satisfies ChartConfig
+
     return (
         <Card
             className={`bg-white border border-gray-200 rounded-lg hover:shadow-lg 

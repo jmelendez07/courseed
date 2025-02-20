@@ -42,9 +42,11 @@ function DashboardChartCourses() {
 				description="Esta gráfica muestra el ranking de cursos según el número de likes y reseñas recibidos."
 				chartData={courses.map((course) => ({
 					label: course.title,
-					bar1: 5,
-					bar2: 8
+					bar1: course.totalReviews,
+					bar2: course.totalLikes
 				}))}
+				labelBar1="Reseñas"
+				labelBar2="Likes"
 			/>
 			<PieChart
 				title={`Top ${institutionsSize} Instituciones con Mayor Oferta Académica`}

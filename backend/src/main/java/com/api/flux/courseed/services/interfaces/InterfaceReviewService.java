@@ -11,9 +11,10 @@ import com.api.flux.courseed.projections.dtos.UpdateReviewDto;
 import reactor.core.publisher.Mono;
 
 public interface InterfaceReviewService {
-    public Mono<Page<ReviewDto>> getReviewsByCourseId(String courseId, int page, int size);
-    public Mono<Page<ReviewDto>> getReviewsByAuthUser(Principal principal, int page, int size);
-    public Mono<Object> createReview(Principal principal, CreateReviewDto createReviewDto);
-    public Mono<ReviewDto> updateReview(Principal principal, String id, UpdateReviewDto saveReviewDto);
-    public Mono<Boolean> deleteReview(Principal principal, String id);
+    Mono<Page<ReviewDto>> getAllReviews(int page, int size);
+    Mono<Page<ReviewDto>> getReviewsByCourseId(String courseId, int page, int size);
+    Mono<Page<ReviewDto>> getReviewsByAuthUser(Principal principal, int page, int size);
+    Mono<Object> createReview(Principal principal, CreateReviewDto createReviewDto);
+    Mono<ReviewDto> updateReview(Principal principal, String id, UpdateReviewDto saveReviewDto);
+    Mono<Boolean> deleteReview(Principal principal, String id);
 }

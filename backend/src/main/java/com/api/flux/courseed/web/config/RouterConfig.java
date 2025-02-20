@@ -113,6 +113,7 @@ public class RouterConfig {
     private RouterFunction<ServerResponse> reviewRoutes(ReviewController reviewController) {
         return RouterFunctions
             .route()
+            .GET("", reviewController::getAllReviews)
             .GET("/course/{courseId}", reviewController::getReviewsByCourseId)
             .GET("/auth", reviewController::getReviewsByAuthUser)
             .POST(reviewController::createReview)

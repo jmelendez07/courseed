@@ -1,5 +1,6 @@
 import { AppSidebar } from "@/components/app-sidebar";
 import BarChartHorizontal from "@/components/bar-chart-horizontal";
+import DashboardContentReviews from "@/components/dashboard-content-reviews";
 import LineChart from "@/components/line-chart";
 import RadarChart from "@/components/radar-chart";
 import {
@@ -9,28 +10,17 @@ import {
 	BreadcrumbPage,
 	BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import { Button } from "@/components/ui/button";
-import ComboBoxResponsive from "@/components/ui/combo-box-responsive";
-import { Input } from "@/components/ui/input";
-import ReviewLarge from "@/components/ui/review-large";
 import { Separator } from "@/components/ui/separator";
 import {
 	SidebarInset,
 	SidebarProvider,
 	SidebarTrigger,
 } from "@/components/ui/sidebar";
-import useReview from "@/hooks/useReview";
-import useUser from "@/hooks/useUser";
 import DialogProvider from "@/providers/DialogProvider";
 import HeadProvider from "@/providers/HeadProvider";
-import { ChevronDown, LoaderCircle, Search } from "lucide-react";
 import { Link } from "react-router-dom";
 
 function Reviews() {
-
-	const review = useReview();
-	const user = useUser({});
-
 	return (
 		<SidebarProvider>
 			<DialogProvider>
@@ -65,79 +55,7 @@ function Reviews() {
 								description="January - June 2024"
 							/>
 						</div>
-						<div className="grid grid-cols-1 items-center md:grid-cols-[1fr,auto] gap-x-4">
-							<form
-								onSubmit={e => {
-									e.preventDefault();
-									review.setParams({
-										...review.params,
-										searchSubmit: true,
-										pageNumber: 0
-									});
-									review.handleFetch();
-								}}
-								className="flex items-center py-4 gap-2"
-							>
-								<Input
-									type="text"
-									disabled={review.loading}
-									value={review.params.searchText}
-									placeholder="Buscar por calificación, descripción..."
-									onChange={e => {
-										if (e.target.value.trim() === "") {
-											review.setParams({
-												...review.params,
-												searchSubmit: false
-											});
-										}
-										review.setParams({
-											...review.params,
-											searchText: e.target.value
-										});
-									}}
-									className="max-w-sm"
-								/>
-								<Button
-									type="submit"
-									disabled={review.loading}
-								>
-									{review.loading ? <LoaderCircle className="animate-spin" /> : <Search />}
-								</Button>
-							</form>
-							<ComboBoxResponsive
-								placeholder="Filtrar por Usuario..."
-								labelAll="Todos los usuarios"
-								statuses={user.users.map(u => { return { id: u.id, name: u.email } })}
-								selectedStatus={ review.params.user 
-									? {id: review.params.user.id, name: review.params.user.email}
-									: null
-								}
-								setSelectedStatus={u => {
-									review.setParams({
-										...review.params,
-										user: { id: u?.id, email: u?.name ? u.name : '' },
-										pageNumber: 0
-									});
-								}}
-								pagination={!user.isLastPage}
-								onPaginate={() => user.setPageNumber(user.pageNumber + 1)}
-							/>
-						</div>
-						<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-							{review.reviews.map((r) => (
-								<ReviewLarge key={r.id} review={r} />
-							))}
-						</div>
-						<div className="flex items-center justify-center space-x-2 py-4">
-							<Button
-								variant="outline"
-								size="sm"
-								onClick={() => { }}
-							>
-								Mostrar mas reseñas
-								<ChevronDown />
-							</Button>
-						</div>
+						<DashboardContentReviews />
 					</div>
 				</SidebarInset>
 			</DialogProvider>

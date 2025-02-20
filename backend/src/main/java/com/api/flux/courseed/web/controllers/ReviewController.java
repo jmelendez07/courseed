@@ -19,6 +19,16 @@ public class ReviewController {
     @Autowired
     private ValidationService validationService;
 
+    public Mono<ServerResponse> getAllReviews(ServerRequest serverRequest) {
+        return reviewService
+            .getAllReviews(
+                Integer.parseInt(serverRequest.queryParam("page").orElse("0")), 
+                Integer.parseInt(serverRequest.queryParam("size").orElse("10"))
+            )
+            .flatMap(reviews-> ServerResponse.ok().bodyValue(reviews))
+            .switchIfEmpty(ServerResponse.notFound().build());
+    }
+
     public Mono<ServerResponse> getReviewsByCourseId(ServerRequest serverRequest) {
         return reviewService
             .getReviewsByCourseId(
@@ -28,16 +38,6 @@ public class ReviewController {
             )
             .flatMap(reviews-> ServerResponse.ok().bodyValue(reviews))
             .switchIfEmpty(ServerResponse.notFound().build());
-
-            // .collectList().flatMap(list -> {
-            //     if (!list.isEmpty()) {
-            //         return ServerResponse.ok()
-            //             .contentType(MediaType.APPLICATION_JSON)
-            //             .body(Flux.fromIterable(list), ReviewDto.class);
-            //     } else {
-            //         return ServerResponse.notFound().build();
-            //     }
-            // });
     }
 
     public Mono<ServerResponse> getReviewsByAuthUser(ServerRequest serverRequest) {
@@ -51,16 +51,6 @@ public class ReviewController {
                 .flatMap(reviews-> ServerResponse.ok().bodyValue(reviews))
                 .switchIfEmpty(ServerResponse.notFound().build())
             );
-
-            // .collectList().flatMap(list -> {
-            //     if (!list.isEmpty()) {
-            //         return ServerResponse.ok()
-            //             .contentType(MediaType.APPLICATION_JSON)
-            //             .body(Flux.fromIterable(list), ReviewDto.class);
-            //     } else {
-            //         return ServerResponse.notFound().build();
-            //     }
-            // })
     }
 
     public Mono<ServerResponse> createReview(ServerRequest serverRequest) {

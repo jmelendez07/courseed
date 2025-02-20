@@ -78,6 +78,52 @@ public class ReviewService implements InterfaceReviewService {
     }
 
     @Override
+    public Mono<Page<ReviewDto>> getAllReviews(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        
+        return reviewRepository.findAllBy(pageable)
+            .flatMap(review -> courseRepository.findById(review.getCourseId())
+                .flatMap(course -> userRepository.findById(review.getUserId())
+                    .flatMap(user -> {
+                        Mono<Category> categoryMono = categoryRepository.findById(course.getCategoryId());
+                        Mono<Institution> institutionMono = institutionRepository.findById(course.getInstitutionId());
+                        Flux<Content> contentFlux = contentRepository.findByCourseId(course.getId());
+                        Flux<Like> likeFlux = likeRepository.findByCourseId(course.getId());
+                        Flux<Review> reviewFlux = reviewRepository.findByCourseId(course.getId());
+
+                        return Mono.zip(categoryMono, institutionMono, contentFlux.collectList(), likeFlux.collectList(), reviewFlux.collectList())
+                            .map(tuple -> {
+                                ReviewDto reviewDto = reviewMapper.toReviewDto(review);
+                                CourseDto courseDto = courseMapper.toCourseDto(course);
+                                courseDto.setCategory(categoryMapper.toCategoryDto(tuple.getT1()));
+                                courseDto.setInstitution(institutionMapper.toInstitutionDto(tuple.getT2()));
+                                courseDto.setContents(tuple.getT3().stream()
+                                    .map(contentMapper::toContentDto)
+                                    .toList()
+                                );
+                                courseDto.setLikes(tuple.getT4().stream()
+                                    .map(likeMapper::toLikeDto)
+                                    .toList()
+                                );
+                                courseDto.setReviews(tuple.getT5().stream()
+                                    .map(reviewMapper::toReviewDto)
+                                    .toList()
+                                );
+
+                                reviewDto.setCourse(courseMapper.toCourseDto(course));
+                                reviewDto.setUser(new UserDto(user.getId(), user.getEmail()));
+
+                                return reviewDto;
+                            });
+                    })
+                )
+            )
+            .collectList()
+            .zipWith(reviewRepository.count())
+            .map(p -> new PageImpl<>(p.getT1(), pageable, p.getT2()));
+    }
+
+    @Override
     public Mono<Page<ReviewDto>> getReviewsByCourseId(String courseId, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
 

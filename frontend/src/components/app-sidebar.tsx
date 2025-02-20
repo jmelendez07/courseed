@@ -1,27 +1,25 @@
 import {
-	BookPlus,
 	GraduationCap,
 	LayoutPanelLeft,
 	MessageSquareText,
 	UserPlus,
 	Users,
-} from "lucide-react"
+} from "lucide-react";
 
-import { NavMain } from "@/components/nav-main"
-import { NavUser } from "@/components/nav-user"
-import { TeamSwitcher } from "@/components/team-switcher"
+import { NavMain } from "@/components/nav-main";
+import { NavUser } from "@/components/nav-user";
+import { TeamSwitcher } from "@/components/team-switcher";
 import {
 	Sidebar,
 	SidebarContent,
 	SidebarFooter,
 	SidebarHeader,
 	SidebarRail,
-} from "@/components/ui/sidebar"
-import React from "react"
-import { DialogContext } from "@/providers/DialogProvider"
-import CreateUserForm from "./create-user-form"
-import CourseForm from "./course-form"
-import UpdateReviewForm from "./update-review-form"
+} from "@/components/ui/sidebar";
+import React from "react";
+import { DialogContext } from "@/providers/DialogProvider";
+import CreateUserForm from "./create-user-form";
+import CourseForm from "./course-form";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
@@ -41,13 +39,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 		dialogChildren: <CourseForm />
 	}
 
-	const reviewForm = {
-		title: "Actualizar Reseña",
-		description: "Modifica los detalles de la reseña para reflejar la experiencia más reciente.",
-		open: true,
-		dialogChildren: <UpdateReviewForm />
-	}
-
 	const data = {
 		actions: [
 			{
@@ -60,11 +51,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 				logo: GraduationCap,
 				action: () => dialogContext?.setContext(courseForm)
 			},
-			{
-				name: "Actualizar Reseña",
-				logo: BookPlus,
-				action: () => dialogContext?.setContext(reviewForm)
-			}
 		],
 		navMain: [
 			{
