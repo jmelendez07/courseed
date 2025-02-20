@@ -111,8 +111,6 @@ const BlogCourses = ({
                         </div>
                     </div>
                 </div>
-
-
                 <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 lg:gap-8">
                     {courseHook.courses.map((course) => (
                         <Course
@@ -146,7 +144,7 @@ const BlogCourses = ({
                             </>
                         ) : (
                             <>
-                                Mostrar mas cursos
+                                Mostrar mas educación continuada
                                 {courseHook.loading ? (
                                     <LoaderCircle className="animate-spin" />
                                 ) : (

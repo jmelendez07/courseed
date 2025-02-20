@@ -17,7 +17,6 @@ import ReviewsUser from "@/pages/auth/user/Reviews";
 import ProtectedAuthRoute from "./ProtectedAuthRoute";
 import ProtectedAdminRoute from "./ProtectedAdminRoute";
 import ProtectedUserRoute from "./ProtectedUserRoute";
-import CreateCourse from "@/pages/auth/admin/courses/CreateCourse";
 
 function Routes() {
 
@@ -35,11 +34,11 @@ function Routes() {
             element: <Register/>
         },
         {
-            path: '/cursos',
+            path: '/educacion',
             element: <Courses />
         },
         {
-            path: '/curso/:id',
+            path: '/educacion/:id',
             element: <Course />
         },
         {
@@ -79,17 +78,13 @@ function Routes() {
                     element: <Users />
                 },
                 {
-                    path: 'cursos',
+                    path: 'educacion',
                     element: <CoursesAdmin />
                 },
                 {
                     path: 'reseñas',
                     element: <ReviewsAdmin />
                 },
-                {
-                    path: 'cursos/nuevo',
-                    element: <CreateCourse />
-                }
             ]
         }
     ]

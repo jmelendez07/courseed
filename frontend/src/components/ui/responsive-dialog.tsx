@@ -47,7 +47,7 @@ function ResponsiveDialog({ open, children, title, description, setOpen }: Respo
     }
 
     return (
-        <Drawer open={open} onOpenChange={setOpen}>
+        <Drawer open={open} autoFocus={open} onOpenChange={setOpen}>
             <DrawerContent>
                 <DrawerHeader className="text-left">
                     <DrawerTitle>{title}</DrawerTitle>

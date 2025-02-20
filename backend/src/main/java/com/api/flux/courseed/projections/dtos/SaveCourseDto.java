@@ -23,20 +23,20 @@ public class SaveCourseDto implements Serializable {
     private String description;
     private String prerequisites;
 
-    @NotBlank(message = "Para proceder, debes completar el campo correspondiente a la modalidad del curso.")
+    @NotBlank(message = "Para proceder, debes completar el campo correspondiente a la modalidad del curso.", groups = FirstValidationGroup.class)
     private String modality;
 
-    @NotNull(message = "Para proceder, debes completar el campo correspondiente al precio del curso.")
-    @DecimalMin(value = "0.0", message = "No podemos aceptar un precio del curso menor a 0.0, Revisa el valor ingresado.")
+    @NotNull(message = "Para proceder, debes completar el campo correspondiente al precio del curso.", groups = FirstValidationGroup.class)
+    @DecimalMin(value = "0.0", message = "No podemos aceptar un precio del curso menor a 0.0, Revisa el valor ingresado.", groups = SecondValidationGroup.class)
     private Double price;
 
-    @NotBlank(message = "Para proceder, debes completar el campo correspondiente a la duración del curso.")
+    @NotBlank(message = "Para proceder, debes completar el campo correspondiente a la duración del curso.", groups = FirstValidationGroup.class)
     private String duration;
 
-    @NotBlank(message = "Es importante que selecciones una categoria antes de continuar.")
+    @NotBlank(message = "Es importante que selecciones una categoria antes de continuar.", groups = FirstValidationGroup.class)
     private String categoryId;
 
-    @NotBlank(message = "Es importante que selecciones una institución antes de continuar.")
+    @NotBlank(message = "Es importante que selecciones una institución antes de continuar.", groups = FirstValidationGroup.class)
     private String institutionId;
 
     public String getUrl() {

@@ -107,6 +107,22 @@ function useCourses({ size, institutionParam, facultyParam }: UseCoursesProps) {
             .finally(() => setLoading(false));
     }
 
+    const handleUpdateCourse = (course: CourseInterface) => {
+        setCourses([
+            ...courses.map(c => {
+                if (c.id === course.id) {
+                    return course;
+                } else {
+                    return c;
+                }
+            })
+        ]);
+    }
+
+    const handleDeleteCourse = (course: CourseInterface) => {
+        setCourses(courses.filter(c => c.id !== course.id));
+    }
+
     React.useEffect(() => handleFetch(), [params.pageNumber, pageSize, params.institution?.id, params.faculty?.id]);
 
     return {
@@ -121,7 +137,9 @@ function useCourses({ size, institutionParam, facultyParam }: UseCoursesProps) {
         setIsLastPage,
         setTotalCourses,
         setParams,
-        handleSearch
+        handleSearch,
+        handleUpdateCourse,
+        handleDeleteCourse
     };
 }
 

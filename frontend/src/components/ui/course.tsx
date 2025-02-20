@@ -115,10 +115,10 @@ function Course({ className, course, optionsEnable, handleEdit, handleDelete }: 
 			<CardFooter>
 				<Button asChild className="w-full group">
 					<a
-						href={`/curso/${course.id}`} 
+						href={`/educacion/${course.id}`} 
 						target="_blank"
 					>
-						Ver Curso
+						Ver Información
 						<ArrowUpRight className="transition-transform group-hover:translate-x-1" />
 					</a>
 				</Button>

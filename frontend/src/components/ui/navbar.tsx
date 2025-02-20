@@ -73,7 +73,7 @@ const Navbar = ({
     const facultyHook = useFaculty({ size: 7 });
 
     const menu: MenuItem[] = [
-        { title: "Educacion continuada", url: "/cursos" },
+        { title: "Educacion continuada", url: "/educacion" },
         {
             title: "Instituciones",
             url: "/",
@@ -199,7 +199,7 @@ const renderMenuItem = (item: MenuItem) => {
                                 <li key={subItem.id}>
                                     <Link
                                         className="flex select-none gap-4 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-muted hover:text-accent-foreground group"
-                                        to={`/cursos?${item.paramKey}=${subItem.id}`}
+                                        to={`/educacion?${item.paramKey}=${subItem.id}`}
                                     >
                                         <ArrowUpRight className="w-5 min-w-5 transition-transform group-hover:translate-x-1" />
                                         <div>
@@ -240,7 +240,7 @@ const renderMobileMenuItem = (item: MenuItem) => {
                         <Link
                             key={subItem.id}
                             className="flex select-none gap-4 rounded-md p-3 leading-none outline-none transition-colors hover:bg-muted hover:text-accent-foreground group"
-                            to={`/cursos?${item.paramKey}=${subItem.id}`}
+                            to={`/educacion?${item.paramKey}=${subItem.id}`}
                         >
                             <ArrowUpRight className="w-5 min-w-5 transition-transform group-hover:translate-x-1" />
                             <div>

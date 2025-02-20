@@ -92,12 +92,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 				],
 			},
 			{
-				title: "Cursos",
+				title: "Educación Continuada",
 				icon: GraduationCap,
 				items: [
 					{
 						title: "Ver todos",
-						url: "/administrador/cursos",
+						url: "/administrador/educacion",
 					},
 					{
 						title: "Registrar Nuevo",

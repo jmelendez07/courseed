@@ -86,7 +86,7 @@ export function NavUser() {
 							<Link to="/salir">
 								<DropdownMenuItem>
 									<LogOut />
-									Log out
+									Cerrar Sesión
 								</DropdownMenuItem>
 							</Link>
 						</DropdownMenuGroup>

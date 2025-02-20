@@ -32,9 +32,9 @@ interface ComboBoxResponsiveProps {
     statuses: Status[];
     selectedStatus: Status | null;
     setSelectedStatus: (status: Status | null) => void;
-    pagination: boolean;
-    onPaginate: () => void;
-    labelAll: string | null;
+    pagination?: boolean;
+    onPaginate?: () => void;
+    labelAll?: string | null;
 }
 
 function ComboBoxResponsive({ 
@@ -54,7 +54,7 @@ function ComboBoxResponsive({
             <Popover open={isOpen} onOpenChange={setIsOpen}>
                 <PopoverTrigger asChild>
                     <Button variant="outline" className="justify-between items-center">
-                        <p className="max-w-[150px] truncate">
+                        <p className="max-w-full truncate">
                             {(selectedStatus && selectedStatus.name) ? <>{selectedStatus.name}</> : placeholder}
                         </p>
                         <ChevronsUpDown />
@@ -78,7 +78,7 @@ function ComboBoxResponsive({
         <Drawer open={isOpen} onOpenChange={setIsOpen}>
             <DrawerTrigger asChild>
                 <Button variant="outline" className="justify-between items-center w-full">
-                    <p className="max-w-[250px] truncate">
+                    <p className="max-w-full truncate">
                         {(selectedStatus && selectedStatus.name) ? <>{selectedStatus.name}</> : placeholder}
                     </p>
                     <ChevronsUpDown />
@@ -104,9 +104,9 @@ function StatusList({setOpen, setSelectedStatus, statuses, pagination, onPaginat
     setOpen: (open: boolean) => void
     setSelectedStatus: (status: Status | null) => void
     statuses: Status[]
-    pagination: boolean,
-    onPaginate: () => void,
-    labelAll: string | null
+    pagination?: boolean,
+    onPaginate?: () => void,
+    labelAll?: string | null
 }) {
     return (
         <Command>
@@ -144,7 +144,9 @@ function StatusList({setOpen, setSelectedStatus, statuses, pagination, onPaginat
                         <CommandItem
                             key="pagination"
                             value="..."
-                            onSelect={() => onPaginate()}
+                            onSelect={() => {
+                                if (onPaginate) onPaginate()
+                            }}
                             className="flex items-center justify-center"
                         >
                             ...

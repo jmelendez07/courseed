@@ -8,8 +8,6 @@ function DialogCourses() {
     const [open, setOpen] = React.useState<boolean>(false);
     const courseHook = useCourses({});
 
-    console.log(courseHook)
-
     React.useEffect(() => {
         const down = (e: KeyboardEvent) => {
             if (e.key === "k" && (e.metaKey || e.ctrlKey)) {

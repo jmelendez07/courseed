@@ -2,17 +2,19 @@ import { Label } from "./ui/label";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import {
-    Select,
-    SelectContent,
-    SelectGroup,
-    SelectItem,
-    SelectLabel,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select";
 import React from "react";
 import { DialogContext } from "@/providers/DialogProvider";
+import CourseInterface from "@/interfaces/course";
+import ComboBoxResponsive from "./ui/combo-box-responsive";
+import useInstitution from "@/hooks/useInstitution";
+import InstitutionInterface from "@/interfaces/institution";
+import useFaculty from "@/hooks/useFaculty";
+import CategoryInterface from "@/interfaces/category";
+import axios, { AxiosError, AxiosResponse } from "axios";
+import APIS from "@/enums/apis";
+import { Info, LoaderCircle } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import dayjs from "dayjs";
 
 const steps = {
     step1: 1,
@@ -24,57 +26,135 @@ interface FormProps {
     title: string;
     price: number;
     duration: string;
-    institution: string | undefined;
-    category: string | undefined,
+    institution: InstitutionInterface | null;
+    category: CategoryInterface | null,
     modality: string | undefined,
     url: string;
     image: string;
     description: string;
 };
 
-function CourseForm() {
+interface ErrorProps {
+    url: string | null;
+    title: string | null;
+    modality: string | null;
+    price: string | null;
+    duration: string | null;
+    categoryId: string | null;
+    institutionId: string | null;
+    courseId: string | null;
+}
 
+interface CourseFormProps {
+    course?: CourseInterface;
+    onSaved?: (course: CourseInterface) => void
+}
+
+function CourseForm({ course, onSaved }: CourseFormProps) {
     const [currentStep, setCurrentStep] = React.useState<number>(steps.step1);
     const [form, setForm] = React.useState<FormProps>({
-        title: "",
-        price: 0,
-        duration: "",
-        institution: undefined,
-        category: undefined,
-        modality: undefined,
-        url: "",
-        image: "",
-        description: ""
+        url: course?.url ?? "",
+        title: course?.title ?? "",
+        image: course?.image ?? "",
+        description: course?.description ?? "",
+        modality: course?.modality,
+        price: course?.price ?? 0,
+        duration: course?.duration ?? "",
+        category: course?.category ?? null,
+        institution: course?.institution ?? null,
     });
+    const [errors, setErrors] = React.useState<ErrorProps>({
+        url: null,
+        title: null,
+        modality: null,
+        price: null,
+        duration: null,
+        categoryId: null,
+        institutionId: null,
+        courseId: null
+    });
+    const [loading, setLoading] = React.useState<boolean>(false);
+    const dialogContext = React.useContext(DialogContext);
+    const institutionHook = useInstitution({ size: 7 });
+    const facultyHook = useFaculty({ size: 7 });
+    const { toast } = useToast();
 
-    const dialogContext = React.useContext(DialogContext)
+    const modalities = [
+        { id: 'Presencial', name: 'Presencial' },
+        { id: 'Virtual', name: 'Virtual' },
+        { id: 'Blended', name: 'Blended' },
+    ];
 
     const handleOnChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         setForm({
             ...form,
-            [e.target.id]: [e.target.value]
+            [e.target.id]: e.target.value
         });
     }
 
     const handleSubmit = (e: React.ChangeEvent<HTMLFormElement>) => {
+        setLoading(true);
         e.preventDefault();
-        dialogContext?.setContext({
-            ...dialogContext.context,
-            open: false
-        });
-    }
+        
+        if (course) {
+            axios.put(`${APIS.COURSES_UPDATE}${course.id}`, {
+                url: form.url,
+                title: form.title,
+                image: form.image,
+                description: form.description,
+                modality: form.modality,
+                price: parseFloat(form.price.toString()),
+                duration: form.duration,
+                categoryId: form.category?.id,
+                institutionId: form.institution?.id
+            })
+                .then((response: AxiosResponse<CourseInterface>) => {
+                    dialogContext?.setContext({
+                        ...dialogContext.context,
+                        open: false
+                    });
+                    toast({
+                        title: `${response.data.title} Actualizado!`,
+                        description: dayjs().format("LLL"),
+                    });
+                    if (onSaved) {
+                        onSaved(response.data);
+                    }
+                })
+                .catch((error: AxiosError<ErrorProps>) => {
+                    if (error.response?.data.courseId) {
+                        dialogContext?.setContext({
+                            ...dialogContext.context,
+                            open: false
+                        });
+                        toast({
+                            title: `${course.title}. Algo salió mal!`,
+                            description: error.response.data.courseId,
+                            variant: "destructive",
+                        });
+                    } else {
+                        setErrors({
+                            url: error.response?.data.url ?? null,
+                            title: error.response?.data.title ?? null,
+                            modality: error.response?.data.modality ?? null,
+                            price: error.response?.data.price ?? null,
+                            duration: error.response?.data.duration ?? null,
+                            categoryId: error.response?.data.categoryId ?? null,
+                            institutionId: error.response?.data.institutionId ?? null,
+                            courseId: error.response?.data.courseId ?? null
+                        });
 
-    React.useEffect(() => {
-        dialogContext?.setContext({
-            ...dialogContext.context,
-            title: `Crear Nuevo Curso ${currentStep}/${Object.keys(steps).length}`,
-            description: currentStep === steps.step1 
-                ? "Establece el título, precio y duración de tu curso para comenzar a crearlo."
-                : currentStep === steps.step2
-                    ? "Selecciona una institución, modalidad y categoria."
-                    : "Establece la url del curso y de imagen. Adicionalmente la descripción para terminar de crearlo."
-        });
-    }, [currentStep]);
+                        if (error.response?.data.title || error.response?.data.price || error.response?.data.duration) {
+                            setCurrentStep(1);
+                        } else if (error.response?.data.institutionId || error.response?.data.modality || error.response?.data.categoryId) {
+                            setCurrentStep(2);
+                        }
+                    }
+
+                })
+                .finally(() => setLoading(false));
+        }
+    }
 
     return (
         <form onSubmit={handleSubmit} className="grid items-start gap-4">
@@ -82,37 +162,69 @@ function CourseForm() {
                 <>
                     <div className="grid gap-2">
                         <Label htmlFor="email">Titulo</Label>
-                        <Input 
-                            type="text" 
-                            autoComplete="name" 
-                            id="title" 
-                            placeholder="Coloca el titulo del curso..." 
+                        <Input
+                            type="text"
+                            autoComplete="name"
+                            id="title"
+                            placeholder="Coloca el titulo del curso..."
                             value={form.title}
                             onChange={handleOnChange}
+                            disabled={loading}
                         />
+                        {errors.title && (
+                            <p className="flex items-start gap-1 text-xs text-red-600 line-clamp-2">
+                                <Info className="w-3 h-3 min-h-3 min-w-3" />
+                                <span>
+                                    {errors.title}
+                                </span>
+                            </p>
+                        )}
                     </div>
                     <div className="grid gap-2">
                         <Label htmlFor="price">Precio</Label>
-                        <Input 
-                            type="number" 
-                            autoComplete="price" 
-                            id="price" 
+                        <Input
+                            type="number"
+                            autoComplete="price"
+                            id="price"
                             value={form.price}
                             onChange={handleOnChange}
+                            disabled={loading}
                         />
+                        {errors.price && (
+                            <p className="flex items-start gap-1 text-xs text-red-600 line-clamp-2">
+                                <Info className="w-3 h-3 min-h-3 min-w-3" />
+                                <span>
+                                    {errors.price}
+                                </span>
+                            </p>
+                        )}
                     </div>
                     <div className="grid gap-2">
                         <Label htmlFor="duration">Duración</Label>
-                        <Input 
-                            type="text" 
-                            autoComplete="duration" 
+                        <Input
+                            type="text"
+                            autoComplete="duration"
                             id="duration"
                             value={form.duration}
                             onChange={handleOnChange}
+                            disabled={loading}
                         />
+                        {errors.duration && (
+                            <p className="flex items-start gap-1 text-xs text-red-600 line-clamp-2">
+                                <Info className="w-3 h-3 min-h-3 min-w-3" />
+                                <span>
+                                    {errors.duration}
+                                </span>
+                            </p>
+                        )}
                     </div>
                     <div className="grid gap-2">
-                        <Button onClick={() => setCurrentStep(steps.step2)}>Siguiente</Button>
+                        <Button 
+                            onClick={() => setCurrentStep(steps.step2)}
+                            disabled={loading}
+                        >
+                            Siguiente
+                        </Button>
                     </div>
                 </>
             )}
@@ -121,60 +233,91 @@ function CourseForm() {
                 <>
                     <div className="grid gap-2">
                         <Label htmlFor="institution">Institución</Label>
-                        <Select onValueChange={value => setForm({
-                            ...form,
-                            institution: value
-                        })} value={form.institution}>
-                            <SelectTrigger>
-                                <SelectValue placeholder="Selecciona una modalidad" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectGroup>
-                                    <SelectLabel>Instituciones Disponibles</SelectLabel>
-                                    <SelectItem value="presencial">Presencial</SelectItem>
-                                    <SelectItem value="virtual">Virtual</SelectItem>
-                                    <SelectItem value="blended">Blended</SelectItem>
-                                </SelectGroup>
-                            </SelectContent>
-                        </Select>
+                        <ComboBoxResponsive 
+                            placeholder="Selecciona una institución"
+                            statuses={(course?.institution && !institutionHook.institutions.some(i => i.id === course.institution.id))
+                                ? [
+                                    course?.institution,
+                                    ...institutionHook.institutions
+                                ]
+                                : institutionHook.institutions 
+                            }
+                            pagination={!institutionHook.isLastPage}
+                            selectedStatus={form.institution}
+                            setSelectedStatus={i => {
+                                setForm({
+                                    ...form,
+                                    institution: i,
+                                });
+                            }}
+                            onPaginate={() => institutionHook.setPageNumber(institutionHook.pageNumber + 1)}
+                        />
+                        {errors.institutionId && (
+                            <p className="flex items-start gap-1 text-xs text-red-600 line-clamp-2">
+                                <Info className="w-3 h-3 min-h-3 min-w-3" />
+                                <span>
+                                    {errors.institutionId}
+                                </span>
+                            </p>
+                        )}
                     </div>
                     <div className="grid gap-2">
-                        <Label htmlFor="modality">Modalidad</Label>
-                        <Select onValueChange={value => setForm({
-                            ...form,
-                            modality: value
-                        })} value={form.modality}>
-                            <SelectTrigger className="">
-                                <SelectValue placeholder="Selecciona una modalidad" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectGroup>
-                                    <SelectLabel>Modalidades Disponibles</SelectLabel>
-                                    <SelectItem value="presencial">Presencial</SelectItem>
-                                    <SelectItem value="virtual">Virtual</SelectItem>
-                                    <SelectItem value="blended">Blended</SelectItem>
-                                </SelectGroup>
-                            </SelectContent>
-                        </Select>
+                        <Label>Modalidad</Label>
+                        <ComboBoxResponsive
+                            placeholder="Selecciona una modalidad"
+                            statuses={(course?.modality && !modalities.some(m => m.name.toLowerCase() === course.modality?.toLowerCase()))
+                                ? [
+                                    { id: course?.modality, name: course?.modality },
+                                    ...modalities
+                                ]
+                                : modalities
+                            }
+                            selectedStatus={{ id: form.modality, name: form.modality }}
+                            setSelectedStatus={i => {
+                                setForm({
+                                    ...form,
+                                    modality: i?.name,
+                                });
+                            }}
+                        />
+                        {errors.modality && (
+                            <p className="flex items-start gap-1 text-xs text-red-600 line-clamp-2">
+                                <Info className="w-3 h-3 min-h-3 min-w-3" />
+                                <span>
+                                    {errors.modality}
+                                </span>
+                            </p>
+                        )}
                     </div>
                     <div className="grid gap-2">
-                        <Label htmlFor="category">Categoria</Label>
-                        <Select onValueChange={value => setForm({
-                            ...form,
-                            category: value
-                        })} value={form.category}>
-                            <SelectTrigger className="">
-                                <SelectValue placeholder="Selecciona una modalidad" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectGroup>
-                                    <SelectLabel>Categorias Disponibles</SelectLabel>
-                                    <SelectItem value="presencial">Presencial</SelectItem>
-                                    <SelectItem value="virtual">Virtual</SelectItem>
-                                    <SelectItem value="blended">Blended</SelectItem>
-                                </SelectGroup>
-                            </SelectContent>
-                        </Select>
+                        <Label>Facultad</Label>
+                        <ComboBoxResponsive 
+                            placeholder="Selecciona una facultad"
+                            statuses={(course?.category && !facultyHook.faculties.some(f => f.id === course.category.id))
+                                ? [
+                                    course?.category,
+                                    ...facultyHook.faculties
+                                ]
+                                : facultyHook.faculties 
+                            }
+                            pagination={!facultyHook.isLastPage}
+                            selectedStatus={form.category}
+                            setSelectedStatus={i => {
+                                setForm({
+                                    ...form,
+                                    category: i,
+                                });
+                            }}
+                            onPaginate={() => facultyHook.setPageNumber(facultyHook.pageNumber + 1)}
+                        />
+                        {errors.categoryId && (
+                            <p className="flex items-start gap-1 text-xs text-red-600 line-clamp-2">
+                                <Info className="w-3 h-3 min-h-3 min-w-3" />
+                                <span>
+                                    {errors.categoryId}
+                                </span>
+                            </p>
+                        )}
                     </div>
                     <div className="grid grid-cols-2 gap-2">
                         <Button onClick={() => setCurrentStep(steps.step1)}>Anterior</Button>
@@ -187,21 +330,31 @@ function CourseForm() {
                 <>
                     <div className="grid gap-2">
                         <Label htmlFor="url">Enlace</Label>
-                        <Input 
-                            type="url" 
-                            autoComplete="url" 
-                            id="url" 
-                            placeholder="protocolo://dominio.tld/subruta" 
+                        <Input
+                            type="url"
+                            autoComplete="url"
+                            id="url"
+                            disabled={loading}
+                            placeholder="protocolo://dominio.tld/subruta"
                             value={form.url}
-                            onChange={handleOnChange}    
+                            onChange={handleOnChange}
                         />
+                        {errors.url && (
+                            <p className="flex items-start gap-1 text-xs text-red-600 line-clamp-2">
+                                <Info className="w-3 h-3 min-h-3 min-w-3" />
+                                <span>
+                                    {errors.url}
+                                </span>
+                            </p>
+                        )}
                     </div>
                     <div className="grid gap-2">
                         <Label htmlFor="url">Enlace de Imagen</Label>
-                        <Input 
-                            type="url" 
-                            autoComplete="url" 
-                            id="image" 
+                        <Input
+                            type="url"
+                            autoComplete="url"
+                            id="image"
+                            disabled={loading}
                             placeholder="protocolo://dominio.tld/subruta"
                             value={form.image}
                             onChange={handleOnChange}
@@ -209,16 +362,32 @@ function CourseForm() {
                     </div>
                     <div className="grid gap-2">
                         <Label htmlFor="description">Descripción</Label>
-                        <Textarea 
-                            id="description" 
+                        <Textarea
+                            id="description"
                             rows={5}
+                            disabled={loading}
                             value={form.description}
                             onChange={handleOnChange}
                         />
                     </div>
                     <div className="grid grid-cols-2 gap-2">
-                        <Button onClick={() => setCurrentStep(steps.step2)}>Anterior</Button>
-                        <Button type="submit">Crear Curso</Button>
+                        <Button 
+                            onClick={() => setCurrentStep(steps.step2)}
+                            disabled={loading}
+                        >
+                            Anterior
+                        </Button>
+                        <Button 
+                            type="submit"
+                            disabled={loading}
+                        >
+                            <p className="max-w-full truncate inline-flex items-center gap-2">
+                                {course ? 'Actualizar' : 'Crear' }
+                                {loading && (
+                                    <LoaderCircle className="animate-spin" />
+                                )}
+                            </p>
+                        </Button>
                     </div>
                 </>
             )}

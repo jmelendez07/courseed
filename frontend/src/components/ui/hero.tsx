@@ -123,7 +123,7 @@ const Hero = ({
                                                 <img
                                                     src={courseHook.courses[3].image}
                                                     alt=""
-                                                    className="absolute z-10 w-full rounded-[16%] bg-red-100 h-full object-cover"
+                                                    className="absolute z-10 w-full rounded-[16%] h-full object-cover"
                                                 />
                                                 )}
                                             </AspectRatio>
