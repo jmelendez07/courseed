@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 import com.api.flux.courseed.persistence.documents.Course;
 
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @Repository
 public interface CourseRepository extends ReactiveMongoRepository<Course, String> {
@@ -19,4 +20,6 @@ public interface CourseRepository extends ReactiveMongoRepository<Course, String
 
     Flux<Course> findByCategoryId(String categoryId, Pageable pageable);
     Flux<Course> findByInstitutionId(String institutionId, Pageable pageable);
+
+    Mono<Long> countByInstitutionId(String institutionId);
 }

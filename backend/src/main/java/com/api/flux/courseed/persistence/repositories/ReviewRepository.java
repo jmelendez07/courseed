@@ -15,4 +15,5 @@ public interface ReviewRepository extends ReactiveMongoRepository<Review, String
     Flux<Review> findByCourseId(String courseId, Pageable pageable);
     Flux<Review> findByUserId(String userId, Pageable pageable);
     Mono<Review> findByUserIdAndCourseId(String userId, String courseId);
+    Mono<Long> countByCourseId(String courseId);
 }

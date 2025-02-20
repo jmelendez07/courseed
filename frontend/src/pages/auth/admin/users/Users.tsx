@@ -13,7 +13,7 @@ import {
     SidebarTrigger,
 } from "@/components/ui/sidebar";
 import UserDataTable from "@/components/user-data-table";
-import PieChart from "@/components/pie-chart-test";
+import PieChart from "@/components/pie-chart";
 import AreaChart from "@/components/area-chart";
 import BarChart from "@/components/bar-chart";
 import HeadProvider from "@/providers/HeadProvider";

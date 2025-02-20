@@ -40,6 +40,15 @@ public class InstitutionController {
             .switchIfEmpty(ServerResponse.notFound().build());
     }
 
+    public Mono<ServerResponse> getInstitutionsWithCoursesCount(ServerRequest serverRequest) {
+        return institutionService.getInstitutionsWithCoursesCount(
+            Integer.parseInt(serverRequest.queryParam("page").orElse("0")), 
+            Integer.parseInt(serverRequest.queryParam("size").orElse("10"))
+        )
+        .flatMap(institutions -> ServerResponse.ok().bodyValue(institutions))
+        .switchIfEmpty(ServerResponse.notFound().build());
+    }
+
     public Mono<ServerResponse> createInstitution(ServerRequest serverRequest) {
         return serverRequest.bodyToMono(SaveInstitutionDto.class)
             .doOnNext(validationService::validate)

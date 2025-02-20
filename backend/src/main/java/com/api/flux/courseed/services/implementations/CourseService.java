@@ -1,5 +1,7 @@
 package com.api.flux.courseed.services.implementations;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -20,6 +22,7 @@ import com.api.flux.courseed.persistence.repositories.LikeRepository;
 import com.api.flux.courseed.persistence.repositories.ReviewRepository;
 import com.api.flux.courseed.persistence.repositories.UserRepository;
 import com.api.flux.courseed.projections.dtos.CourseDto;
+import com.api.flux.courseed.projections.dtos.CourseWithReviewsCountAndLikesCount;
 import com.api.flux.courseed.projections.dtos.ReviewDto;
 import com.api.flux.courseed.projections.dtos.SaveCourseDto;
 import com.api.flux.courseed.projections.dtos.UserDto;
@@ -285,6 +288,22 @@ public class CourseService implements InterfaceCourseService {
             .collectList()
             .zipWith(courseRepository.count())
             .map(p -> new PageImpl<>(p.getT1(), pageable, p.getT2()));
+    }
+
+    @Override
+    public Mono<List<CourseWithReviewsCountAndLikesCount>> getTopCoursesWithReviewsAndLikes(int page, int size) {
+        return courseRepository.findAll()
+            .flatMap(course -> {
+                Mono<Long> reviewsCount = reviewRepository.countByCourseId(course.getId());
+                Mono<Long> likesCount = likeRepository.countByCourseId(course.getId());
+
+                return Mono.zip(reviewsCount, likesCount)
+                    .map(tuple -> new CourseWithReviewsCountAndLikesCount(course.getId(), course.getTitle(), tuple.getT1(), tuple.getT2()));
+            })
+            .sort((c1, c2) -> Long.compare(c2.getTotalLikes() + c2.getTotalReviews(), c1.getTotalLikes() + c1.getTotalReviews()))
+            .skip(page * size)
+            .take(size)
+            .collectList();
     }
 
     @Override

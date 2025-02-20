@@ -1,8 +1,6 @@
 import { AppSidebar } from "@/components/app-sidebar";
-import BarChart from "@/components/bar-chart";
-import BarChartHorizontal from "@/components/bar-chart-horizontal";
+import DashboardChartCourses from "@/components/dashboard-chart-courses";
 import DashboardContentCourses from "@/components/dashboard-content-courses";
-import PieChartTest from "@/components/pie-chart-test";
 import {
 	Breadcrumb,
 	BreadcrumbItem,
@@ -51,11 +49,7 @@ function Courses() {
 						</div>
 					</header>
 					<div className="flex flex-1 flex-col gap-4 p-4 pt-0">
-						<div className="grid gap-4 md:grid-cols-3">
-							<BarChart />
-							<PieChartTest />
-							<BarChartHorizontal />
-						</div>
+						<DashboardChartCourses />
 						<DashboardContentCourses/>
 					</div>
 				</SidebarInset>

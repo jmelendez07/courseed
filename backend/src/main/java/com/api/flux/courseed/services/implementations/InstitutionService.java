@@ -1,5 +1,7 @@
 package com.api.flux.courseed.services.implementations;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -7,8 +9,10 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import com.api.flux.courseed.persistence.repositories.CourseRepository;
 import com.api.flux.courseed.persistence.repositories.InstitutionRepository;
 import com.api.flux.courseed.projections.dtos.InstitutionDto;
+import com.api.flux.courseed.projections.dtos.InstitutionWithCoursesCountDto;
 import com.api.flux.courseed.projections.dtos.SaveInstitutionDto;
 import com.api.flux.courseed.projections.mappers.InstitutionMapper;
 import com.api.flux.courseed.services.interfaces.InterfaceInstitutionService;
@@ -21,6 +25,9 @@ public class InstitutionService implements InterfaceInstitutionService {
 
     @Autowired
     private InstitutionRepository institutionRepository;
+
+    @Autowired
+    private CourseRepository courseRepository;
 
     @Autowired
     private InstitutionMapper institutionMapper;    
@@ -60,6 +67,18 @@ public class InstitutionService implements InterfaceInstitutionService {
                     "No hemos podido encontrar la institución indicada por su nombre. Te sugerimos que verifiques y lo intentes nuevamente."
                 ).getWebExchangeBindException()
             ));
+    }
+
+    @Override
+    public Mono<List<InstitutionWithCoursesCountDto>> getInstitutionsWithCoursesCount(int page, int size) {
+        return institutionRepository.findAll()
+            .flatMap(institution -> courseRepository.countByInstitutionId(institution.getId())
+                .map(totalCourses -> new InstitutionWithCoursesCountDto(institution.getId(), institution.getName(), totalCourses))
+            )
+            .sort((institution1, institution2) -> institution2.getTotalCourses().compareTo(institution1.getTotalCourses()))
+            .skip(page * size)
+            .take(size)
+            .collectList();
     }
 
     @Override

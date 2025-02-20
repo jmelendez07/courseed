@@ -67,6 +67,15 @@ public class CourseController {
             .switchIfEmpty(ServerResponse.notFound().build());
     }
 
+    public Mono<ServerResponse> getTopCoursesWithReviewsAndLikes(ServerRequest serverRequest) {
+        return courseService.getTopCoursesWithReviewsAndLikes(
+            Integer.parseInt(serverRequest.queryParam("page").orElse("0")), 
+            Integer.parseInt(serverRequest.queryParam("size").orElse("10"))
+        )
+        .flatMap(courses -> ServerResponse.ok().bodyValue(courses))
+        .switchIfEmpty(ServerResponse.notFound().build());
+    }
+
     public Mono<ServerResponse> createCourse(ServerRequest serverRequest) {
         return serverRequest.bodyToMono(SaveCourseDto.class)
             .doOnNext(validationService::validate)

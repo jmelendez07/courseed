@@ -13,4 +13,5 @@ public interface LikeRepository extends ReactiveMongoRepository<Like, String> {
     Flux<Like> findByCourseId(String courseId);
     Flux<Like> findByUserId(String userId);
     Mono<Like> findByUserIdAndCourseId(String userId, String courseId);
+    Mono<Long> countByCourseId(String courseId);
 }

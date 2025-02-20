@@ -50,7 +50,7 @@ public class SecurityConfig {
                     .pathMatchers(HttpMethod.POST, "/courses").hasRole(Roles.ADMIN)
                     .pathMatchers(HttpMethod.PUT, "/courses/*").hasRole(Roles.ADMIN)
                     .pathMatchers(HttpMethod.DELETE, "/courses/*").hasRole(Roles.ADMIN)
-                    .pathMatchers(HttpMethod.GET, "/institutions", "/institutions/*", "/institutions/name/*").permitAll()
+                    .pathMatchers(HttpMethod.GET, "/institutions", "/institutions/*", "/institutions/name/*", "/institutions/courses/count").permitAll()
                     .pathMatchers(HttpMethod.POST, "/institutions").hasRole(Roles.ADMIN)
                     .pathMatchers(HttpMethod.PUT, "/institutions/*").hasRole(Roles.ADMIN)
                     .pathMatchers(HttpMethod.DELETE, "/institutions/*").hasRole(Roles.ADMIN)
