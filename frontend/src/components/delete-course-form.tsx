@@ -1,6 +1,6 @@
 import APIS from "@/enums/apis";
 import CourseInterface from "@/interfaces/course";
-import axios, { AxiosError, AxiosResponse } from "axios";
+import axios, { AxiosError } from "axios";
 import React from "react";
 import { Button } from "./ui/button";
 import { LoaderCircle } from "lucide-react";
@@ -27,17 +27,16 @@ function DeleteCourseForm({ course, onDeleted }: DeleteCourseProps) {
         e.preventDefault();
         
         axios.delete(`${APIS.COURSES_DELETE}${course.id}`)
-            .then((response: AxiosResponse) => {
-                console.log(response);
-                if (onDeleted) onDeleted(course);
+            .then(() => {
                 dialogContext?.setContext({
                     ...dialogContext.context,
                     open: false
                 });
                 toast({
-                    title: `${response.data.title} Eliminado!`,
+                    title: `${course.title} Eliminado!`,
                     description: dayjs().format("LLL"),
                 });
+                if (onDeleted) onDeleted(course);
             })
             .catch((error: AxiosError<ErrorProps>) => {
                 dialogContext?.setContext({

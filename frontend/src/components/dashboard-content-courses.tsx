@@ -69,13 +69,19 @@ function DashboardContentCourses({ className }: { className?: string }) {
                             title: `Renueva ${course.title}`,
                             description: "Actualiza el contenido con los últimos enfoques de titulo, precio, duración...",
                             open: true,
-                            dialogChildren: <CourseForm course={course} onSaved={(c) => courseHook.handleUpdateCourse(c)} />
+                            dialogChildren: <CourseForm 
+                                course={course}
+                                onUpdated={(c) => courseHook.handleUpdateCourse(c)} 
+                            />
                         })}
                         handleDelete={() => dialogContext?.setContext({
                             title: `Eliminar ${course.title}`,
                             description: "¿Estas seguro de querer eliminar esta educación? No podras recuperarla",
                             open: true,
-                            dialogChildren: <DeleteCourseForm course={course} onDeleted={(c) => courseHook.handleDeleteCourse(c)} />
+                            dialogChildren: <DeleteCourseForm 
+                                course={course} 
+                                onDeleted={(c) => courseHook.handleDeleteCourse(c)} 
+                            />
                         })}
                     />
                 ))}

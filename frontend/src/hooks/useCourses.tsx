@@ -107,6 +107,14 @@ function useCourses({ size, institutionParam, facultyParam }: UseCoursesProps) {
             .finally(() => setLoading(false));
     }
 
+    const handleCreatedCourse = (course: CourseInterface) => {
+        alert(1);
+        setCourses(currentCourses => [
+            course,
+            ...currentCourses
+        ]);
+    }
+
     const handleUpdateCourse = (course: CourseInterface) => {
         setCourses([
             ...courses.map(c => {
@@ -138,6 +146,7 @@ function useCourses({ size, institutionParam, facultyParam }: UseCoursesProps) {
         setTotalCourses,
         setParams,
         handleSearch,
+        handleCreatedCourse,
         handleUpdateCourse,
         handleDeleteCourse
     };

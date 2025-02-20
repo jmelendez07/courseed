@@ -47,10 +47,11 @@ interface ErrorProps {
 
 interface CourseFormProps {
     course?: CourseInterface;
-    onSaved?: (course: CourseInterface) => void
+    onCreated?: (course: CourseInterface) => void;
+    onUpdated?: (course: CourseInterface) => void;
 }
 
-function CourseForm({ course, onSaved }: CourseFormProps) {
+function CourseForm({ course, onCreated, onUpdated }: CourseFormProps) {
     const [currentStep, setCurrentStep] = React.useState<number>(steps.step1);
     const [form, setForm] = React.useState<FormProps>({
         url: course?.url ?? "",
@@ -93,67 +94,121 @@ function CourseForm({ course, onSaved }: CourseFormProps) {
     }
 
     const handleSubmit = (e: React.ChangeEvent<HTMLFormElement>) => {
-        setLoading(true);
         e.preventDefault();
         
         if (course) {
-            axios.put(`${APIS.COURSES_UPDATE}${course.id}`, {
-                url: form.url,
-                title: form.title,
-                image: form.image,
-                description: form.description,
-                modality: form.modality,
-                price: parseFloat(form.price.toString()),
-                duration: form.duration,
-                categoryId: form.category?.id,
-                institutionId: form.institution?.id
+            handleUpdate();
+        } else {
+            handleCreate();
+        }
+    }
+
+    const handleCreate = () => {
+        setLoading(true);
+        axios.post(APIS.COURSES_CREATE, {
+            url: form.url,
+            title: form.title,
+            image: form.image,
+            description: form.description,
+            modality: form.modality,
+            price: parseFloat(form.price.toString()),
+            duration: form.duration,
+            categoryId: form.category?.id,
+            institutionId: form.institution?.id
+        })
+            .then((response: AxiosResponse<CourseInterface>) => {
+                dialogContext?.setContext({
+                    ...dialogContext.context,
+                    open: false
+                });
+                toast({
+                    title: `${response.data.title} Creado!`,
+                    description: dayjs().format("LLL"),
+                });
+                if (onCreated) {
+                    alert(2);
+                    onCreated(response.data);
+                }
             })
-                .then((response: AxiosResponse<CourseInterface>) => {
+            .catch((error: AxiosError<ErrorProps>) => {
+                setErrors({
+                    url: error.response?.data.url ?? null,
+                    title: error.response?.data.title ?? null,
+                    modality: error.response?.data.modality ?? null,
+                    price: error.response?.data.price ?? null,
+                    duration: error.response?.data.duration ?? null,
+                    categoryId: error.response?.data.categoryId ?? null,
+                    institutionId: error.response?.data.institutionId ?? null,
+                    courseId: error.response?.data.courseId ?? null
+                });
+
+                if (error.response?.data.title || error.response?.data.price || error.response?.data.duration) {
+                    setCurrentStep(1);
+                } else if (error.response?.data.institutionId || error.response?.data.modality || error.response?.data.categoryId) {
+                    setCurrentStep(2);
+                }
+            })
+            .finally(() => setLoading(false))
+    }
+
+    const handleUpdate = () => {
+        setLoading(true);
+        axios.put(`${APIS.COURSES_UPDATE}${course?.id}`, {
+            url: form.url,
+            title: form.title,
+            image: form.image,
+            description: form.description,
+            modality: form.modality,
+            price: parseFloat(form.price.toString()),
+            duration: form.duration,
+            categoryId: form.category?.id,
+            institutionId: form.institution?.id
+        })
+            .then((response: AxiosResponse<CourseInterface>) => {
+                dialogContext?.setContext({
+                    ...dialogContext.context,
+                    open: false
+                });
+                toast({
+                    title: `${response.data.title} Actualizado!`,
+                    description: dayjs().format("LLL"),
+                });
+                if (onUpdated) {
+                    onUpdated(response.data);
+                }
+            })
+            .catch((error: AxiosError<ErrorProps>) => {
+                if (error.response?.data.courseId) {
                     dialogContext?.setContext({
                         ...dialogContext.context,
                         open: false
                     });
                     toast({
-                        title: `${response.data.title} Actualizado!`,
-                        description: dayjs().format("LLL"),
+                        title: `${course?.title}. Algo salió mal!`,
+                        description: error.response.data.courseId,
+                        variant: "destructive",
                     });
-                    if (onSaved) {
-                        onSaved(response.data);
-                    }
-                })
-                .catch((error: AxiosError<ErrorProps>) => {
-                    if (error.response?.data.courseId) {
-                        dialogContext?.setContext({
-                            ...dialogContext.context,
-                            open: false
-                        });
-                        toast({
-                            title: `${course.title}. Algo salió mal!`,
-                            description: error.response.data.courseId,
-                            variant: "destructive",
-                        });
-                    } else {
-                        setErrors({
-                            url: error.response?.data.url ?? null,
-                            title: error.response?.data.title ?? null,
-                            modality: error.response?.data.modality ?? null,
-                            price: error.response?.data.price ?? null,
-                            duration: error.response?.data.duration ?? null,
-                            categoryId: error.response?.data.categoryId ?? null,
-                            institutionId: error.response?.data.institutionId ?? null,
-                            courseId: error.response?.data.courseId ?? null
-                        });
+                } else {
+                    setErrors({
+                        url: error.response?.data.url ?? null,
+                        title: error.response?.data.title ?? null,
+                        modality: error.response?.data.modality ?? null,
+                        price: error.response?.data.price ?? null,
+                        duration: error.response?.data.duration ?? null,
+                        categoryId: error.response?.data.categoryId ?? null,
+                        institutionId: error.response?.data.institutionId ?? null,
+                        courseId: error.response?.data.courseId ?? null
+                    });
 
-                        if (error.response?.data.title || error.response?.data.price || error.response?.data.duration) {
-                            setCurrentStep(1);
-                        } else if (error.response?.data.institutionId || error.response?.data.modality || error.response?.data.categoryId) {
-                            setCurrentStep(2);
-                        }
+                    if (error.response?.data.title || error.response?.data.price || error.response?.data.duration) {
+                        setCurrentStep(1);
+                    } else if (error.response?.data.institutionId || error.response?.data.modality || error.response?.data.categoryId) {
+                        setCurrentStep(2);
                     }
+                }
 
-                })
-                .finally(() => setLoading(false));
-        }
+            })
+            .finally(() => setLoading(false));
     }
 
     return (

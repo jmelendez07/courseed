@@ -35,8 +35,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 	}
 
 	const courseForm = {
-		title: "Crear Nuevo Curso",
-		description: "description",
+		title: "Crea un Nuevo Curso",
+		description: "Añade un nuevo curso a la plataforma con su titulo, precio, duración...",
 		open: true,
 		dialogChildren: <CourseForm />
 	}
@@ -56,8 +56,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 				action: () => dialogContext?.setContext(userForm)
 			},
 			{
-				name: "Nuevo Curso",
-				logo: BookPlus,
+				name: "Nueva Educación Continuada",
+				logo: GraduationCap,
 				action: () => dialogContext?.setContext(courseForm)
 			},
 			{
