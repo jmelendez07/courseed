@@ -77,6 +77,7 @@ public class RouterConfig {
             .route()
             .GET("", courseController::getAllCourses)
             .GET("/search", courseController::searchCoursesByText)
+            .GET("/reviews/avg", courseController::getTopCoursesWithRatingAvg)
             .GET("/{id}", courseController::getCourseById)
             .GET("/category/{categoryId}", courseController::getCoursesByCategoryId)
             .GET("/institution/{institutionId}", courseController::getCoursesByInstitutionId)
@@ -114,6 +115,7 @@ public class RouterConfig {
         return RouterFunctions
             .route()
             .GET("", reviewController::getAllReviews)
+            .GET("/months/count", reviewController::getReviewCountsForLastSixMonths)
             .GET("/course/{courseId}", reviewController::getReviewsByCourseId)
             .GET("/auth", reviewController::getReviewsByAuthUser)
             .POST(reviewController::createReview)

@@ -1,8 +1,6 @@
 import { AppSidebar } from "@/components/app-sidebar";
-import BarChartHorizontal from "@/components/bar-chart-horizontal";
+import DashboardChartReviews from "@/components/dashboard-chart-reviews";
 import DashboardContentReviews from "@/components/dashboard-content-reviews";
-import LineChart from "@/components/line-chart";
-import RadarChart from "@/components/radar-chart";
 import {
 	Breadcrumb,
 	BreadcrumbItem,
@@ -47,14 +45,7 @@ function Reviews() {
 						</div>
 					</header>
 					<div className="flex flex-1 flex-col gap-4 p-4 pt-0">
-						<div className="grid auto-rows-min gap-4 md:grid-cols-3">
-							<LineChart />
-							<BarChartHorizontal />
-							<RadarChart
-								title="Distribución de Reseñas por Institución"
-								description="January - June 2024"
-							/>
-						</div>
+						<DashboardChartReviews />
 						<DashboardContentReviews />
 					</div>
 				</SidebarInset>

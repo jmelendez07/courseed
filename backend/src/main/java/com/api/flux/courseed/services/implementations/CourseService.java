@@ -1,5 +1,4 @@
 package com.api.flux.courseed.services.implementations;
-
 import java.util.List;
 
 import org.springframework.data.domain.Page;
@@ -22,6 +21,7 @@ import com.api.flux.courseed.persistence.repositories.LikeRepository;
 import com.api.flux.courseed.persistence.repositories.ReviewRepository;
 import com.api.flux.courseed.persistence.repositories.UserRepository;
 import com.api.flux.courseed.projections.dtos.CourseDto;
+import com.api.flux.courseed.projections.dtos.CourseWithRatingAvg;
 import com.api.flux.courseed.projections.dtos.CourseWithReviewsCountAndLikesCount;
 import com.api.flux.courseed.projections.dtos.ReviewDto;
 import com.api.flux.courseed.projections.dtos.SaveCourseDto;
@@ -303,6 +303,15 @@ public class CourseService implements InterfaceCourseService {
             .sort((c1, c2) -> Long.compare(c2.getTotalLikes() + c2.getTotalReviews(), c1.getTotalLikes() + c1.getTotalReviews()))
             .skip(page * size)
             .take(size)
+            .collectList();
+    }
+
+    @Override
+    public Mono<List<CourseWithRatingAvg>> getTopCoursesWithRatingAvg(int size) {
+        return reviewRepository.findTopRatedCourses(size)
+            .flatMap(reviewAvg -> courseRepository.findById(reviewAvg.getCourseId())
+                .map(course -> new CourseWithRatingAvg(course.getId(), course.getTitle(), reviewAvg.getRating()))
+            )
             .collectList();
     }
 

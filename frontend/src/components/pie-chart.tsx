@@ -63,8 +63,9 @@ function PieChart({
                         <Pie data={chartData} dataKey="value" nameKey="label" label>
                             <LabelList
                                 dataKey="label"
-                                className="fill-background"
-                                stroke="none"
+                                offset={8}
+                                fontWeight={2}
+                                fill="#fff"
                                 fontSize={12}
                                 formatter={renderLabel}
                             />

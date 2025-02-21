@@ -55,6 +55,12 @@ public class ReviewController {
             );
     }
 
+    public Mono<ServerResponse> getReviewCountsForLastSixMonths(ServerRequest serverRequest) {
+        return reviewService.getReviewCountsForLastSixMonths()
+            .flatMap(reviews-> ServerResponse.ok().bodyValue(reviews))
+            .switchIfEmpty(ServerResponse.notFound().build());
+    }
+
     public Mono<ServerResponse> createReview(ServerRequest serverRequest) {
         return serverRequest.bodyToMono(CreateReviewDto.class)
             .doOnNext(validationService::validate)

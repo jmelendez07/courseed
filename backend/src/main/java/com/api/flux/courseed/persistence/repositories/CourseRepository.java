@@ -12,14 +12,10 @@ import reactor.core.publisher.Mono;
 
 @Repository
 public interface CourseRepository extends ReactiveMongoRepository<Course, String> {
-
     Flux<Course> findAllBy(Pageable pageable);
-
     @Query("{ '$or': [ { 'title': { '$regex': ?0, '$options': 'i' } }, { 'description': { '$regex': ?0, '$options': 'i' } }, { 'duration': { '$regex': ?0, '$options': 'i' } } ] }")
     Flux<Course> searchCourses(String text, Pageable pageable);
-
     Flux<Course> findByCategoryId(String categoryId, Pageable pageable);
     Flux<Course> findByInstitutionId(String institutionId, Pageable pageable);
-
     Mono<Long> countByInstitutionId(String institutionId);
 }

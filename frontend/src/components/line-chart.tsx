@@ -12,34 +12,45 @@ import {
     ChartTooltip,
     ChartTooltipContent,
 } from "@/components/ui/chart";
+import { useMediaQuery } from "@/hooks/use-media-query";
 
-const chartData = [
-    { month: "January", desktop: 186, mobile: 80 },
-    { month: "February", desktop: 305, mobile: 200 },
-    { month: "March", desktop: 237, mobile: 120 },
-    { month: "April", desktop: 73, mobile: 190 },
-    { month: "May", desktop: 209, mobile: 130 },
-    { month: "June", desktop: 214, mobile: 140 },
-];
+interface LineChartProps {
+    title?: string;
+    description?: string;
+    chartData: ChartItem[];
+    labelValueToolTip?: String;
+    className?: String;
+}
 
-const chartConfig = {
-    desktop: {
-        label: "Desktop",
-        color: "hsl(var(--chart-1))",
-    },
-    mobile: {
-        label: "Mobile",
-        color: "hsl(var(--chart-2))",
-    },
-} satisfies ChartConfig
+interface ChartItem {
+    month: String;
+    count: number;
+}
 
-function LineChart() {
+function LineChart({ 
+    title="Line Chart - Label",
+    description="January - June 2024",
+    labelValueToolTip="count",
+    chartData,
+    className
+}: LineChartProps) {
+    const isDesktop = useMediaQuery("(min-width: 768px)");
+    const chartConfig = {
+        desktop: {
+            label: "Desktop",
+            color: "oklch(0.588 0.158 241.966)",
+        },
+        count: {
+            label: labelValueToolTip,
+        }
+    } satisfies ChartConfig
+
     return (
-        <Card className="bg-white border border-gray-200 rounded-lg hover:shadow-lg 
-            transition-shadow duration-300 grid grid-rows-[auto_1fr]">
+        <Card className={`bg-white border border-gray-200 rounded-lg hover:shadow-lg 
+            transition-shadow duration-300 grid grid-rows-[auto_1fr] ${className}`}>
             <CardHeader>
-                <CardTitle>Line Chart - Label</CardTitle>
-                <CardDescription>January - June 2024</CardDescription>
+                <CardTitle>{title}</CardTitle>
+                <CardDescription>{description}</CardDescription>
             </CardHeader>
             <CardContent className="max-h-full overflow-hidden">
                 <ChartContainer config={chartConfig} className="w-full max-h-[220px] overflow-hidden">
@@ -58,14 +69,19 @@ function LineChart() {
                             tickLine={false}
                             axisLine={false}
                             tickMargin={8}
-                            tickFormatter={(value) => value.slice(0, 3)}
+                            tickFormatter={(value) => isDesktop ? value.slice(0, 15) + "..." : value.slice(0, 3)}
                         />
                         <ChartTooltip
                             cursor={false}
-                            content={<ChartTooltipContent indicator="line" />}
+                            content={
+                                <ChartTooltipContent 
+                                    indicator="line" 
+                                    label="hola"
+                                />
+                            }
                         />
                         <Line
-                            dataKey="desktop"
+                            dataKey="count"
                             type="natural"
                             stroke="var(--color-desktop)"
                             strokeWidth={2}

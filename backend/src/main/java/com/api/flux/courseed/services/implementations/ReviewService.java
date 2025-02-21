@@ -1,6 +1,15 @@
 package com.api.flux.courseed.services.implementations;
 
 import java.security.Principal;
+import java.time.LocalDate;
+import java.time.format.TextStyle;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -23,6 +32,7 @@ import com.api.flux.courseed.persistence.repositories.ReviewRepository;
 import com.api.flux.courseed.persistence.repositories.UserRepository;
 import com.api.flux.courseed.projections.dtos.CourseDto;
 import com.api.flux.courseed.projections.dtos.CreateReviewDto;
+import com.api.flux.courseed.projections.dtos.ReviewCountByMonth;
 import com.api.flux.courseed.projections.dtos.ReviewDto;
 import com.api.flux.courseed.projections.dtos.UpdateReviewDto;
 import com.api.flux.courseed.projections.dtos.UserDto;
@@ -55,6 +65,15 @@ public class ReviewService implements InterfaceReviewService {
     private InstitutionMapper institutionMapper;
     private LikeMapper likeMapper;
     private ContentMapper contentMapper;
+
+    private final Map<String, String> MONTH_TRANSLATIONS = Map.ofEntries(
+        Map.entry("January", "Enero"), Map.entry("February", "Febrero"),
+        Map.entry("March", "Marzo"), Map.entry("April", "Abril"),
+        Map.entry("May", "Mayo"), Map.entry("June", "Junio"),
+        Map.entry("July", "Julio"), Map.entry("August", "Agosto"),
+        Map.entry("September", "Septiembre"), Map.entry("October", "Octubre"),
+        Map.entry("November", "Noviembre"), Map.entry("December", "Diciembre")
+    );
 
     public ReviewService(
         ReviewRepository reviewRepository, UserRepository userRepository,
@@ -209,6 +228,16 @@ public class ReviewService implements InterfaceReviewService {
             .collectList()
             .zipWith(reviewRepository.count())
             .map(p -> new PageImpl<>(p.getT1(), pageable, p.getT2()));
+    }
+
+    @Override
+    public Mono<List<ReviewCountByMonth>> getReviewCountsForLastSixMonths() {
+        LocalDate today = LocalDate.now();
+        List<ReviewCountByMonth> lastSixMonths = generateLastSixMonths(today);
+
+        return reviewRepository.countReviewsLastSixMonths(today.minusMonths(5).withDayOfMonth(1))
+            .collectList()
+            .map(reviewCounts -> mergeWithMissingMonths(lastSixMonths, reviewCounts));
     }
 
     @Override
@@ -391,5 +420,31 @@ public class ReviewService implements InterfaceReviewService {
         } catch (NumberFormatException e) {
             return false;
         }
+    }
+
+    private List<ReviewCountByMonth> generateLastSixMonths(LocalDate date) {
+        return IntStream.range(0, 6)
+                .mapToObj(i -> date.minusMonths(i))
+                .map(d -> new ReviewCountByMonth(d.getYear(), d.getMonth().getDisplayName(TextStyle.FULL, Locale.forLanguageTag("en")), 0))
+                .sorted(Comparator.comparingInt(ReviewCountByMonth::getYear).thenComparing(Comparator.comparingInt(this::getMonthIndex)))
+                .collect(Collectors.toList());
+    }
+
+    private List<ReviewCountByMonth> mergeWithMissingMonths(List<ReviewCountByMonth> predefined, List<ReviewCountByMonth> fromDb) {
+        Map<String, Integer> reviewCountsMap = fromDb
+            .stream()
+            .collect(Collectors.toMap(r -> r.getYear() + "-" + r.getMonth(), r -> Math.toIntExact(r.getCount())));
+
+        return predefined.stream()
+                .map(r -> new ReviewCountByMonth(r.getYear(), MONTH_TRANSLATIONS.getOrDefault(r.getMonth(), r.getMonth()), reviewCountsMap.getOrDefault(r.getYear() + "-" + r.getMonth(), 0)))
+                .collect(Collectors.toList());
+    }
+
+    private int getMonthIndex(ReviewCountByMonth review) {
+        return LocalDate.of(review.getYear(), 1, 1)
+                .withMonth(Arrays.asList("january", "february", "march", "april", "may", "june", "july", "august", "september", "october", "november", "december")
+                    .indexOf(review.getMonth().toLowerCase()) + 1
+                )
+                .getMonthValue();
     }
 }

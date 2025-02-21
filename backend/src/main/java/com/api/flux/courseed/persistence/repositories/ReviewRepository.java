@@ -1,9 +1,15 @@
 package com.api.flux.courseed.persistence.repositories;
 
+import java.time.LocalDate;
+
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.mongodb.repository.Aggregation;
 import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
 import org.springframework.stereotype.Repository;
 import com.api.flux.courseed.persistence.documents.Review;
+import com.api.flux.courseed.projections.dtos.ReviewAvg;
+import com.api.flux.courseed.projections.dtos.ReviewCountByMonth;
+
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -17,4 +23,20 @@ public interface ReviewRepository extends ReactiveMongoRepository<Review, String
     Flux<Review> findByUserId(String userId, Pageable pageable);
     Mono<Review> findByUserIdAndCourseId(String userId, String courseId);
     Mono<Long> countByCourseId(String courseId);
+
+    @Aggregation({
+        "{ '$group': { '_id': '$courseId', 'rating': { '$avg': '$rating' } } }",
+        "{ '$sort': { 'rating': -1 } }",
+        "{ '$limit': ?0 }",
+        "{ '$project': { 'courseId': '$_id', 'rating': 1, '_id': 0 } }"
+    })
+    Flux<ReviewAvg> findTopRatedCourses(int size);
+
+    @Aggregation(pipeline = {
+        "{ $match: { updatedAt: { $gte: ?0 } } }",
+        "{ $group: { _id: { year: { $year: '$updatedAt' }, monthName: { $dateToString: { format: '%B', date: '$updatedAt', timezone: 'America/New_York' } } }, count: { $sum: 1 } } }",
+        "{ $sort: { '_id.year': 1, '_id.monthName': 1 } }",
+        "{ '$project': { 'year': '$_id.year', 'month': '$_id.monthName', 'count': 1 } }"
+    })
+    Flux<ReviewCountByMonth> countReviewsLastSixMonths(LocalDate fromDate);
 }

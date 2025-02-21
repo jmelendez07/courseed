@@ -12,30 +12,46 @@ import {
     ChartTooltip,
     ChartTooltipContent,
 } from "@/components/ui/chart";
+import { useMediaQuery } from "@/hooks/use-media-query";
 
-const chartData = [
-    { month: "January", desktop: 186 },
-    { month: "February", desktop: 305 },
-    { month: "March", desktop: 237 },
-    { month: "April", desktop: 73 },
-    { month: "May", desktop: 209 },
-    { month: "June", desktop: 214 },
-];
+interface BarChartHorizontalProps {
+    title?: String;
+    description?: String;
+    chartData: ChartItem[];
+    labelValueToolTip?: String;
+    className?: String;
+} 
 
-const chartConfig = {
-    desktop: {
-        label: "Desktop",
-        color: "hsl(var(--chart-1))",
-    },
-} satisfies ChartConfig
+interface ChartItem {
+    label: String;
+    value: number;
+}
 
-function BarChartHorizontal() {
+function BarChartHorizontal({ 
+    title = "Bar Chart - Horizontal",
+    description = "January - June 2024",
+    labelValueToolTip = "value",
+    chartData,
+    className 
+}: BarChartHorizontalProps) {
+    const isDesktop = useMediaQuery("(min-width: 768px)");
+
+    const chartConfig = {
+        desktop: {
+            label: "Desktop",
+            color: "oklch(0.588 0.158 241.966)",
+        },
+        value: {
+            label: labelValueToolTip
+        }
+    } satisfies ChartConfig
+
     return (
-        <Card className="bg-white border border-gray-200 rounded-lg hover:shadow-lg 
-            transition-shadow duration-300 grid grid-rows-[auto_1fr]">
+        <Card className={`bg-white border border-gray-200 rounded-lg hover:shadow-lg 
+            transition-shadow duration-300 grid grid-rows-[auto_1fr] ${className}`}>
             <CardHeader>
-                <CardTitle>Bar Chart - Horizontal</CardTitle>
-                <CardDescription>January - June 2024</CardDescription>
+                <CardTitle>{title}</CardTitle>
+                <CardDescription>{description}</CardDescription>
             </CardHeader>
             <CardContent className="max-h-full overflow-hidden">
                 <ChartContainer config={chartConfig} className="w-full max-h-[220px] overflow-hidden">
@@ -44,12 +60,12 @@ function BarChartHorizontal() {
                         data={chartData}
                         layout="vertical"
                         margin={{
-                            right: 16,
+                            right: isDesktop ? -180 : -100,
                         }}
                     >
                         <CartesianGrid horizontal={false} />
                         <YAxis
-                            dataKey="month"
+                            dataKey="label"
                             type="category"
                             tickLine={false}
                             tickMargin={10}
@@ -57,30 +73,32 @@ function BarChartHorizontal() {
                             tickFormatter={(value) => value.slice(0, 3)}
                             hide
                         />
-                        <XAxis dataKey="desktop" type="number" hide />
+                        <XAxis dataKey="value" type="number" hide />
                         <ChartTooltip
                             cursor={false}
                             content={<ChartTooltipContent indicator="line" />}
                         />
                         <Bar
-                            dataKey="desktop"
+                            dataKey="value"
                             layout="vertical"
                             fill="var(--color-desktop)"
                             radius={4}
                         >
                             <LabelList
-                                dataKey="month"
+                                dataKey="label"
                                 position="insideLeft"
                                 offset={8}
-                                className="fill-[--color-label]"
+                                fill="#fff"
                                 fontSize={12}
+                                formatter={(value: string) => value.slice(0, isDesktop ? 30 : 15) + "..."}
                             />
                             <LabelList
-                                dataKey="desktop"
+                                dataKey="value"
                                 position="right"
                                 offset={8}
                                 className="fill-foreground"
                                 fontSize={12}
+                                formatter={(value: string) => value + "⭐"}
                             />
                         </Bar>
                     </BarChart>

@@ -76,6 +76,14 @@ public class CourseController {
         .switchIfEmpty(ServerResponse.notFound().build());
     }
 
+    public Mono<ServerResponse> getTopCoursesWithRatingAvg(ServerRequest serverRequest) {
+        return courseService.getTopCoursesWithRatingAvg(
+            Integer.parseInt(serverRequest.queryParam("size").orElse("10"))
+        )
+        .flatMap(courses -> ServerResponse.ok().bodyValue(courses))
+        .switchIfEmpty(ServerResponse.notFound().build());
+    }
+
     public Mono<ServerResponse> createCourse(ServerRequest serverRequest) {
         return serverRequest.bodyToMono(SaveCourseDto.class)
             .doOnNext(validationService::validate)

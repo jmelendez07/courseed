@@ -1,6 +1,7 @@
 import { Bar, BarChart as BarChartRechart, CartesianGrid, XAxis } from "recharts";
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent } from "@/components/ui/chart";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
+import { useMediaQuery } from "@/hooks/use-media-query";
 
 interface BarChartProps {
     title?: string;
@@ -37,6 +38,8 @@ function BarChart({
         },
     } satisfies ChartConfig
 
+    const isDesktop = useMediaQuery("(min-width: 768px)");
+
     return (
         <Card
             className={`bg-white border border-gray-200 rounded-lg hover:shadow-lg 
@@ -57,7 +60,7 @@ function BarChart({
                             tickLine={false}
                             tickMargin={10}
                             axisLine={false}
-                            tickFormatter={(value) => value.slice(0, 3)}
+                            tickFormatter={(value) => isDesktop ? value.slice(0, 10) + "..." : value.slice(0, 3)}
                         />
                         <ChartTooltip
                             cursor={false}
