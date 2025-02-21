@@ -1,6 +1,6 @@
 import APIS from "@/enums/apis";
 import UserInterface from "@/interfaces/user";
-import axios, { AxiosError, AxiosResponse } from "axios";
+import axios, { AxiosResponse } from "axios";
 import React from "react";
 
 interface ResponseUserProps {
@@ -9,11 +9,12 @@ interface ResponseUserProps {
 }
 
 interface useUserProps {
+	size?: number;
 	replaceUsers?: boolean;
 }
 
-function useUser({ replaceUsers = false }: useUserProps) {
-    const pageSize: number = 2;
+function useUsers({ size, replaceUsers = false }: useUserProps) {
+    const pageSize: number = size ?? 12;
     const [users, setUsers] = React.useState<UserInterface[]>([]);
     const [loading, setLoading] = React.useState<boolean>(false);
     const [isLastPage, setIsLastPage] = React.useState<boolean>(false);
@@ -36,7 +37,7 @@ function useUser({ replaceUsers = false }: useUserProps) {
 				);
 				setIsLastPage(response.data.last);
 			})
-			.catch((error: AxiosError) => console.error(error))
+			.catch(() => setIsLastPage(true))
 			.finally(() => setLoading(false));
 	}, [pageNumber, pageSize]);
 
@@ -53,4 +54,4 @@ function useUser({ replaceUsers = false }: useUserProps) {
 	}
 }
 
-export default useUser;
+export default useUsers;

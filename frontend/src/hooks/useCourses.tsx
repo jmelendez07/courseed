@@ -100,10 +100,7 @@ function useCourses({ size, institutionParam, facultyParam }: UseCoursesProps) {
                 setIsLastPage(response.data.last || response.data.empty);
                 setTotalCourses(response.data.totalElements);
             })
-            .catch((error: AxiosError) => {
-                console.error(error);
-                setIsLastPage(true);
-            })
+            .catch(() => setIsLastPage(true))
             .finally(() => setLoading(false));
     }
 

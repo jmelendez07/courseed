@@ -11,7 +11,7 @@ import com.api.flux.courseed.projections.dtos.UpdateReviewDto;
 import reactor.core.publisher.Mono;
 
 public interface InterfaceReviewService {
-    Mono<Page<ReviewDto>> getAllReviews(int page, int size);
+    Mono<Page<ReviewDto>> getAllReviews(int page, int size, String search, String userId);
     Mono<Page<ReviewDto>> getReviewsByCourseId(String courseId, int page, int size);
     Mono<Page<ReviewDto>> getReviewsByAuthUser(Principal principal, int page, int size);
     Mono<Object> createReview(Principal principal, CreateReviewDto createReviewDto);

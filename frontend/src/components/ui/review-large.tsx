@@ -45,24 +45,27 @@ function ReviewLarge({ review, handleEdit, handleDelete }: ReviewComponentProps)
 					<img
 						src={review.course.image}
 						alt={review.course.title}
-						className="w-full object-cover rounded-lg max-h-32"
+						className="w-full object-cover rounded-lg h-32 max-h-32"
 					/>
 				</div>
-				<div className="flex items-center mb-2">
-					{[...Array(5)].map((_, index) => (
-						<Star
-							key={index}
-							className={`h-5 w-5 ${index < review.rating ? "text-yellow-400 fill-current" : "text-gray-300"}`}
-						/>
-					))}
-				</div>
 				<p className="text-sm text-gray-600 mb-2 line-clamp-2">{review.content}</p>
-				<div className="flex items-center text-xs text-gray-500 gap-2">
-					<Avatar className="h-8 w-8 rounded-lg">
-						<AvatarFallback className="rounded-full">{review.user.email.slice(0, 2).toUpperCase()}</AvatarFallback>
-					</Avatar>
-					<span>{review.user.email}</span>
+				<div className="flex items-center justify-between gap-2">
+					<div className="flex items-center text-xs text-gray-500 gap-2 overflow-hidden">
+						<Avatar className="h-8 w-8 rounded-lg">
+							<AvatarFallback className="rounded-full">{review.user.email.slice(0, 2).toUpperCase()}</AvatarFallback>
+						</Avatar>
+						<span className="truncate">{review.user.email}</span>
+					</div>
+					<div className="flex items-center mb-2">
+						{[...Array(5)].map((_, index) => (
+							<Star
+								key={index}
+								className={`h-5 w-5 min-w-5 ${index < review.rating ? "text-yellow-400 fill-current" : "text-gray-300"}`}
+							/>
+						))}
+					</div>
 				</div>
+				
 			</CardContent>
 		</Card>
 	);

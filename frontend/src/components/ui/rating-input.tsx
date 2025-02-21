@@ -2,27 +2,38 @@ import React from "react";
 import { Star } from "lucide-react";
 
 interface RatinInputProps {
-    onChange?: (rating: number) => void
+    rating: number;
+    disabled?: boolean;
+    setRating: (value: number) => void;
 }
 
-function RatingInput({ onChange }: RatinInputProps) {
-    const [rating, setRating] = React.useState<number>(0);
+function RatingInput({ rating, disabled, setRating }: RatinInputProps) {
     const [hover, setHover] = React.useState<number>(0);
-
-    const handleRating = (value: number) => {
-        setRating(value);
-        if (onChange) onChange(value);
-    }
 
     return (
         <div className="flex items-center space-x-1">
             {[1, 2, 3, 4, 5].map((star) => (
                 <button
                     key={star}
-                    className={`p-0 ${(hover || rating) >= star ? "text-yellow-400 hover:text-yellow-400/30" : "text-gray-300"}`}
-                    onClick={() => handleRating(star)}
-                    onMouseEnter={() => setHover(star)}
-                    onMouseLeave={() => setHover(0)}
+                    className={`p-0
+                        ${(hover || rating) >= star ? "text-yellow-400 hover:text-yellow-400/30" : "text-gray-300"}
+                        ${disabled ? 'cursor-not-allowed': 'cursor-pointer'}
+                    `}
+                    onClick={() => {
+                        if (!disabled) {
+                            setRating(star);
+                        }
+                    }}
+                    onMouseEnter={() => {
+                        if (!disabled) {
+                            setHover(star);
+                        }
+                    }}
+                    onMouseLeave={() => {
+                        if (!disabled) {
+                            setHover(0);
+                        }
+                    }}
                     type="button"
                 >
                     <Star className="size-5 fill-current" />

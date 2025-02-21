@@ -1,4 +1,4 @@
-import useReview from "@/hooks/useReview";
+import useReviews from "@/hooks/useReviews";
 import { DialogContext } from "@/providers/DialogProvider";
 import React from "react";
 import { Input } from "./ui/input";
@@ -6,14 +6,15 @@ import { Button } from "./ui/button";
 import { ChevronDown, LoaderCircle, Search } from "lucide-react";
 import ComboBoxResponsive from "./ui/combo-box-responsive";
 import ReviewLarge from "./ui/review-large";
-import useUser from "@/hooks/useUser";
+import useUsers from "@/hooks/useUsers";
 import UpdateReviewForm from "./update-review-form";
+import DeleteReviewForm from "./delete-review-form";
 
 function DashboardContentReviews({ className }: { className?: string }) {
 
     const dialogContext = React.useContext(DialogContext);
-	const reviewHook = useReview();
-    const userHook = useUser({});
+	const reviewHook = useReviews({});
+    const userHook = useUsers({});
 
     return (
         <div className={`flex flex-col gap-4 ${className}`}>
@@ -75,7 +76,7 @@ function DashboardContentReviews({ className }: { className?: string }) {
                     onPaginate={() => userHook.setPageNumber(userHook.pageNumber + 1)}
                 />
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {reviewHook.reviews.map(review => (
                     <ReviewLarge
                         key={review.id}
@@ -84,7 +85,19 @@ function DashboardContentReviews({ className }: { className?: string }) {
                             title: "Actualizar Reseña",
                             description: "Modifica los detalles de la reseña para reflejar la experiencia más reciente.",
                             open: true,
-                            dialogChildren: <UpdateReviewForm />
+                            dialogChildren: <UpdateReviewForm 
+                                review={review} 
+                                onUpdated={(r) => reviewHook.handleReviewUpdated(r)}
+                            />
+                        })}
+                        handleDelete={() => dialogContext?.setContext({
+                            title: "Eliminar Reseña",
+                            description: "¿Estas seguro de querer eliminar esta reseña? No podras recuperarla",
+                            open: true,
+                            dialogChildren: <DeleteReviewForm 
+                                review={review} 
+                                onDeleted={(r) => reviewHook.handleReviewDeleted(r)}
+                            />
                         })}
                     />
                 ))}

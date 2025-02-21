@@ -13,6 +13,7 @@ import com.api.flux.courseed.persistence.documents.Content;
 import com.api.flux.courseed.persistence.documents.Institution;
 import com.api.flux.courseed.persistence.documents.Like;
 import com.api.flux.courseed.persistence.documents.Review;
+import com.api.flux.courseed.persistence.documents.User;
 import com.api.flux.courseed.persistence.repositories.CategoryRepository;
 import com.api.flux.courseed.persistence.repositories.ContentRepository;
 import com.api.flux.courseed.persistence.repositories.CourseRepository;
@@ -32,6 +33,7 @@ import com.api.flux.courseed.projections.mappers.InstitutionMapper;
 import com.api.flux.courseed.projections.mappers.LikeMapper;
 import com.api.flux.courseed.projections.mappers.ReviewMapper;
 import com.api.flux.courseed.services.interfaces.InterfaceReviewService;
+import com.api.flux.courseed.services.interfaces.Roles;
 import com.api.flux.courseed.web.exceptions.CustomWebExchangeBindException;
 
 import reactor.core.publisher.Flux;
@@ -78,10 +80,18 @@ public class ReviewService implements InterfaceReviewService {
     }
 
     @Override
-    public Mono<Page<ReviewDto>> getAllReviews(int page, int size) {
+    public Mono<Page<ReviewDto>> getAllReviews(int page, int size, String search, String userId) {
         Pageable pageable = PageRequest.of(page, size);
+        Flux<Review> reviewFlux = null;
+
+        if (isNumeric(search)) {
+            int rating = Integer.parseInt(search);
+            reviewFlux = reviewRepository.findByRatingAndUserIdContaining(pageable, rating, userId);
+        } else {
+            reviewFlux = reviewRepository.findByContentContainingAndUserIdContaining(pageable, search, userId);
+        }
         
-        return reviewRepository.findAllBy(pageable)
+        return reviewFlux
             .flatMap(review -> courseRepository.findById(review.getCourseId())
                 .flatMap(course -> userRepository.findById(review.getUserId())
                     .flatMap(user -> {
@@ -89,9 +99,9 @@ public class ReviewService implements InterfaceReviewService {
                         Mono<Institution> institutionMono = institutionRepository.findById(course.getInstitutionId());
                         Flux<Content> contentFlux = contentRepository.findByCourseId(course.getId());
                         Flux<Like> likeFlux = likeRepository.findByCourseId(course.getId());
-                        Flux<Review> reviewFlux = reviewRepository.findByCourseId(course.getId());
+                        Flux<Review> reviewsFlux = reviewRepository.findByCourseId(course.getId());
 
-                        return Mono.zip(categoryMono, institutionMono, contentFlux.collectList(), likeFlux.collectList(), reviewFlux.collectList())
+                        return Mono.zip(categoryMono, institutionMono, contentFlux.collectList(), likeFlux.collectList(), reviewsFlux.collectList())
                             .map(tuple -> {
                                 ReviewDto reviewDto = reviewMapper.toReviewDto(review);
                                 CourseDto courseDto = courseMapper.toCourseDto(course);
@@ -273,7 +283,7 @@ public class ReviewService implements InterfaceReviewService {
         return userRepository.findByEmail(principal.getName())
             .flatMap(user -> reviewRepository.findById(id)
                 .flatMap(review -> {
-                    if (review.getUserId().equals(user.getId())) {
+                    if (review.getUserId().equals(user.getId()) || user.getRoles().contains(Roles.PREFIX + Roles.ADMIN)) {
                         review.setContent(updateReviewDto.getContent());
                         review.setRating(updateReviewDto.getRating());
                         return reviewRepository.save(review)
@@ -284,8 +294,9 @@ public class ReviewService implements InterfaceReviewService {
                                     Flux<Content> contentFlux = contentRepository.findByCourseId(course.getId());
                                     Flux<Like> likeFlux = likeRepository.findByCourseId(course.getId());
                                     Flux<Review> reviewFlux = reviewRepository.findByCourseId(course.getId());
+                                    Mono<User> userMono = userRepository.findById(savedReview.getUserId());
     
-                                    return Mono.zip(categoryMono, institutionMono, contentFlux.collectList(), likeFlux.collectList(), reviewFlux.collectList())
+                                    return Mono.zip(categoryMono, institutionMono, contentFlux.collectList(), likeFlux.collectList(), reviewFlux.collectList(), userMono)
                                         .map(tuple -> {
                                             ReviewDto reviewDto = reviewMapper.toReviewDto(review);
                                             CourseDto courseDto = courseMapper.toCourseDto(course);
@@ -305,7 +316,7 @@ public class ReviewService implements InterfaceReviewService {
                                             );
     
                                             reviewDto.setCourse(courseMapper.toCourseDto(course));
-                                            reviewDto.setUser(new UserDto(user.getId(), user.getEmail()));
+                                            reviewDto.setUser(new UserDto(tuple.getT6().getId(), tuple.getT6().getEmail()));
     
                                             return reviewDto;
                                         });
@@ -343,7 +354,7 @@ public class ReviewService implements InterfaceReviewService {
         return userRepository.findByEmail(principal.getName())
             .flatMap(user -> reviewRepository.findById(id)
                 .flatMap(review -> {
-                    if (review.getUserId().equals(user.getId())) {
+                    if (review.getUserId().equals(user.getId()) || user.getRoles().contains(Roles.PREFIX + Roles.ADMIN)) {
                         return reviewRepository.deleteById(review.getId())
                             .then(Mono.just(true));
                     } else {
@@ -371,5 +382,14 @@ public class ReviewService implements InterfaceReviewService {
                     "Parece que el usuario autenticado no se encuentra en el sistema. Te recomendamos cerrar sesión y volver a ingresar."
                 ).getWebExchangeBindException()
             ));
+    }
+
+    private boolean isNumeric(String str) {
+        try {
+            Integer.parseInt(str);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
     }
 }

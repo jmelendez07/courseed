@@ -1,7 +1,7 @@
 import APIS from "@/enums/apis";
 import ReviewCourseUserInterface from "@/interfaces/review-course-user";
 import UserInterface from "@/interfaces/user";
-import axios, { AxiosError, AxiosResponse } from "axios";
+import axios, { AxiosResponse } from "axios";
 import React from "react";
 
 interface ResponseReviewProps {
@@ -18,11 +18,15 @@ interface ParamsProps {
     user: UserInterface | null
 }
 
-function useReview() {
+interface UseReviewsProps {
+    size?: number;
+}
+
+function useReviews({ size }: UseReviewsProps) {
     const [reviews, setReviews] = React.useState<ReviewCourseUserInterface[]>([]);
     const [loading, setLoading] = React.useState(false);
     const [totalCourses, setTotalCourses] = React.useState<number | null>(null);
-    const pageSize: number = 12;
+    const pageSize: number = size ?? 12;
     const [isLastPage, setIsLastPage] = React.useState<boolean>(false);
 
     const [params, setParams] = React.useState<ParamsProps>({
@@ -39,7 +43,7 @@ function useReview() {
                 page: params.pageNumber,
                 size: pageSize,
                 search: params.searchText,
-                user: params.user?.id
+                userId: params.user?.id
             }
         })
 			.then((response: AxiosResponse<ResponseReviewProps>) => {
@@ -53,14 +57,48 @@ function useReview() {
 				setIsLastPage(response.data.last || response.data.empty);
                 setTotalCourses(response.data.totalElements);
 			})
-			.catch((error: AxiosError) => {
-                console.error(error);
-                setIsLastPage(true);
-            })
+			.catch(() => setIsLastPage(true))
 			.finally(() => setLoading(false));
-    }, [params.pageNumber, pageSize, params.searchText, params.searchSubmit]); 
+    }, [params.pageNumber, pageSize, params.searchText, params.searchSubmit, params.user]);
 
-    React.useEffect(() => handleFetch(), [params.pageNumber, pageSize]);
+    const handleSearch = () => {
+        setParams({
+            ...params,
+            pageNumber: 0
+        });
+        setLoading(true);
+        axios.get(`${APIS.REVIEWS}?search=${params.searchText}`, {
+            params: {
+                page: 0,
+                size: pageSize
+            },
+        })
+            .then((response: AxiosResponse<ResponseReviewProps>) => {
+                setReviews(currentReviews => params.pageNumber === 0
+                    ? response.data.content
+                    : [
+                        ...currentReviews,
+                        ...response.data.content
+                    ]
+                );
+                setIsLastPage(response.data.last || response.data.empty);
+                setTotalCourses(response.data.totalElements);
+            })
+            .catch(() => setIsLastPage(true))
+            .finally(() => setLoading(false));
+    }
+
+    const handleReviewUpdated = (review: ReviewCourseUserInterface) => {
+        setReviews(reviews.map(r => {
+            return r.id === review.id ? review : r;
+        }));
+    }
+    
+    const handleReviewDeleted = (review: ReviewCourseUserInterface) => {
+        setReviews(reviews.filter(r => r.id !== review.id));
+    }
+
+    React.useEffect(() => handleFetch(), [params.pageNumber, pageSize, params.user]);
 
     return {
         reviews,
@@ -74,8 +112,11 @@ function useReview() {
         setIsLastPage,
         setTotalCourses,
         setParams,
-        handleFetch
+        handleFetch,
+        handleSearch,
+        handleReviewUpdated,
+        handleReviewDeleted
     };
 }
 
-export default useReview;
+export default useReviews;

@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/table";
 import { Button } from "./ui/button";
 import { Input } from "@/components/ui/input";
-import useUser from "@/hooks/useUser";
+import useUser from "@/hooks/useUsers";
 import { MoreHorizontal, UserPen, UserX, ArrowUpDown, MessageSquareText, Heart } from "lucide-react";
  
 import {

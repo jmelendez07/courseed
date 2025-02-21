@@ -14,6 +14,8 @@ enum APIS {
     INSTITUTIONS = 'api/institutions',
     INSTITUTIONS_COURSES_COUNT = 'api/institutions/courses/count',
     REVIEWS = 'api/reviews',
+    REVIEWS_UPDATE = 'api/reviews/',
+    REVIEWS_DELETE = 'api/reviews/',
     FACULTIES = 'api/categories'
 }
 

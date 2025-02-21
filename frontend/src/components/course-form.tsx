@@ -126,7 +126,6 @@ function CourseForm({ course, onCreated, onUpdated }: CourseFormProps) {
                     description: dayjs().format("LLL"),
                 });
                 if (onCreated) {
-                    alert(2);
                     onCreated(response.data);
                 }
             })
