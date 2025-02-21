@@ -90,7 +90,7 @@ function BarChartHorizontal({
                                 offset={8}
                                 fill="#fff"
                                 fontSize={12}
-                                formatter={(value: string) => value.slice(0, isDesktop ? 30 : 15) + "..."}
+                                formatter={(value: string) => value.slice(0, isDesktop ? 20 : 15) + "..."}
                             />
                             <LabelList
                                 dataKey="value"

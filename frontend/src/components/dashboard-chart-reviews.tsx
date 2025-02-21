@@ -32,7 +32,7 @@ function DashboardChartReviews() {
             <LineChart 
                 title="📅 Reseñas Recibidas Mensualmente (Último Semestre)"
                 description={dayjs().format("MMM - MMMM YYYY")}
-                className="col-span-2"
+                className="md:col-span-2"
                 labelValueToolTip="Reseñas"
                 chartData={monthsWithReviewsCount.map(m => ({ month: m.month + " - " + m.year, count: m.count }))}
             />

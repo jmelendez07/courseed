@@ -6,15 +6,16 @@ import ReviewCourseUserInterface from "@/interfaces/review-course-user";
 import { Avatar, AvatarFallback } from "./avatar";
 
 interface ReviewComponentProps {
-	review: ReviewCourseUserInterface,
-	handleEdit?: (review: ReviewCourseUserInterface) => void
-	handleDelete?: (review: ReviewCourseUserInterface) => void
+	review: ReviewCourseUserInterface;
+	handleEdit?: (review: ReviewCourseUserInterface) => void;
+	handleDelete?: (review: ReviewCourseUserInterface) => void;
+	className?: String;
 }
 
-function ReviewLarge({ review, handleEdit, handleDelete }: ReviewComponentProps) {
+function ReviewLarge({ review, handleEdit, handleDelete, className }: ReviewComponentProps) {
 	return (
 		<Card
-			className="flex flex-col bg-white ease-in-out hover:shadow-lg transition-shadow duration-300"
+			className={`flex flex-col bg-white ease-in-out hover:shadow-lg transition-shadow duration-300 ${className}`}
 		>
 			<CardHeader className="flex flex-row items-start justify-between space-y-0 pb-2">
 				<h2 className="text-lg font-semibold leading-tight">{review.course.title}</h2>

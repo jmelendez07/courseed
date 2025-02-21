@@ -3,7 +3,7 @@ import { DialogContext } from "@/providers/DialogProvider";
 import React from "react";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
-import { ChevronDown, LoaderCircle, Search } from "lucide-react";
+import { ChevronDown, ChevronUp, LoaderCircle, Search } from "lucide-react";
 import ComboBoxResponsive from "./ui/combo-box-responsive";
 import ReviewLarge from "./ui/review-large";
 import useUsers from "@/hooks/useUsers";
@@ -76,7 +76,7 @@ function DashboardContentReviews({ className }: { className?: string }) {
                     onPaginate={() => userHook.setPageNumber(userHook.pageNumber + 1)}
                 />
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 {reviewHook.reviews.map(review => (
                     <ReviewLarge
                         key={review.id}
@@ -106,10 +106,33 @@ function DashboardContentReviews({ className }: { className?: string }) {
                 <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => { }}
+                    onClick={() => {
+                        if (reviewHook.isLastPage) {
+                            window.scrollTo({ top: 0, behavior: "smooth" });
+                        } else {
+                            reviewHook.setParams({
+                                ...reviewHook.params,
+                                pageNumber: reviewHook.params.pageNumber + 1
+                            });
+                        }
+                    }}
+                    disabled={reviewHook.loading}
                 >
-                    Mostrar mas reseñas
-                    <ChevronDown />
+                    {reviewHook.isLastPage ? (
+                        <>
+                            ¡Lo has visto todo! Vuelve arriba.
+                            <ChevronUp />
+                        </>
+                    ) : (
+                        <>
+                            Mostrar mas reseñas
+                            {reviewHook.loading ? (
+                                <LoaderCircle className="animate-spin" />
+                            ) : (
+                                <ChevronDown />
+                            )}
+                        </>
+                    )}
                 </Button>
             </div>
         </div>
