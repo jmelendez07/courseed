@@ -15,7 +15,6 @@ import {
 import UserDataTable from "@/components/user-data-table";
 import PieChart from "@/components/pie-chart";
 import AreaChart from "@/components/area-chart";
-import BarChart from "@/components/bar-chart";
 import HeadProvider from "@/providers/HeadProvider";
 import DialogProvider from "@/providers/DialogProvider";
 import { Link } from "react-router-dom";
@@ -48,9 +47,8 @@ function Users() {
                 </header>
                 <div className="flex flex-1 flex-col gap-4 p-4 pt-0 max-w-[100vw]">
                     <div className="grid auto-rows-min gap-4 md:grid-cols-3">
-                        <PieChart />
-                        <AreaChart />
-                        <BarChart />
+                        <PieChart chartData={[]} />
+                        <AreaChart className="md:col-span-2" />
                     </div>
                     <UserDataTable />
                 </div>

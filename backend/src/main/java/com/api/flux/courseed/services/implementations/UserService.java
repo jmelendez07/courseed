@@ -9,6 +9,11 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import com.api.flux.courseed.persistence.documents.Like;
+import com.api.flux.courseed.persistence.documents.Review;
+import com.api.flux.courseed.persistence.repositories.LikeRepository;
+import com.api.flux.courseed.persistence.repositories.ReviewRepository;
 import com.api.flux.courseed.persistence.repositories.UserRepository;
 import com.api.flux.courseed.projections.dtos.UpdateUserEmailDto;
 import com.api.flux.courseed.projections.dtos.UpdateUserPasswordDto;
@@ -19,6 +24,7 @@ import com.api.flux.courseed.services.interfaces.InterfaceUserService;
 import com.api.flux.courseed.services.interfaces.Roles;
 import com.api.flux.courseed.web.exceptions.CustomWebExchangeBindException;
 
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Service
@@ -26,6 +32,12 @@ public class UserService implements InterfaceUserService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private LikeRepository likeRepository;
+
+    @Autowired
+    private ReviewRepository reviewRepository;
 
     @Autowired
     private UserMapper userMapper;
@@ -38,7 +50,18 @@ public class UserService implements InterfaceUserService {
         Pageable pageable = PageRequest.of(page, size);
 
         return userRepository.findAllBy(pageable)
-            .map(userMapper::toUserDto)
+            .flatMap(user -> {
+                Flux<Like> likeFLux = likeRepository.findByUserId(user.getId());
+                Flux<Review> reviewFlux = reviewRepository.findByUserId(user.getId());
+
+                return Mono.zip(likeFLux.collectList(), reviewFlux.collectList())
+                    .map(tuple -> {
+                        UserDto userDto = userMapper.toUserDto(user);
+                        userDto.setLikes(tuple.getT1().size());
+                        userDto.setReviews(tuple.getT2().size());
+                        return userDto;
+                    });
+            })
             .collectList()
             .zipWith(userRepository.count())
             .map(p -> new PageImpl<>(p.getT1(), pageable, p.getT2()));
@@ -119,8 +142,7 @@ public class UserService implements InterfaceUserService {
         return userRepository.findById(id)
             .flatMap(user -> {
                 List<String> newRoles = updateUserRolesDto.getRoles().stream()
-                    .filter(role -> role.equals(Roles.ADMIN) || role.equals(Roles.USER))
-                    .map(role -> role.startsWith(Roles.PREFIX) ? role : Roles.PREFIX + role)
+                    .filter(role -> role.equals(Roles.PREFIX + Roles.ADMIN) || role.equals(Roles.PREFIX + Roles.USER))
                     .toList();
 
                 if (!newRoles.isEmpty()) {

@@ -31,10 +31,14 @@ const chartConfig = {
     },
 } satisfies ChartConfig
 
-function AreaChart() {
+interface AreaChartProps {
+    className?: string;
+}
+
+function AreaChart({ className }: AreaChartProps) {
     return (
-        <Card className="bg-white border border-gray-200 rounded-lg hover:shadow-lg 
-            transition-shadow duration-300 grid grid-rows-[auto_1fr]">
+        <Card className={`bg-white border border-gray-200 rounded-lg hover:shadow-lg 
+            transition-shadow duration-300 grid grid-rows-[auto_1fr] ${className}`}>
             <CardHeader>
                 <CardTitle>Area Chart - Stacked</CardTitle>
                 <CardDescription>

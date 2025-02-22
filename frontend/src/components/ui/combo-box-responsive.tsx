@@ -75,7 +75,7 @@ function ComboBoxResponsive({
     }
 
     return (
-        <Drawer open={isOpen} onOpenChange={setIsOpen}>
+        <Drawer open={isOpen} autoFocus={isOpen} onOpenChange={setIsOpen}>
             <DrawerTrigger asChild>
                 <Button variant="outline" className="justify-between items-center w-full">
                     <p className="max-w-full truncate">

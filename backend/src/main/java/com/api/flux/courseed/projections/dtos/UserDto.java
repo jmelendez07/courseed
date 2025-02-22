@@ -10,6 +10,8 @@ public class UserDto implements Serializable {
     private List<String> roles;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private int likes;
+    private int reviews;
 
     public UserDto() {}
 
@@ -65,5 +67,19 @@ public class UserDto implements Serializable {
         this.updatedAt = updatedAt;
     }
 
-    
+    public int getLikes() {
+        return likes;
+    }
+
+    public void setLikes(int likes) {
+        this.likes = likes;
+    }
+
+    public int getReviews() {
+        return reviews;
+    }
+
+    public void setReviews(int reviews) {
+        this.reviews = reviews;
+    }    
 }

@@ -1,6 +1,10 @@
 enum APIS {
     USERS = 'api/users',
     USER_AUTHENTICATED = 'api/auth',
+    USER_UPDATE_EMAIL = 'api/users/email/',
+    USER_UPDATE_PASSWORD = 'api/users/password/',
+    USER_UPDATE_ROLES = 'api/users/roles/',
+    USER_DELETE = 'api/users/',
     LOGIN = 'api/auth/login',
     REGISTER = 'api/auth/register',
     COURSES = 'api/courses',

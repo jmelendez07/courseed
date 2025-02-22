@@ -41,6 +41,14 @@ function useUsers({ size, replaceUsers = false }: useUserProps) {
 			.finally(() => setLoading(false));
 	}, [pageNumber, pageSize]);
 
+	const handleUpdateUser = (user: UserInterface) => {
+		setUsers(users.map(u => u.id === user.id ? user : u));
+	}
+
+	const handleDeleteUser = (user: UserInterface) => {
+		setUsers(users.filter(u => u.id !== user.id));
+	}
+
     return {
 		users,
 		loading,
@@ -50,7 +58,9 @@ function useUsers({ size, replaceUsers = false }: useUserProps) {
 		setUsers,
 		setLoading,
 		setPageNumber,
-		setIsLastPage
+		setIsLastPage,
+		handleUpdateUser,
+		handleDeleteUser
 	}
 }
 
