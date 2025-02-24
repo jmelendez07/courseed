@@ -13,11 +13,10 @@ import {
     SidebarTrigger,
 } from "@/components/ui/sidebar";
 import UserDataTable from "@/components/user-data-table";
-import PieChart from "@/components/pie-chart";
-import AreaChart from "@/components/area-chart";
 import HeadProvider from "@/providers/HeadProvider";
 import DialogProvider from "@/providers/DialogProvider";
 import { Link } from "react-router-dom";
+import DashboardChartUsers from "@/components/dashboard-chart-users";
 
 function Users() {
     return (
@@ -46,10 +45,7 @@ function Users() {
                     </div>
                 </header>
                 <div className="flex flex-1 flex-col gap-4 p-4 pt-0 max-w-[100vw]">
-                    <div className="grid auto-rows-min gap-4 md:grid-cols-3">
-                        <PieChart chartData={[]} />
-                        <AreaChart className="md:col-span-2" />
-                    </div>
+                    <DashboardChartUsers />
                     <UserDataTable />
                 </div>
             </SidebarInset>

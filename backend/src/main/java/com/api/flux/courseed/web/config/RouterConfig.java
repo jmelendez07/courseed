@@ -130,6 +130,8 @@ public class RouterConfig {
             .GET("", userController::getAllUsers)
             .GET("/{id}", userController::getUserById)
             .GET("/email/{email}", userController::getUserByEmail)
+            .GET("/months/count", userController::getUserCountForLastSixMonths)
+            .POST("/create", userController::createUser)
             .PUT("/email/{id}", userController::updateUserEmail)
             .PUT("/password/{id}", userController::updateUserPassword)
             .PUT("/roles/{id}", userController::updateUserRoles)
@@ -141,6 +143,7 @@ public class RouterConfig {
         return RouterFunctions
             .route()
             .GET("", roleController::getAllRoles)
+            .GET("/users/count", roleController::getRolesWithUserCount)
             .build();
     }
 

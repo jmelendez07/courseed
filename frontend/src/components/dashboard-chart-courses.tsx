@@ -7,7 +7,7 @@ import APIS from "@/enums/apis";
 import CoursesWithReviewsLikesCount from "@/interfaces/courses-with-reviews-likes-count";
 
 function DashboardChartCourses() {
-	const institutionsSize = 5;
+	const institutionsSize = 3;
 	const coursesSize = 9;
 	const [institutions, setInstitutions] = React.useState<InstitutionsWithCoursesCount[]>([]);
 	const [courses, setCourses] = React.useState<CoursesWithReviewsLikesCount[]>([]);
@@ -38,7 +38,7 @@ function DashboardChartCourses() {
 		<div className="grid gap-4 md:grid-cols-3">
 			<BarChart 
 				className="md:col-span-2" 
-				title={`Top ${coursesSize} Educaciones continuas con Mayor Interacción`}
+				title={`Top ${coursesSize} Educaciones continuas con Mayor Interacción 📚`}
 				description="Esta gráfica muestra el ranking de cursos según el número de likes y reseñas recibidos."
 				chartData={courses.map((course) => ({
 					label: course.title,
@@ -49,7 +49,7 @@ function DashboardChartCourses() {
 				labelBar2="Likes"
 			/>
 			<PieChart
-				title={`Top ${institutionsSize} Instituciones con Mayor Oferta Académica`}
+				title={`Top ${institutionsSize} Instituciones con Mayor Oferta Académica 🎓`}
 				description="Esta gráfica muestra las 5 instituciones con el mayor número de cursos disponibles."
 				chartData={institutions.map((institution, index) => ({
 					label: institution.name,

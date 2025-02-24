@@ -12,6 +12,8 @@ interface AuthUserProps {
     id: string;
     email: string;
     roles: string[];
+    likes: number;
+    reviews: number;
 }
 
 interface AuthContextProps {

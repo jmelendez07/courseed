@@ -50,10 +50,6 @@ function Course({ className, course, optionsEnable, handleEdit, handleDelete }: 
 					src={course.image}
 					alt={course.title}
 					className="w-full h-[200px] object-cover rounded-t-lg"
-					onError={(e) => {
-						e.currentTarget.src = "https://picsum.photos/400/300"
-						e.currentTarget.onerror = null
-					}}
 				/>
 				<Badge className={`absolute top-2 ${optionsEnable ? "left-2" : "right-2"}  bg-gray-100 text-gray-800 hover:bg-gray-200`}>
 					{course.category.name}

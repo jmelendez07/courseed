@@ -36,7 +36,7 @@ function DialogCourses() {
                 <CommandList>
                     <CommandEmpty>No hay resultados.</CommandEmpty>
                     {courseHook.courses.map(course => (
-                        <CommandItem>
+                        <CommandItem key={course.id}>
                             <img 
                                 src={course.image} 
                                 alt={course.title}

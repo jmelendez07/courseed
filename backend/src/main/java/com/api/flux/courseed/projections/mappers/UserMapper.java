@@ -4,6 +4,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
 import com.api.flux.courseed.persistence.documents.User;
+import com.api.flux.courseed.projections.dtos.CreateUserDto;
 import com.api.flux.courseed.projections.dtos.RegisterUserDto;
 import com.api.flux.courseed.projections.dtos.UserDto;
 
@@ -18,4 +19,9 @@ public interface UserMapper {
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
     User toUser(RegisterUserDto registerUserDto);
+
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "updatedAt", ignore = true)
+    User toUser(CreateUserDto createUserDto);
 }

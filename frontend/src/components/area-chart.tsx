@@ -1,4 +1,4 @@
-import { Area, AreaChart as AreaChartReChart, CartesianGrid, XAxis } from "recharts"
+import { Area, AreaChart as AreaChartReChart, CartesianGrid, LabelList, XAxis } from "recharts"
 import {
     Card,
     CardContent,
@@ -12,46 +12,55 @@ import {
     ChartTooltip,
     ChartTooltipContent,
 } from "@/components/ui/chart"
-const chartData = [
-    { month: "January", desktop: 186, mobile: 80 },
-    { month: "February", desktop: 305, mobile: 200 },
-    { month: "March", desktop: 237, mobile: 120 },
-    { month: "April", desktop: 73, mobile: 190 },
-    { month: "May", desktop: 209, mobile: 130 },
-    { month: "June", desktop: 214, mobile: 140 },
-]
-const chartConfig = {
-    desktop: {
-        label: "Desktop",
-        color: "hsl(var(--chart-1))",
-    },
-    mobile: {
-        label: "Mobile",
-        color: "hsl(var(--chart-2))",
-    },
-} satisfies ChartConfig
+import { useMediaQuery } from "@/hooks/use-media-query";
 
 interface AreaChartProps {
+    title?: string;
+    description?: string;
+    chartData: ChartItem[];
+    labelValueToolTip?: String;
     className?: string;
 }
 
-function AreaChart({ className }: AreaChartProps) {
+interface ChartItem {
+    month: String;
+    count: number;
+}
+
+function AreaChart({
+    title = "Area Chart - Stacked",
+    description = "Showing total visitors for the last 6 months",
+    chartData = [],
+    labelValueToolTip = "count",
+    className
+}: AreaChartProps) {
+
+    const isDesktop = useMediaQuery("(min-width: 768px)");
+    const chartConfig = {
+        desktop: {
+            label: "Desktop",
+            color: "oklch(0.588 0.158 241.966)",
+        },
+        count: {
+            label: labelValueToolTip,
+        }
+    } satisfies ChartConfig
+
     return (
         <Card className={`bg-white border border-gray-200 rounded-lg hover:shadow-lg 
             transition-shadow duration-300 grid grid-rows-[auto_1fr] ${className}`}>
             <CardHeader>
-                <CardTitle>Area Chart - Stacked</CardTitle>
-                <CardDescription>
-                    Showing total visitors for the last 6 months
-                </CardDescription>
+                <CardTitle>{title}</CardTitle>
+                <CardDescription>{description}</CardDescription>
             </CardHeader>
-            <CardContent className="max-h-full overflow-hidden">
+            <CardContent className="overflow-hidden">
                 <ChartContainer config={chartConfig} className="w-full max-h-[220px] overflow-hidden">
                     <AreaChartReChart
                         accessibilityLayer
                         data={chartData}
                         margin={{
                             left: 12,
+                            top: 20,
                             right: 12,
                         }}
                     >
@@ -61,28 +70,47 @@ function AreaChart({ className }: AreaChartProps) {
                             tickLine={false}
                             axisLine={false}
                             tickMargin={8}
-                            tickFormatter={(value) => value.slice(0, 3)}
+                            tickFormatter={(value) => value.slice(0, isDesktop ? 5 : 3)}
                         />
                         <ChartTooltip
                             cursor={false}
                             content={<ChartTooltipContent indicator="dot" />}
                         />
+                        <defs>
+                            <linearGradient id="fillDesktop" x1="0" y1="0" x2="0" y2="1">
+                                <stop
+                                    offset="5%"
+                                    stopColor="oklch(0.588 0.158 241.966)"
+                                    stopOpacity={0.8}
+                                />
+                                <stop
+                                    offset="95%"
+                                    stopColor="oklch(0.588 0.158 241.966)"
+                                    stopOpacity={0.1}
+                                />
+                            </linearGradient>
+                        </defs>
                         <Area
-                            dataKey="mobile"
-                            type="natural"
-                            fill="var(--color-mobile)"
+                            dataKey="count"
+                            fill="url(#fillDesktop)"
                             fillOpacity={0.4}
-                            stroke="var(--color-mobile)"
+                            stroke="oklch(0.588 0.158 241.966)"
                             stackId="a"
-                        />
-                        <Area
-                            dataKey="desktop"
-                            type="natural"
-                            fill="var(--color-desktop)"
-                            fillOpacity={0.4}
-                            stroke="var(--color-desktop)"
-                            stackId="a"
-                        />
+                            type="monotone"
+                            dot={{
+                                fill: "oklch(0.588 0.158 241.966)",
+                            }}
+                            activeDot={{
+                                r: 5,
+                            }}
+                        >
+                            <LabelList
+                                position="top"
+                                offset={6}
+                                className="fill-foreground"
+                                fontSize={12}
+                            />
+                        </Area>
                     </AreaChartReChart>
                 </ChartContainer>
             </CardContent>

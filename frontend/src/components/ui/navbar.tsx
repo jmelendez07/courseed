@@ -1,4 +1,4 @@
-import { ArrowUpRight, LogIn, Menu, UserPlus } from "lucide-react";
+import { ArrowUpRight, ChevronsUpDown, LayoutPanelLeft, LogIn, LogOut, Menu, UserPen, UserPlus } from "lucide-react";
 
 import {
     Accordion,
@@ -27,6 +27,11 @@ import useInstitution from "@/hooks/useInstitution";
 import useFaculty from "@/hooks/useFaculty";
 import InstitutionInterface from "@/interfaces/institution";
 import CategoryInterface from "@/interfaces/category";
+import { useAuth } from "@/providers/AuthProvider";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "./dropdown-menu";
+import { Avatar, AvatarFallback } from "./avatar";
+import React from "react";
+import ROLES from "@/enums/roles";
 
 interface MenuItem {
     title: string;
@@ -71,6 +76,7 @@ const Navbar = ({
 
     const institutionHook = useInstitution({ size: 7 });
     const facultyHook = useFaculty({ size: 7 });
+    const authHook = useAuth();
 
     const menu: MenuItem[] = [
         { title: "Educacion continuada", url: "/educacion" },
@@ -86,20 +92,20 @@ const Navbar = ({
             paramKey: "facultad",
             items: facultyHook.faculties
         },
-        // {
-        //     title: "Pricing",
-        //     url: "#",
-        // },
-        // {
-        //     title: "Blog",
-        //     url: "#",
-        // },
     ];
+
+    const getName = React.useCallback(() => {
+        const name = authHook?.user?.email.split('@')[0];
+        if (name) {
+            return name.charAt(0).toUpperCase() + name.slice(1);
+        }
+        return '';
+    }, [authHook?.user?.email]);
 
     return (
         <section className="py-4 flex justify-center">
             <div className="container px-4 md:px-8 xl:px-12 2xl:px-16">
-                <nav className="hidden justify-between lg:flex">
+                <nav className="hidden items-center justify-between lg:flex">
                     <div className="flex items-center gap-6">
                         <Link to={logo.url} className="flex items-center gap-2">
                             <img src={logo.src} className="w-8" alt={logo.alt} />
@@ -113,24 +119,76 @@ const Navbar = ({
                             </NavigationMenu>
                         </div>
                     </div>
-                    <div className="flex gap-2 ">
-                        <Button asChild variant="outline" size="sm">
-                            <Link 
-                                to={auth.login.url}
+                    {authHook?.user ? (
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <div
+                                    className="flex items-center justify-start gap-3 p-2"
+                                >
+                                    <Avatar className="h-8 w-8 rounded-lg">
+                                        <AvatarFallback className="rounded-lg">{authHook?.user?.email.slice(0, 2).toUpperCase()}</AvatarFallback>
+                                    </Avatar>
+                                    <div className="grid flex-1 text-left text-sm leading-tight">
+                                        <span className="truncate font-semibold">{getName()}</span>
+                                        <span className="truncate text-xs">{authHook?.user?.email}</span>
+                                    </div>
+                                    <ChevronsUpDown className="ml-auto size-4" />
+                                </div>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent
+                                className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
+                                side="bottom"
+                                align="end"
+                                sideOffset={4}
                             >
-                                {auth.login.text}
-                                <LogIn />
-                            </Link>
-                        </Button>
-                        <Button asChild size="sm">
-                            <Link 
-                                to={auth.signup.url}
-                            >
-                                {auth.signup.text}
-                                <UserPlus />
-                            </Link>
-                        </Button>
-                    </div>
+                                <DropdownMenuLabel className="p-0 font-normal">
+                                    <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
+                                        <Avatar className="h-8 w-8 rounded-lg">
+                                            <AvatarFallback className="rounded-lg">{authHook?.user?.email.slice(0, 2).toUpperCase()}</AvatarFallback>
+                                        </Avatar>
+                                        <div className="grid flex-1 text-left text-sm leading-tight">
+                                            <span className="truncate font-semibold">{getName()}</span>
+                                            <span className="truncate text-xs">{authHook?.user?.email}</span>
+                                        </div>
+                                    </div>
+                                </DropdownMenuLabel>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuGroup>
+                                    <Link to={authHook.user.roles.some(r => r === ROLES.ADMIN) ? '/administrador' : '/usuario'}>
+                                        <DropdownMenuItem>
+                                            <LayoutPanelLeft />
+                                            Panel
+                                        </DropdownMenuItem>
+                                    </Link>
+                                    <Link to="/salir">
+                                        <DropdownMenuItem>
+                                            <LogOut />
+                                            Cerrar Sesión
+                                        </DropdownMenuItem>
+                                    </Link>
+                                </DropdownMenuGroup>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                    ) : (
+                        <div className="flex gap-2">
+                            <Button asChild variant="outline" size="sm">
+                                <Link
+                                    to={auth.login.url}
+                                >
+                                    {auth.login.text}
+                                    <LogIn />
+                                </Link>
+                            </Button>
+                            <Button asChild size="sm">
+                                <Link
+                                    to={auth.signup.url}
+                                >
+                                    {auth.signup.text}
+                                    <UserPlus />
+                                </Link>
+                            </Button>
+                        </div>
+                    )}
                 </nav>
                 <div className="block lg:hidden">
                     <div className="flex items-center justify-between">
@@ -163,20 +221,72 @@ const Navbar = ({
                                     >
                                         {menu.map((item) => renderMobileMenuItem(item))}
                                     </Accordion>
-                                    <div className="flex flex-col gap-3 border-t py-4">
-                                        <Button asChild variant="outline">
-                                            <Link to={auth.login.url}>
-                                                {auth.login.text}
-                                                <LogIn />
-                                            </Link>
-                                        </Button>
-                                        <Button asChild>
-                                            <Link to={auth.signup.url}>
-                                                {auth.signup.text}
-                                                <UserPlus />
-                                            </Link>
-                                        </Button>
-                                    </div>
+                                    {authHook?.user ? (
+                                        <DropdownMenu>
+                                            <DropdownMenuTrigger asChild>
+                                                <div
+                                                    className="flex items-center justify-start gap-3 p-2"
+                                                >
+                                                    <Avatar className="h-8 w-8 rounded-lg">
+                                                        <AvatarFallback className="rounded-lg">{authHook?.user?.email.slice(0, 2).toUpperCase()}</AvatarFallback>
+                                                    </Avatar>
+                                                    <div className="grid flex-1 text-left text-sm leading-tight">
+                                                        <span className="truncate font-semibold">{getName()}</span>
+                                                        <span className="truncate text-xs">{authHook?.user?.email}</span>
+                                                    </div>
+                                                    <ChevronsUpDown className="ml-auto size-4" />
+                                                </div>
+                                            </DropdownMenuTrigger>
+                                            <DropdownMenuContent
+                                                className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
+                                                side="bottom"
+                                                align="end"
+                                                sideOffset={4}
+                                            >
+                                                <DropdownMenuLabel className="p-0 font-normal">
+                                                    <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
+                                                        <Avatar className="h-8 w-8 rounded-lg">
+                                                            <AvatarFallback className="rounded-lg">{authHook?.user?.email.slice(0, 2).toUpperCase()}</AvatarFallback>
+                                                        </Avatar>
+                                                        <div className="grid flex-1 text-left text-sm leading-tight">
+                                                            <span className="truncate font-semibold">{getName()}</span>
+                                                            <span className="truncate text-xs">{authHook?.user?.email}</span>
+                                                        </div>
+                                                    </div>
+                                                </DropdownMenuLabel>
+                                                <DropdownMenuSeparator />
+                                                <DropdownMenuGroup>
+                                                    <Link to={authHook.user.roles.some(r => r === ROLES.ADMIN) ? '/administrador' : '/usuario'}>
+                                                        <DropdownMenuItem>
+                                                            <LayoutPanelLeft />
+                                                            Panel
+                                                        </DropdownMenuItem>
+                                                    </Link>
+                                                    <Link to="/salir">
+                                                        <DropdownMenuItem>
+                                                            <LogOut />
+                                                            Cerrar Sesión
+                                                        </DropdownMenuItem>
+                                                    </Link>
+                                                </DropdownMenuGroup>
+                                            </DropdownMenuContent>
+                                        </DropdownMenu>
+                                    ) : (
+                                        <div className="flex flex-col gap-3 border-t py-4">
+                                            <Button asChild variant="outline">
+                                                <Link to={auth.login.url}>
+                                                    {auth.login.text}
+                                                    <LogIn />
+                                                </Link>
+                                            </Button>
+                                            <Button asChild>
+                                                <Link to={auth.signup.url}>
+                                                    {auth.signup.text}
+                                                    <UserPlus />
+                                                </Link>
+                                            </Button>
+                                        </div>
+                                    )}
                                 </div>
                             </SheetContent>
                         </Sheet>

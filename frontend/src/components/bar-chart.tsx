@@ -60,7 +60,7 @@ function BarChart({
                             tickLine={false}
                             tickMargin={10}
                             axisLine={false}
-                            tickFormatter={(value) => isDesktop ? value.slice(0, 10) + "..." : value.slice(0, 3)}
+                            tickFormatter={(value) => value.slice(0, isDesktop ? 5 : 3)}
                         />
                         <ChartTooltip
                             cursor={false}

@@ -59,10 +59,11 @@ public class SecurityConfig {
                     .pathMatchers(HttpMethod.GET, "/likes/course/*").permitAll()
                     .pathMatchers(HttpMethod.GET, "/reviews", "/reviews/months/count").hasRole(Roles.ADMIN)
                     .pathMatchers(HttpMethod.GET, "/reviews/course/*").permitAll()
-                    .pathMatchers(HttpMethod.GET, "/users", "/users/*", "users/email/*").hasRole(Roles.ADMIN)
+                    .pathMatchers(HttpMethod.GET, "/users", "/users/*", "users/email/*", "/users/months/count").hasRole(Roles.ADMIN)
+                    .pathMatchers(HttpMethod.POST, "/users/create").hasRole(Roles.ADMIN)
                     .pathMatchers(HttpMethod.PUT, "/users/*", "/users/email/*", "/users/password/*", "/users/roles/*").hasRole(Roles.ADMIN)
                     .pathMatchers(HttpMethod.DELETE, "/users/*").hasRole(Roles.ADMIN)
-                    .pathMatchers(HttpMethod.GET, "/roles").hasRole(Roles.ADMIN)
+                    .pathMatchers(HttpMethod.GET, "/roles", "/roles/users/count").hasRole(Roles.ADMIN)
                     .anyExchange().authenticated())
                 .addFilterAt(authenticationWebFilter, SecurityWebFiltersOrder.AUTHENTICATION);
 

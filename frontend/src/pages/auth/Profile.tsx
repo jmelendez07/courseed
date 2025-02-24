@@ -1,4 +1,6 @@
 import { AppSidebar } from "@/components/app-sidebar";
+import DashboardContentProfile from "@/components/dashboard-content-profile";
+import DashboardStatsProfile from "@/components/dashboard-stats-profile";
 import {
     Breadcrumb,
     BreadcrumbItem,
@@ -38,13 +40,10 @@ function Profile() {
                         </Breadcrumb>
                     </div>
                 </header>
-                <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
-                    <div className="grid auto-rows-min gap-4 md:grid-cols-3">
-                        <div className="aspect-video rounded-xl bg-zinc-100/50 dark:bg-zinc-800/50" />
-                        <div className="aspect-video rounded-xl bg-zinc-100/50 dark:bg-zinc-800/50" />
-                        <div className="aspect-video rounded-xl bg-zinc-100/50 dark:bg-zinc-800/50" />
-                    </div>
-                    <div className="min-h-[100vh] flex-1 rounded-xl bg-zinc-100/50 md:min-h-min dark:bg-zinc-800/50" />
+                <div className="flex flex-col gap-8 p-8">
+                    <DashboardContentProfile />
+                    <Separator className="my-4" />
+                    <DashboardStatsProfile />
                 </div>
             </SidebarInset>
         </SidebarProvider>

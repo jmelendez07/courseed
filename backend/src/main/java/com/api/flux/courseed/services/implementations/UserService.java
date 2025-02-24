@@ -1,6 +1,11 @@
 package com.api.flux.courseed.services.implementations;
 
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -12,12 +17,15 @@ import org.springframework.stereotype.Service;
 
 import com.api.flux.courseed.persistence.documents.Like;
 import com.api.flux.courseed.persistence.documents.Review;
+import com.api.flux.courseed.persistence.documents.User;
 import com.api.flux.courseed.persistence.repositories.LikeRepository;
 import com.api.flux.courseed.persistence.repositories.ReviewRepository;
 import com.api.flux.courseed.persistence.repositories.UserRepository;
+import com.api.flux.courseed.projections.dtos.CreateUserDto;
 import com.api.flux.courseed.projections.dtos.UpdateUserEmailDto;
 import com.api.flux.courseed.projections.dtos.UpdateUserPasswordDto;
 import com.api.flux.courseed.projections.dtos.UpdateUserRolesDto;
+import com.api.flux.courseed.projections.dtos.UserCountByMonth;
 import com.api.flux.courseed.projections.dtos.UserDto;
 import com.api.flux.courseed.projections.mappers.UserMapper;
 import com.api.flux.courseed.services.interfaces.InterfaceUserService;
@@ -91,6 +99,90 @@ public class UserService implements InterfaceUserService {
                     "No hemos podido encontrar al usuario indicado por su email. Te sugerimos que verifiques y lo intentes nuevamente."
                 ).getWebExchangeBindException()
             ));
+    }
+
+    @Override
+    public Mono<List<UserCountByMonth>> getUserCountForLastSixMonths() {
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime endDate = now.with(LocalTime.MAX);
+        LocalDateTime startDate = endDate.minusMonths(6);
+
+        return userRepository.findByCreatedAtBetween(startDate, endDate)
+            .collectList()
+            .flatMapMany(users -> {
+                List<String> months = Arrays.asList(
+                    "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", 
+                    "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
+                );
+
+                Map<String, Long> monthCounts = new LinkedHashMap<>();
+                for (int i = 0; i < 6; i++) {
+                    LocalDateTime monthStart = startDate.plusMonths(i + 1);
+                    String monthName = months.get(monthStart.getMonthValue() - 1);
+                    int yearForMonth = monthStart.getYear();
+                    String key = monthName + "-" + yearForMonth;
+
+                    monthCounts.put(key, 0L);
+                }
+
+                users.forEach(user -> {
+                    LocalDateTime createdAt = user.getCreatedAt();
+                    String monthName = months.get(createdAt.getMonthValue() - 1);
+                    int yearForMonth = createdAt.getYear();
+                    String key = monthName + "-" + yearForMonth;
+                    monthCounts.put(key, monthCounts.getOrDefault(key, 0L) + 1);
+                });
+
+                return Flux.fromIterable(monthCounts.entrySet())
+                    .map(entry -> {
+                        String[] keyParts = entry.getKey().split("-");
+                        String monthName = keyParts[0];
+                        int yearForMonth = Integer.parseInt(keyParts[1]);
+                        return new UserCountByMonth(yearForMonth, monthName, entry.getValue());
+                    });
+            })
+            .collectList();
+    }
+
+    @Override
+    public Mono<Object> createUser(CreateUserDto createUserDto) {
+        if (!createUserDto.getPassword().equals(createUserDto.getConfirmPassword())) {
+            return Mono.error(new CustomWebExchangeBindException(
+                createUserDto, 
+                "confirmPassword", 
+                "La confirmación de la contraseña no coincide con la contraseña original. Por favor, revísalo e inténtalo de nuevo."
+            ).getWebExchangeBindException());
+        }
+
+        List<String> roles = createUserDto.getRoles().stream()
+            .filter(role -> role.equals(Roles.PREFIX + Roles.ADMIN) || role.equals(Roles.PREFIX + Roles.USER))
+            .toList();
+
+        if (roles.isEmpty()) {
+            return Mono.error(
+                new CustomWebExchangeBindException(
+                    createUserDto.getRoles(), 
+                    "roles", 
+                    "No se pueden asignar roles que no están registrados a este usuario. Te sugerimos que verifiques la información y lo intentes de nuevo."
+                ).getWebExchangeBindException()
+            );
+        }
+
+        return userRepository.findByEmail(createUserDto.getEmail())
+            .flatMap(existingUser -> Mono.error(
+                new CustomWebExchangeBindException(
+                    createUserDto.getEmail(), 
+                    "email", 
+                    "El email que intentas registrar ya está asociado a otra cuenta. Por favor, intenta con un correo electrónico diferente."
+                ).getWebExchangeBindException()
+            ))
+            .switchIfEmpty(Mono.defer(() -> {
+                User user = userMapper.toUser(createUserDto);
+                user.setPassword(passwordEncoder.encode(user.getPassword()));
+
+                return userRepository.save(user)
+                    .map(savedUser -> userMapper.toUserDto(savedUser));
+            }));
     }
 
     @Override

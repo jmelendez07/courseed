@@ -28,7 +28,7 @@ import { useAuth } from "@/providers/AuthProvider";
 import React from "react";
 
 export function NavUser() {
-	const { isMobile } = useSidebar()
+	const { isMobile } = useSidebar();
 	const auth = useAuth();
 
 	const getName = React.useCallback(() => {

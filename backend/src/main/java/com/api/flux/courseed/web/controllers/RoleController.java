@@ -21,4 +21,10 @@ public class RoleController {
             .contentType(MediaType.APPLICATION_JSON)
             .body(roleService.findAll(), Role.class);
     }
+
+    public Mono<ServerResponse> getRolesWithUserCount(ServerRequest serverRequest) {
+        return roleService.getRolesWithUserCount()
+            .flatMap(reviews-> ServerResponse.ok().bodyValue(reviews))
+            .switchIfEmpty(ServerResponse.notFound().build());
+    }
 }

@@ -1,6 +1,8 @@
 enum APIS {
     USERS = 'api/users',
     USER_AUTHENTICATED = 'api/auth',
+    USERS_COUNT_BY_MONTH = 'api/users/months/count',
+    USER_CREATE = 'api/users/create',
     USER_UPDATE_EMAIL = 'api/users/email/',
     USER_UPDATE_PASSWORD = 'api/users/password/',
     USER_UPDATE_ROLES = 'api/users/roles/',
@@ -19,10 +21,13 @@ enum APIS {
     INSTITUTIONS = 'api/institutions',
     INSTITUTIONS_COURSES_COUNT = 'api/institutions/courses/count',
     REVIEWS = 'api/reviews',
+    REVIEWS_BY_AUTH_USER = 'api/reviews/auth', 
     REVIEWS_COUNT_BY_MONTH = 'api/reviews/months/count',
     REVIEWS_UPDATE = 'api/reviews/',
     REVIEWS_DELETE = 'api/reviews/',
-    FACULTIES = 'api/categories'
+    LIKES_BY_AUTH_USER = 'api/likes/auth',
+    FACULTIES = 'api/categories',
+    ROLES_WITH_USERS_COUNT = 'api/roles/users/count',
 }
 
 export default APIS;

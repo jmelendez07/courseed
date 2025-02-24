@@ -1,6 +1,8 @@
 package com.api.flux.courseed.web.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
+
+import com.api.flux.courseed.projections.dtos.CreateUserDto;
 import com.api.flux.courseed.projections.dtos.UpdateUserEmailDto;
 import com.api.flux.courseed.projections.dtos.UpdateUserPasswordDto;
 import com.api.flux.courseed.projections.dtos.UpdateUserRolesDto;
@@ -39,6 +41,21 @@ public class UserController {
         return userService.getUserByEmail(serverRequest.pathVariable("email"))
             .flatMap(user -> ServerResponse.ok().bodyValue(user))
             .switchIfEmpty(ServerResponse.notFound().build());
+    }
+
+    public Mono<ServerResponse> getUserCountForLastSixMonths(ServerRequest serverRequest) {
+        return userService.getUserCountForLastSixMonths()
+            .flatMap(user -> ServerResponse.ok().bodyValue(user))
+            .switchIfEmpty(ServerResponse.notFound().build());
+    }
+
+    public Mono<ServerResponse> createUser(ServerRequest serverRequest) {
+        return serverRequest.bodyToMono(CreateUserDto.class)
+        .doOnNext(validationService::validate)
+        .flatMap(createUserDto -> userService.createUser(createUserDto)
+            .flatMap(user -> ServerResponse.ok().bodyValue(user))
+            .switchIfEmpty(ServerResponse.notFound().build())   
+        );
     }
 
     public Mono<ServerResponse> updateUserEmail(ServerRequest serverRequest) {

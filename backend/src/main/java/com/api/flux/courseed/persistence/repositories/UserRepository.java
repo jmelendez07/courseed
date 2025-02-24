@@ -1,5 +1,7 @@
 package com.api.flux.courseed.persistence.repositories;
 
+import java.time.LocalDateTime;
+
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
 import org.springframework.stereotype.Repository;
@@ -14,4 +16,6 @@ public interface UserRepository extends ReactiveMongoRepository<User, String> {
     Flux<User> findAllBy(Pageable pageable);
     Mono<User> findByEmail(String email);
     Mono<User> findByEmailAndIdNot(String email, String id);
+    Flux<User> findByRolesContaining(String role);
+    Flux<User> findByCreatedAtBetween(LocalDateTime startDate, LocalDateTime endDate);
 }

@@ -30,14 +30,14 @@ function DashboardChartReviews() {
     return (
         <div className="grid auto-rows-min gap-4 md:grid-cols-3">
             <LineChart 
-                title="📅 Reseñas Recibidas Mensualmente (Último Semestre)"
+                title="Reseñas Recibidas Mensualmente (Último Semestre) 📅"
                 description={dayjs().format("MMM - MMMM YYYY")}
                 className="md:col-span-2"
                 labelValueToolTip="Reseñas"
                 chartData={monthsWithReviewsCount.map(m => ({ month: m.month + " - " + m.year, count: m.count }))}
             />
             <BarChartHorizontal 
-                title={`Top ${coursesWithRatingAvg.length} Cursos con Mejores Reseñas`}
+                title={`Top ${coursesWithRatingAvg.length} Cursos con Mejores Reseñas 🏆`}
                 description="Estos son los cursos más valorados por su calidad, contenido y enseñanza."
                 labelValueToolTip="Calificación"
                 chartData={coursesWithRatingAvg.sort((a, b) => (a.avgRating > b.avgRating ? -1 : 1)).map(c => ({ label: c.title, value: c.avgRating }))}

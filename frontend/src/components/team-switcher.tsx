@@ -1,5 +1,5 @@
 import * as React from "react";
-import { ChevronRight, ChevronsUpDown, GalleryVerticalEnd, House } from "lucide-react";
+import { ChevronRight, ChevronsUpDown, House } from "lucide-react";
 
 import {
 	DropdownMenu,
@@ -16,15 +16,18 @@ import {
 	useSidebar,
 } from "@/components/ui/sidebar";
 import { Link } from "react-router-dom";
+import ROLES from "@/enums/roles";
 
 export function TeamSwitcher({
 	teams,
+	roles,
 }: {
 	teams: {
 		name: string
 		logo: React.ElementType,
 		action?: () => void
 	}[]
+	roles: string[]
 }) {
 	const { isMobile } = useSidebar();
 
@@ -37,14 +40,22 @@ export function TeamSwitcher({
 							size="lg"
 							className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
 						>
-							<div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-								<GalleryVerticalEnd className="size-4" />
-							</div>
+							<img
+								src="/logo.png"
+								alt="Courseed"
+								title="Courseed"
+								className="h-8"
+							/>
 							<div className="grid flex-1 text-left text-sm leading-tight">
 								<span className="truncate font-semibold">
 									Courseed
 								</span>
-								<span className="truncate text-xs">Administrador</span>
+								<span className="truncate text-xs">
+									{roles.some(r => r === ROLES.ADMIN) 
+										? 'Administrador'
+										: 'Usuario'
+									}
+								</span>
 							</div>
 							<ChevronsUpDown className="ml-auto" />
 						</SidebarMenuButton>
@@ -69,27 +80,31 @@ export function TeamSwitcher({
 								</Link>
 								<ChevronRight />
 							</DropdownMenuItem>
-						<DropdownMenuSeparator />
-						<DropdownMenuLabel className="text-xs text-zinc-500 dark:text-zinc-400">
-							Acciones Rapidas
-						</DropdownMenuLabel>
-						{teams.map((team, _) => (
-							<DropdownMenuItem
-								key={team.name}
-								onClick={() => {
-									if (team.action) team.action()
-								}}
-								className="gap-2 p-2 flex justify-between"
-							>
-								<div className="flex gap-2">
-									<div className="flex size-6 items-center justify-center rounded-sm border">
-										<team.logo className="size-4 shrink-0" />
-									</div>
-									{team.name}
-								</div>
-								<ChevronRight />
-							</DropdownMenuItem>
-						))}
+						{teams.length > 0 && (
+							<>
+								<DropdownMenuSeparator />
+								<DropdownMenuLabel className="text-xs text-zinc-500 dark:text-zinc-400">
+									Acciones Rapidas
+								</DropdownMenuLabel>
+								{teams.map((team, _) => (
+									<DropdownMenuItem
+										key={team.name}
+										onClick={() => {
+											if (team.action) team.action()
+										}}
+										className="gap-2 p-2 flex justify-between"
+									>
+										<div className="flex gap-2">
+											<div className="flex size-6 min-w-6 items-center justify-center rounded-sm border">
+												<team.logo className="size-4 shrink-0" />
+											</div>
+											{team.name}
+										</div>
+										<ChevronRight />
+									</DropdownMenuItem>
+								))}	
+							</>
+						)}
 					</DropdownMenuContent>
 				</DropdownMenu>
 			</SidebarMenuItem>

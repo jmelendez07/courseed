@@ -10,7 +10,11 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.api.flux.courseed.persistence.documents.Like;
+import com.api.flux.courseed.persistence.documents.Review;
 import com.api.flux.courseed.persistence.documents.User;
+import com.api.flux.courseed.persistence.repositories.LikeRepository;
+import com.api.flux.courseed.persistence.repositories.ReviewRepository;
 import com.api.flux.courseed.persistence.repositories.UserRepository;
 import com.api.flux.courseed.projections.dtos.LoginUserDto;
 import com.api.flux.courseed.projections.dtos.RegisterUserDto;
@@ -23,6 +27,7 @@ import com.api.flux.courseed.services.interfaces.Roles;
 import com.api.flux.courseed.web.config.JwtUtil;
 import com.api.flux.courseed.web.exceptions.CustomWebExchangeBindException;
 
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Service
@@ -30,6 +35,12 @@ public class AuthService implements InterfaceAuthService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private ReviewRepository reviewRepository;
+
+    @Autowired
+    private LikeRepository likeRepository;
 
     @Autowired
     private UserMapper userMapper;
@@ -46,7 +57,19 @@ public class AuthService implements InterfaceAuthService {
     @Override
     public Mono<UserDto> getAuthUser(Principal principal) {
         return userRepository.findByEmail(principal.getName())
-            .map(userMapper::toUserDto)
+            .flatMap(user -> {
+                Flux<Review> reviewFlux = reviewRepository.findByUserId(user.getId());
+                Flux<Like> likeFlux = likeRepository.findByUserId(user.getId());
+
+                return Mono.zip(reviewFlux.collectList(), likeFlux.collectList())
+                    .map(tuple -> {
+                        UserDto userDto = userMapper.toUserDto(user);
+                        userDto.setReviews(tuple.getT1().size());
+                        userDto.setLikes(tuple.getT2().size());
+
+                        return userDto;
+                    });
+            })
             .switchIfEmpty(Mono.error(
                 new CustomWebExchangeBindException(
                     principal.getName(), 

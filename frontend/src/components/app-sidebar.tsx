@@ -2,6 +2,7 @@ import {
 	GraduationCap,
 	LayoutPanelLeft,
 	MessageSquareText,
+	ThumbsUp,
 	UserPlus,
 	Users,
 } from "lucide-react";
@@ -20,10 +21,17 @@ import React from "react";
 import { DialogContext } from "@/providers/DialogProvider";
 import CreateUserForm from "./create-user-form";
 import CourseForm from "./course-form";
+import { useAuth } from "@/providers/AuthProvider";
+import ROLES from "@/enums/roles";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
 	const dialogContext = React.useContext(DialogContext);
+	const authHook = useAuth();
+
+	const isAdmin = (): boolean | undefined => {
+		return authHook?.user?.roles.some(r => r === ROLES.ADMIN);
+	}
 
 	const userForm = {
 		title: "Registrar Nuevo Usuario",
@@ -39,7 +47,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 		dialogChildren: <CourseForm />
 	}
 
-	const data = {
+	const dataAdmin = {
 		actions: [
 			{
 				name: "Nuevo Usuario",
@@ -54,14 +62,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 		],
 		navMain: [
 			{
-				title: "Dashboard",
+				title: "Panel",
 				icon: LayoutPanelLeft,
-				items: [
-					{
-						title: "Inicio",
-						url: "/administrador",
-					}
-				],
+				url: "/administrador"
 			},
 			{
 				title: "Usuarios",
@@ -94,23 +97,42 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 			{
 				title: "Reseñas",
 				icon: MessageSquareText,
-				items: [
-					{
-						title: "Ver todas",
-						url: "/administrador/reseñas",
-					}
-				],
+				url: "/administrador/reseñas"
 			},
 		],
 	};
 
+	const dataUser = {
+		actions: [],
+		navMain: [
+			{
+				title: "Panel",
+				icon: LayoutPanelLeft,
+				url: "/usuario"
+			},
+			{
+				title: "Reseñas",
+				icon: MessageSquareText,
+				url: "/usuario/reseñas"
+			},
+			{
+				title: "Likes",
+				icon: ThumbsUp,
+				url: "/usuario/likes"
+			},
+		]
+	}
+
 	return (
 		<Sidebar collapsible="icon" {...props}>
 			<SidebarHeader>
-				<TeamSwitcher teams={data.actions} />
+				<TeamSwitcher 
+					teams={isAdmin() ? dataAdmin.actions : dataUser.actions} 
+					roles={authHook?.user ? authHook.user.roles : []}
+				/>
 			</SidebarHeader>
 			<SidebarContent>
-				<NavMain items={data.navMain} />
+				<NavMain items={isAdmin() ? dataAdmin.navMain : dataUser.navMain} />
 			</SidebarContent>
 			<SidebarFooter>
 				<NavUser />
