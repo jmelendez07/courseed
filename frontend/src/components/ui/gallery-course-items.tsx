@@ -107,7 +107,6 @@ const GalleryCourseItems = ({
                         ))}
                     </CarouselContent>
                 </Carousel>
-                {/* 2xl:mx-12 */}
             </div>
         </section>
     );

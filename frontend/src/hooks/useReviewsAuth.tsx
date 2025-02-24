@@ -22,7 +22,7 @@ interface ResponseProps {
 
 function useReviewsAuth({ size }: UseReviewsAuthProps) {
     const [reviews, setReviews] = React.useState<ReviewCourseUserInterface[]>([]);
-    const [loading, setLoading] = React.useState<boolean>(false);
+    const [loading, setLoading] = React.useState<boolean>(true);
     const [isLastPage, setIsLastPage] = React.useState<boolean>(false);
     const [totalReviews, setTotalReviews] = React.useState<number | null>(null);
     const pageSize: number = size ?? 12;
@@ -34,12 +34,39 @@ function useReviewsAuth({ size }: UseReviewsAuthProps) {
     });
 
     React.useEffect(() => {
+        if (params.searchSubmit) return;
         setLoading(true);
         axios.get(APIS.REVIEWS_BY_AUTH_USER, {
             params: {
                 size: pageSize,
                 page: params.pageNumber,
-                // search: params.searchText
+                search: params.searchText
+            }
+        })
+            .then((response: AxiosResponse<ResponseProps>) => {
+                setReviews(currentReviews => params.pageNumber > 0 
+                    ? [ ...currentReviews, ...response.data.content ] 
+                    : response.data.content
+                );
+                setIsLastPage(response.data.last || response.data.empty);
+                setTotalReviews(response.data.totalElements);
+            })
+            .catch(() => setIsLastPage(true))
+            .finally(() => setLoading(false));
+    }, [pageSize, params.pageNumber]);
+
+    const handleSearch = React.useCallback(() => {
+        setLoading(true);
+        setParams({
+            ...params,
+            searchSubmit: true,
+            pageNumber: 0, 
+        });
+        axios.get(APIS.REVIEWS_BY_AUTH_USER, {
+            params: {
+                size: pageSize,
+                page: 0,
+                search: params.searchText
             }
         })
             .then((response: AxiosResponse<ResponseProps>) => {
@@ -49,7 +76,7 @@ function useReviewsAuth({ size }: UseReviewsAuthProps) {
             })
             .catch(() => setIsLastPage(true))
             .finally(() => setLoading(false));
-    }, [pageSize, params.pageNumber, params.searchSubmit]);
+    }, [params.searchText, params.searchSubmit]);
 
     return {
         reviews,
@@ -57,7 +84,8 @@ function useReviewsAuth({ size }: UseReviewsAuthProps) {
         isLastPage,
         totalReviews,
         params,
-        setParams
+        setParams,
+        handleSearch
     };
 }
 

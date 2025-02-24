@@ -67,22 +67,20 @@ public class ReviewService implements InterfaceReviewService {
     private ContentMapper contentMapper;
 
     private final Map<String, String> MONTH_TRANSLATIONS = Map.ofEntries(
-        Map.entry("January", "Enero"), Map.entry("February", "Febrero"),
-        Map.entry("March", "Marzo"), Map.entry("April", "Abril"),
-        Map.entry("May", "Mayo"), Map.entry("June", "Junio"),
-        Map.entry("July", "Julio"), Map.entry("August", "Agosto"),
-        Map.entry("September", "Septiembre"), Map.entry("October", "Octubre"),
-        Map.entry("November", "Noviembre"), Map.entry("December", "Diciembre")
-    );
+            Map.entry("January", "Enero"), Map.entry("February", "Febrero"),
+            Map.entry("March", "Marzo"), Map.entry("April", "Abril"),
+            Map.entry("May", "Mayo"), Map.entry("June", "Junio"),
+            Map.entry("July", "Julio"), Map.entry("August", "Agosto"),
+            Map.entry("September", "Septiembre"), Map.entry("October", "Octubre"),
+            Map.entry("November", "Noviembre"), Map.entry("December", "Diciembre"));
 
     public ReviewService(
-        ReviewRepository reviewRepository, UserRepository userRepository,
-        CourseRepository courseRepository, CategoryRepository categoryRepository,
-        InstitutionRepository institutionRepository, ContentRepository contentRepository,
-        LikeRepository likeRepository, ReviewMapper reviewMapper, CourseMapper courseMapper,
-        CategoryMapper categoryMapper, InstitutionMapper institutionMapper, LikeMapper likeMapper,
-        ContentMapper contentMapper
-    ) {
+            ReviewRepository reviewRepository, UserRepository userRepository,
+            CourseRepository courseRepository, CategoryRepository categoryRepository,
+            InstitutionRepository institutionRepository, ContentRepository contentRepository,
+            LikeRepository likeRepository, ReviewMapper reviewMapper, CourseMapper courseMapper,
+            CategoryMapper categoryMapper, InstitutionMapper institutionMapper, LikeMapper likeMapper,
+            ContentMapper contentMapper) {
         this.reviewRepository = reviewRepository;
         this.userRepository = userRepository;
         this.courseRepository = courseRepository;
@@ -109,47 +107,46 @@ public class ReviewService implements InterfaceReviewService {
         } else {
             reviewFlux = reviewRepository.findByContentContainingAndUserIdContaining(pageable, search, userId);
         }
-        
+
         return reviewFlux
-            .flatMap(review -> courseRepository.findById(review.getCourseId())
-                .flatMap(course -> userRepository.findById(review.getUserId())
-                    .flatMap(user -> {
-                        Mono<Category> categoryMono = categoryRepository.findById(course.getCategoryId());
-                        Mono<Institution> institutionMono = institutionRepository.findById(course.getInstitutionId());
-                        Flux<Content> contentFlux = contentRepository.findByCourseId(course.getId());
-                        Flux<Like> likeFlux = likeRepository.findByCourseId(course.getId());
-                        Flux<Review> reviewsFlux = reviewRepository.findByCourseId(course.getId());
+                .flatMap(review -> courseRepository.findById(review.getCourseId())
+                        .flatMap(course -> userRepository.findById(review.getUserId())
+                                .flatMap(user -> {
+                                    Mono<Category> categoryMono = categoryRepository.findById(course.getCategoryId());
+                                    Mono<Institution> institutionMono = institutionRepository
+                                            .findById(course.getInstitutionId());
+                                    Flux<Content> contentFlux = contentRepository.findByCourseId(course.getId());
+                                    Flux<Like> likeFlux = likeRepository.findByCourseId(course.getId());
+                                    Flux<Review> reviewsFlux = reviewRepository.findByCourseId(course.getId());
 
-                        return Mono.zip(categoryMono, institutionMono, contentFlux.collectList(), likeFlux.collectList(), reviewsFlux.collectList())
-                            .map(tuple -> {
-                                ReviewDto reviewDto = reviewMapper.toReviewDto(review);
-                                CourseDto courseDto = courseMapper.toCourseDto(course);
-                                courseDto.setCategory(categoryMapper.toCategoryDto(tuple.getT1()));
-                                courseDto.setInstitution(institutionMapper.toInstitutionDto(tuple.getT2()));
-                                courseDto.setContents(tuple.getT3().stream()
-                                    .map(contentMapper::toContentDto)
-                                    .toList()
-                                );
-                                courseDto.setLikes(tuple.getT4().stream()
-                                    .map(likeMapper::toLikeDto)
-                                    .toList()
-                                );
-                                courseDto.setReviews(tuple.getT5().stream()
-                                    .map(reviewMapper::toReviewDto)
-                                    .toList()
-                                );
+                                    return Mono
+                                            .zip(categoryMono, institutionMono, contentFlux.collectList(),
+                                                    likeFlux.collectList(), reviewsFlux.collectList())
+                                            .map(tuple -> {
+                                                ReviewDto reviewDto = reviewMapper.toReviewDto(review);
+                                                CourseDto courseDto = courseMapper.toCourseDto(course);
+                                                courseDto.setCategory(categoryMapper.toCategoryDto(tuple.getT1()));
+                                                courseDto.setInstitution(
+                                                        institutionMapper.toInstitutionDto(tuple.getT2()));
+                                                courseDto.setContents(tuple.getT3().stream()
+                                                        .map(contentMapper::toContentDto)
+                                                        .toList());
+                                                courseDto.setLikes(tuple.getT4().stream()
+                                                        .map(likeMapper::toLikeDto)
+                                                        .toList());
+                                                courseDto.setReviews(tuple.getT5().stream()
+                                                        .map(reviewMapper::toReviewDto)
+                                                        .toList());
 
-                                reviewDto.setCourse(courseMapper.toCourseDto(course));
-                                reviewDto.setUser(new UserDto(user.getId(), user.getEmail()));
+                                                reviewDto.setCourse(courseMapper.toCourseDto(course));
+                                                reviewDto.setUser(new UserDto(user.getId(), user.getEmail()));
 
-                                return reviewDto;
-                            });
-                    })
-                )
-            )
-            .collectList()
-            .zipWith(reviewRepository.count())
-            .map(p -> new PageImpl<>(p.getT1(), pageable, p.getT2()));
+                                                return reviewDto;
+                                            });
+                                })))
+                .collectList()
+                .zipWith(reviewRepository.count())
+                .map(p -> new PageImpl<>(p.getT1(), pageable, p.getT2()));
     }
 
     @Override
@@ -157,77 +154,83 @@ public class ReviewService implements InterfaceReviewService {
         Pageable pageable = PageRequest.of(page, size);
 
         return reviewRepository.findByCourseId(courseId, pageable)
-            .flatMap(review -> userRepository.findById(review.getUserId())
-                .flatMap(user -> {
-                    ReviewDto reviewDto = reviewMapper.toReviewDto(review);
-                    UserDto userDto = new UserDto(user.getId(), user.getEmail());
-                    reviewDto.setUser(userDto);
-                    return Mono.just(reviewDto);  
-                })
-            )
-            .switchIfEmpty(Mono.error(
-                new CustomWebExchangeBindException(
-                    courseId, 
-                    "courseId", 
-                    "No se encontraron reseñas del curso indicado. Te sugerimos que verifiques la información y lo intentes de nuevo."
-                ).getWebExchangeBindException()
-            ))
-            .collectList()
-            .zipWith(reviewRepository.count())
-            .map(p -> new PageImpl<>(p.getT1(), pageable, p.getT2()));
+                .flatMap(review -> userRepository.findById(review.getUserId())
+                        .flatMap(user -> {
+                            ReviewDto reviewDto = reviewMapper.toReviewDto(review);
+                            UserDto userDto = new UserDto(user.getId(), user.getEmail());
+                            reviewDto.setUser(userDto);
+                            return Mono.just(reviewDto);
+                        }))
+                .switchIfEmpty(Mono.error(
+                        new CustomWebExchangeBindException(
+                                courseId,
+                                "courseId",
+                                "No se encontraron reseñas del curso indicado. Te sugerimos que verifiques la información y lo intentes de nuevo.")
+                                .getWebExchangeBindException()))
+                .collectList()
+                .zipWith(reviewRepository.count())
+                .map(p -> new PageImpl<>(p.getT1(), pageable, p.getT2()));
     }
 
     @Override
-    public Mono<Page<ReviewDto>> getReviewsByAuthUser(Principal principal, int page, int size) {
+    public Mono<Page<ReviewDto>> getReviewsByAuthUser(Principal principal, int page, int size, String search) {
         Pageable pageable = PageRequest.of(page, size);
 
         return userRepository.findByEmail(principal.getName())
-            .flatMapMany(user -> reviewRepository.findByUserId(user.getId(), pageable)
-                .flatMap(review -> courseRepository.findById(review.getCourseId())
-                    .flatMap(course -> {
-                        Mono<Category> categoryMono = categoryRepository.findById(course.getCategoryId());
-                        Mono<Institution> institutionMono = institutionRepository.findById(course.getInstitutionId());
-                        Flux<Content> contentFlux = contentRepository.findByCourseId(course.getId());
-                        Flux<Like> likeFlux = likeRepository.findByCourseId(course.getId());
-                        Flux<Review> reviewFlux = reviewRepository.findByCourseId(course.getId());
+                .flatMapMany(user -> {
+                    Flux<Review> reviewSearchFlux = null;
+                    if (isNumeric(search)) {
+                        int rating = Integer.parseInt(search);
+                        reviewSearchFlux = reviewRepository.findByRatingAndUserIdContaining(pageable, rating,
+                                user.getId());
+                    } else {
+                        reviewSearchFlux = reviewRepository.findByContentContainingAndUserIdContaining(pageable, search,
+                                user.getId());
+                    }
 
-                        return Mono.zip(categoryMono, institutionMono, contentFlux.collectList(), likeFlux.collectList(), reviewFlux.collectList())
-                            .map(tuple -> {
-                                ReviewDto reviewDto = reviewMapper.toReviewDto(review);
-                                CourseDto courseDto = courseMapper.toCourseDto(course);
-                                courseDto.setCategory(categoryMapper.toCategoryDto(tuple.getT1()));
-                                courseDto.setInstitution(institutionMapper.toInstitutionDto(tuple.getT2()));
-                                courseDto.setContents(tuple.getT3().stream()
-                                    .map(contentMapper::toContentDto)
-                                    .toList()
-                                );
-                                courseDto.setLikes(tuple.getT4().stream()
-                                    .map(likeMapper::toLikeDto)
-                                    .toList()
-                                );
-                                courseDto.setReviews(tuple.getT5().stream()
-                                    .map(reviewMapper::toReviewDto)
-                                    .toList()
-                                );
+                    return reviewSearchFlux.flatMap(review -> courseRepository.findById(review.getCourseId())
+                        .flatMap(course -> {
+                            Mono<Category> categoryMono = categoryRepository.findById(course.getCategoryId());
+                            Mono<Institution> institutionMono = institutionRepository
+                                    .findById(course.getInstitutionId());
+                            Flux<Content> contentFlux = contentRepository.findByCourseId(course.getId());
+                            Flux<Like> likeFlux = likeRepository.findByCourseId(course.getId());
+                            Flux<Review> reviewFlux = reviewRepository.findByCourseId(course.getId());
+                            
+                            return Mono
+                                    .zip(categoryMono, institutionMono, contentFlux.collectList(),
+                                            likeFlux.collectList(), reviewFlux.collectList())
+                                    .map(tuple -> {
+                                        ReviewDto reviewDto = reviewMapper.toReviewDto(review);
+                                        CourseDto courseDto = courseMapper.toCourseDto(course);
+                                        courseDto.setCategory(categoryMapper.toCategoryDto(tuple.getT1()));
+                                        courseDto.setInstitution(institutionMapper.toInstitutionDto(tuple.getT2()));
+                                        courseDto.setContents(tuple.getT3().stream()
+                                                .map(contentMapper::toContentDto)
+                                                .toList());
+                                        courseDto.setLikes(tuple.getT4().stream()
+                                                .map(likeMapper::toLikeDto)
+                                                .toList());
+                                        courseDto.setReviews(tuple.getT5().stream()
+                                                .map(reviewMapper::toReviewDto)
+                                                .toList());
 
-                                reviewDto.setCourse(courseMapper.toCourseDto(course));
-                                reviewDto.setUser(new UserDto(user.getId(), user.getEmail()));
+                                        reviewDto.setCourse(courseMapper.toCourseDto(course));
+                                        reviewDto.setUser(new UserDto(user.getId(), user.getEmail()));
 
-                                return reviewDto;
-                            });
-                    })
-                )
-            )
-            .switchIfEmpty(Mono.error(
-                new CustomWebExchangeBindException(
-                    principal.getName(), 
-                    "auth", 
-                    "No se encontraron reseñas del usuario autenticado. Te sugerimos que verifiques la información y lo intentes de nuevo."
-                ).getWebExchangeBindException()
-            ))
-            .collectList()
-            .zipWith(reviewRepository.count())
-            .map(p -> new PageImpl<>(p.getT1(), pageable, p.getT2()));
+                                        return reviewDto;
+                                    });
+                        }));
+                })
+                .switchIfEmpty(Mono.error(
+                        new CustomWebExchangeBindException(
+                                principal.getName(),
+                                "auth",
+                                "No se encontraron reseñas del usuario autenticado. Te sugerimos que verifiques la información y lo intentes de nuevo.")
+                                .getWebExchangeBindException()))
+                .collectList()
+                .zipWith(reviewRepository.count())
+                .map(p -> new PageImpl<>(p.getT1(), pageable, p.getT2()));
     }
 
     @Override
@@ -236,181 +239,183 @@ public class ReviewService implements InterfaceReviewService {
         List<ReviewCountByMonth> lastSixMonths = generateLastSixMonths(today);
 
         return reviewRepository.countReviewsLastSixMonths(today.minusMonths(5).withDayOfMonth(1))
-            .collectList()
-            .map(reviewCounts -> mergeWithMissingMonths(lastSixMonths, reviewCounts));
+                .collectList()
+                .map(reviewCounts -> mergeWithMissingMonths(lastSixMonths, reviewCounts));
     }
 
     @Override
     public Mono<Object> createReview(Principal principal, CreateReviewDto createReviewDto) {
         return userRepository.findByEmail(principal.getName())
-            .flatMap(user -> courseRepository.findById(createReviewDto.getCourseId())
-                .flatMap(course -> reviewRepository.findByUserIdAndCourseId(user.getId(), course.getId())
-                    .flatMap(review -> Mono.error(
-                        new CustomWebExchangeBindException(
-                            createReviewDto.getCourseId(), 
-                            "courseId", 
-                            "¡Tu reseña es importante para nosotros! Sin embargo, solo se permite una reseña por usuario para cada curso."
-                        ).getWebExchangeBindException()
-                    ))
-                    .switchIfEmpty(Mono.defer(() -> {
-                        Review review = reviewMapper.toReview(createReviewDto);
-                        review.setUserId(user.getId());
-                        return reviewRepository.save(review)
-                            .flatMap(savedReview -> {
-                                Mono<Category> categoryMono = categoryRepository.findById(course.getCategoryId());
-                                Mono<Institution> institutionMono = institutionRepository.findById(course.getInstitutionId());
-                                Flux<Content> contentFlux = contentRepository.findByCourseId(course.getId());
-                                Flux<Like> likeFlux = likeRepository.findByCourseId(course.getId());
-                                Flux<Review> reviewFlux = reviewRepository.findByCourseId(course.getId());
+                .flatMap(user -> courseRepository.findById(createReviewDto.getCourseId())
+                        .flatMap(course -> reviewRepository.findByUserIdAndCourseId(user.getId(), course.getId())
+                                .flatMap(review -> Mono.error(
+                                        new CustomWebExchangeBindException(
+                                                createReviewDto.getCourseId(),
+                                                "courseId",
+                                                "¡Tu reseña es importante para nosotros! Sin embargo, solo se permite una reseña por usuario para cada curso.")
+                                                .getWebExchangeBindException()))
+                                .switchIfEmpty(Mono.defer(() -> {
+                                    Review review = reviewMapper.toReview(createReviewDto);
+                                    review.setUserId(user.getId());
+                                    return reviewRepository.save(review)
+                                            .flatMap(savedReview -> {
+                                                Mono<Category> categoryMono = categoryRepository
+                                                        .findById(course.getCategoryId());
+                                                Mono<Institution> institutionMono = institutionRepository
+                                                        .findById(course.getInstitutionId());
+                                                Flux<Content> contentFlux = contentRepository
+                                                        .findByCourseId(course.getId());
+                                                Flux<Like> likeFlux = likeRepository.findByCourseId(course.getId());
+                                                Flux<Review> reviewFlux = reviewRepository
+                                                        .findByCourseId(course.getId());
 
-                                return Mono.zip(categoryMono, institutionMono, contentFlux.collectList(), likeFlux.collectList(), reviewFlux.collectList())
-                                    .map(tuple -> {
-                                        ReviewDto reviewDto = reviewMapper.toReviewDto(review);
-                                        CourseDto courseDto = courseMapper.toCourseDto(course);
-                                        courseDto.setCategory(categoryMapper.toCategoryDto(tuple.getT1()));
-                                        courseDto.setInstitution(institutionMapper.toInstitutionDto(tuple.getT2()));
-                                        courseDto.setContents(tuple.getT3().stream()
-                                            .map(contentMapper::toContentDto)
-                                            .toList()
-                                        );
-                                        courseDto.setLikes(tuple.getT4().stream()
-                                            .map(likeMapper::toLikeDto)
-                                            .toList()
-                                        );
-                                        courseDto.setReviews(tuple.getT5().stream()
-                                            .map(reviewMapper::toReviewDto)
-                                            .toList()
-                                        );
+                                                return Mono
+                                                        .zip(categoryMono, institutionMono, contentFlux.collectList(),
+                                                                likeFlux.collectList(), reviewFlux.collectList())
+                                                        .map(tuple -> {
+                                                            ReviewDto reviewDto = reviewMapper.toReviewDto(review);
+                                                            CourseDto courseDto = courseMapper.toCourseDto(course);
+                                                            courseDto.setCategory(
+                                                                    categoryMapper.toCategoryDto(tuple.getT1()));
+                                                            courseDto.setInstitution(
+                                                                    institutionMapper.toInstitutionDto(tuple.getT2()));
+                                                            courseDto.setContents(tuple.getT3().stream()
+                                                                    .map(contentMapper::toContentDto)
+                                                                    .toList());
+                                                            courseDto.setLikes(tuple.getT4().stream()
+                                                                    .map(likeMapper::toLikeDto)
+                                                                    .toList());
+                                                            courseDto.setReviews(tuple.getT5().stream()
+                                                                    .map(reviewMapper::toReviewDto)
+                                                                    .toList());
 
-                                        reviewDto.setCourse(courseMapper.toCourseDto(course));
-                                        reviewDto.setUser(new UserDto(user.getId(), user.getEmail()));
+                                                            reviewDto.setCourse(courseMapper.toCourseDto(course));
+                                                            reviewDto.setUser(
+                                                                    new UserDto(user.getId(), user.getEmail()));
 
-                                        return reviewDto;
-                                    });
-                            });
-                    }))
-                )
+                                                            return reviewDto;
+                                                        });
+                                            });
+                                })))
+                        .switchIfEmpty(Mono.error(
+                                new CustomWebExchangeBindException(
+                                        createReviewDto.getCourseId(),
+                                        "courseId",
+                                        "No hemos podido encontrar el curso indicado. Te sugerimos que verifiques la información y lo intentes de nuevo.")
+                                        .getWebExchangeBindException())))
                 .switchIfEmpty(Mono.error(
-                    new CustomWebExchangeBindException(
-                        createReviewDto.getCourseId(), 
-                        "courseId", 
-                        "No hemos podido encontrar el curso indicado. Te sugerimos que verifiques la información y lo intentes de nuevo."
-                    ).getWebExchangeBindException())
-                )
-            )
-            .switchIfEmpty(Mono.error(
-                new CustomWebExchangeBindException(
-                    principal.getName(), 
-                    "auth", 
-                    "Parece que el usuario autenticado no se encuentra en el sistema. Te recomendamos cerrar sesión y volver a ingresar."
-                ).getWebExchangeBindException()
-            ));
+                        new CustomWebExchangeBindException(
+                                principal.getName(),
+                                "auth",
+                                "Parece que el usuario autenticado no se encuentra en el sistema. Te recomendamos cerrar sesión y volver a ingresar.")
+                                .getWebExchangeBindException()));
     }
 
     @Override
     public Mono<ReviewDto> updateReview(Principal principal, String id, UpdateReviewDto updateReviewDto) {
         return userRepository.findByEmail(principal.getName())
-            .flatMap(user -> reviewRepository.findById(id)
-                .flatMap(review -> {
-                    if (review.getUserId().equals(user.getId()) || user.getRoles().contains(Roles.PREFIX + Roles.ADMIN)) {
-                        review.setContent(updateReviewDto.getContent());
-                        review.setRating(updateReviewDto.getRating());
-                        return reviewRepository.save(review)
-                            .flatMap(savedReview -> courseRepository.findById(savedReview.getCourseId())
-                                .flatMap(course -> {
-                                    Mono<Category> categoryMono = categoryRepository.findById(course.getCategoryId());
-                                    Mono<Institution> institutionMono = institutionRepository.findById(course.getInstitutionId());
-                                    Flux<Content> contentFlux = contentRepository.findByCourseId(course.getId());
-                                    Flux<Like> likeFlux = likeRepository.findByCourseId(course.getId());
-                                    Flux<Review> reviewFlux = reviewRepository.findByCourseId(course.getId());
-                                    Mono<User> userMono = userRepository.findById(savedReview.getUserId());
-    
-                                    return Mono.zip(categoryMono, institutionMono, contentFlux.collectList(), likeFlux.collectList(), reviewFlux.collectList(), userMono)
-                                        .map(tuple -> {
-                                            ReviewDto reviewDto = reviewMapper.toReviewDto(review);
-                                            CourseDto courseDto = courseMapper.toCourseDto(course);
-                                            courseDto.setCategory(categoryMapper.toCategoryDto(tuple.getT1()));
-                                            courseDto.setInstitution(institutionMapper.toInstitutionDto(tuple.getT2()));
-                                            courseDto.setContents(tuple.getT3().stream()
-                                                .map(contentMapper::toContentDto)
-                                                .toList()
-                                            );
-                                            courseDto.setLikes(tuple.getT4().stream()
-                                                .map(likeMapper::toLikeDto)
-                                                .toList()
-                                            );
-                                            courseDto.setReviews(tuple.getT5().stream()
-                                                .map(reviewMapper::toReviewDto)
-                                                .toList()
-                                            );
-    
-                                            reviewDto.setCourse(courseMapper.toCourseDto(course));
-                                            reviewDto.setUser(new UserDto(tuple.getT6().getId(), tuple.getT6().getEmail()));
-    
-                                            return reviewDto;
-                                        });
-                                })
-                            );
-                    } else {
-                        return Mono.error(
-                            new CustomWebExchangeBindException(
-                                principal.getName(), 
-                                "auth", 
-                                "No tiene la autorización necesaria para actualizar una reseña que corresponde a otro usuario."
-                            ).getWebExchangeBindException()
-                        );
-                    }
-                })
+                .flatMap(user -> reviewRepository.findById(id)
+                        .flatMap(review -> {
+                            if (review.getUserId().equals(user.getId())
+                                    || user.getRoles().contains(Roles.PREFIX + Roles.ADMIN)) {
+                                review.setContent(updateReviewDto.getContent());
+                                review.setRating(updateReviewDto.getRating());
+                                return reviewRepository.save(review)
+                                        .flatMap(savedReview -> courseRepository.findById(savedReview.getCourseId())
+                                                .flatMap(course -> {
+                                                    Mono<Category> categoryMono = categoryRepository
+                                                            .findById(course.getCategoryId());
+                                                    Mono<Institution> institutionMono = institutionRepository
+                                                            .findById(course.getInstitutionId());
+                                                    Flux<Content> contentFlux = contentRepository
+                                                            .findByCourseId(course.getId());
+                                                    Flux<Like> likeFlux = likeRepository.findByCourseId(course.getId());
+                                                    Flux<Review> reviewFlux = reviewRepository
+                                                            .findByCourseId(course.getId());
+                                                    Mono<User> userMono = userRepository
+                                                            .findById(savedReview.getUserId());
+
+                                                    return Mono
+                                                            .zip(categoryMono, institutionMono,
+                                                                    contentFlux.collectList(), likeFlux.collectList(),
+                                                                    reviewFlux.collectList(), userMono)
+                                                            .map(tuple -> {
+                                                                ReviewDto reviewDto = reviewMapper.toReviewDto(review);
+                                                                CourseDto courseDto = courseMapper.toCourseDto(course);
+                                                                courseDto.setCategory(
+                                                                        categoryMapper.toCategoryDto(tuple.getT1()));
+                                                                courseDto.setInstitution(institutionMapper
+                                                                        .toInstitutionDto(tuple.getT2()));
+                                                                courseDto.setContents(tuple.getT3().stream()
+                                                                        .map(contentMapper::toContentDto)
+                                                                        .toList());
+                                                                courseDto.setLikes(tuple.getT4().stream()
+                                                                        .map(likeMapper::toLikeDto)
+                                                                        .toList());
+                                                                courseDto.setReviews(tuple.getT5().stream()
+                                                                        .map(reviewMapper::toReviewDto)
+                                                                        .toList());
+
+                                                                reviewDto.setCourse(courseMapper.toCourseDto(course));
+                                                                reviewDto.setUser(new UserDto(tuple.getT6().getId(),
+                                                                        tuple.getT6().getEmail()));
+
+                                                                return reviewDto;
+                                                            });
+                                                }));
+                            } else {
+                                return Mono.error(
+                                        new CustomWebExchangeBindException(
+                                                principal.getName(),
+                                                "auth",
+                                                "No tiene la autorización necesaria para actualizar una reseña que corresponde a otro usuario.")
+                                                .getWebExchangeBindException());
+                            }
+                        })
+                        .switchIfEmpty(Mono.error(
+                                new CustomWebExchangeBindException(
+                                        id,
+                                        "reviewId",
+                                        "No hemos podido encontrar la reseña indicada. Te sugerimos que verifiques la información y lo intentes de nuevo.")
+                                        .getWebExchangeBindException())))
                 .switchIfEmpty(Mono.error(
-                    new CustomWebExchangeBindException(
-                        id, 
-                        "reviewId", 
-                        "No hemos podido encontrar la reseña indicada. Te sugerimos que verifiques la información y lo intentes de nuevo."
-                    ).getWebExchangeBindException()
-                ))
-            )
-            .switchIfEmpty(Mono.error(
-                new CustomWebExchangeBindException(
-                    principal.getName(), 
-                    "auth", 
-                    "Parece que el usuario autenticado no se encuentra en el sistema. Te recomendamos cerrar sesión y volver a ingresar."
-                ).getWebExchangeBindException()
-            ));
+                        new CustomWebExchangeBindException(
+                                principal.getName(),
+                                "auth",
+                                "Parece que el usuario autenticado no se encuentra en el sistema. Te recomendamos cerrar sesión y volver a ingresar.")
+                                .getWebExchangeBindException()));
     }
 
     @Override
     public Mono<Boolean> deleteReview(Principal principal, String id) {
         return userRepository.findByEmail(principal.getName())
-            .flatMap(user -> reviewRepository.findById(id)
-                .flatMap(review -> {
-                    if (review.getUserId().equals(user.getId()) || user.getRoles().contains(Roles.PREFIX + Roles.ADMIN)) {
-                        return reviewRepository.deleteById(review.getId())
-                            .then(Mono.just(true));
-                    } else {
-                        return Mono.error(
-                            new CustomWebExchangeBindException(
-                                principal.getName(), 
-                                "auth", 
-                                "No tiene la autorización necesaria para eliminar una reseña que corresponde a otro usuario."
-                            ).getWebExchangeBindException()
-                        );
-                    }
-                })
+                .flatMap(user -> reviewRepository.findById(id)
+                        .flatMap(review -> {
+                            if (review.getUserId().equals(user.getId())
+                                    || user.getRoles().contains(Roles.PREFIX + Roles.ADMIN)) {
+                                return reviewRepository.deleteById(review.getId())
+                                        .then(Mono.just(true));
+                            } else {
+                                return Mono.error(
+                                        new CustomWebExchangeBindException(
+                                                principal.getName(),
+                                                "auth",
+                                                "No tiene la autorización necesaria para eliminar una reseña que corresponde a otro usuario.")
+                                                .getWebExchangeBindException());
+                            }
+                        })
+                        .switchIfEmpty(Mono.error(
+                                new CustomWebExchangeBindException(
+                                        id,
+                                        "reviewId",
+                                        "No hemos podido encontrar la reseña indicada. Te sugerimos que verifiques la información y lo intentes de nuevo.")
+                                        .getWebExchangeBindException())))
                 .switchIfEmpty(Mono.error(
-                    new CustomWebExchangeBindException(
-                        id, 
-                        "reviewId", 
-                        "No hemos podido encontrar la reseña indicada. Te sugerimos que verifiques la información y lo intentes de nuevo."
-                    ).getWebExchangeBindException()
-                ))
-            )
-            .switchIfEmpty(Mono.error(
-                new CustomWebExchangeBindException(
-                    principal.getName(), 
-                    "auth", 
-                    "Parece que el usuario autenticado no se encuentra en el sistema. Te recomendamos cerrar sesión y volver a ingresar."
-                ).getWebExchangeBindException()
-            ));
+                        new CustomWebExchangeBindException(
+                                principal.getName(),
+                                "auth",
+                                "Parece que el usuario autenticado no se encuentra en el sistema. Te recomendamos cerrar sesión y volver a ingresar.")
+                                .getWebExchangeBindException()));
     }
 
     private boolean isNumeric(String str) {
@@ -425,26 +430,32 @@ public class ReviewService implements InterfaceReviewService {
     private List<ReviewCountByMonth> generateLastSixMonths(LocalDate date) {
         return IntStream.range(0, 6)
                 .mapToObj(i -> date.minusMonths(i))
-                .map(d -> new ReviewCountByMonth(d.getYear(), d.getMonth().getDisplayName(TextStyle.FULL, Locale.forLanguageTag("en")), 0))
-                .sorted(Comparator.comparingInt(ReviewCountByMonth::getYear).thenComparing(Comparator.comparingInt(this::getMonthIndex)))
+                .map(d -> new ReviewCountByMonth(d.getYear(),
+                        d.getMonth().getDisplayName(TextStyle.FULL, Locale.forLanguageTag("en")), 0))
+                .sorted(Comparator.comparingInt(ReviewCountByMonth::getYear)
+                        .thenComparing(Comparator.comparingInt(this::getMonthIndex)))
                 .collect(Collectors.toList());
     }
 
-    private List<ReviewCountByMonth> mergeWithMissingMonths(List<ReviewCountByMonth> predefined, List<ReviewCountByMonth> fromDb) {
+    private List<ReviewCountByMonth> mergeWithMissingMonths(List<ReviewCountByMonth> predefined,
+            List<ReviewCountByMonth> fromDb) {
         Map<String, Integer> reviewCountsMap = fromDb
-            .stream()
-            .collect(Collectors.toMap(r -> r.getYear() + "-" + r.getMonth(), r -> Math.toIntExact(r.getCount())));
+                .stream()
+                .collect(Collectors.toMap(r -> r.getYear() + "-" + r.getMonth(), r -> Math.toIntExact(r.getCount())));
 
         return predefined.stream()
-                .map(r -> new ReviewCountByMonth(r.getYear(), MONTH_TRANSLATIONS.getOrDefault(r.getMonth(), r.getMonth()), reviewCountsMap.getOrDefault(r.getYear() + "-" + r.getMonth(), 0)))
+                .map(r -> new ReviewCountByMonth(r.getYear(),
+                        MONTH_TRANSLATIONS.getOrDefault(r.getMonth(), r.getMonth()),
+                        reviewCountsMap.getOrDefault(r.getYear() + "-" + r.getMonth(), 0)))
                 .collect(Collectors.toList());
     }
 
     private int getMonthIndex(ReviewCountByMonth review) {
         return LocalDate.of(review.getYear(), 1, 1)
-                .withMonth(Arrays.asList("january", "february", "march", "april", "may", "june", "july", "august", "september", "october", "november", "december")
-                    .indexOf(review.getMonth().toLowerCase()) + 1
-                )
+                .withMonth(Arrays
+                        .asList("january", "february", "march", "april", "may", "june", "july", "august", "september",
+                                "october", "november", "december")
+                        .indexOf(review.getMonth().toLowerCase()) + 1)
                 .getMonthValue();
     }
 }

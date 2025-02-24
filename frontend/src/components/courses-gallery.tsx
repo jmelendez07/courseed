@@ -7,7 +7,7 @@ function CoursesGallery() {
     return (
         <GalleryCourseItems
             heading="Cursos" 
-            url="/cursos"
+            url="/educacion"
             linkText="Descubre todos los cursos que ofrecemos."
             items={courseHook.courses}
         />

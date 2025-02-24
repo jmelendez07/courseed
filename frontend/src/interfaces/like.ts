@@ -1,7 +1,11 @@
+import CourseInterface from "./course";
+import UserInterface from "./user";
+
 interface LikeInterface {
     id: string;
-    userId: string;
-    like: boolean;
+    user?: UserInterface;
+    course?: CourseInterface;
+    createdAt: string;
 }
 
 export default LikeInterface;

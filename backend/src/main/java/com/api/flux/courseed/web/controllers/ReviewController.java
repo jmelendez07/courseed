@@ -48,7 +48,8 @@ public class ReviewController {
                 .getReviewsByAuthUser(
                     principal,
                     Integer.parseInt(serverRequest.queryParam("page").orElse("0")), 
-                    Integer.parseInt(serverRequest.queryParam("size").orElse("10"))
+                    Integer.parseInt(serverRequest.queryParam("size").orElse("10")),
+                    serverRequest.queryParam("search").orElse("")
                 )
                 .flatMap(reviews-> ServerResponse.ok().bodyValue(reviews))
                 .switchIfEmpty(ServerResponse.notFound().build())

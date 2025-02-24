@@ -1,5 +1,6 @@
 import APIS from "@/enums/apis";
 import CourseInterface from "@/interfaces/course";
+import LikeInterface from "@/interfaces/like";
 import axios, { AxiosError, AxiosResponse } from "axios";
 import React from "react";
 
@@ -24,11 +25,29 @@ function useCourse({ id }: useCourseProps) {
             .finally(() => setLoading(false));
     }, [id]);
 
+    const handleDeleteLike = (id: string) => {
+        if (!course) return;
+        setCourse({
+            ...course,
+            likes: course.likes.filter(l => l.id !== id)
+        });
+    }
+
+    const handleCreateLike = (like: LikeInterface) => {
+        if (!course) return;
+        setCourse({
+            ...course,
+            likes: [...course.likes, like]
+        });
+    }
+
     return {
         course,
         loading,
         setCourse,
-        setLoading
+        setLoading,
+        handleCreateLike,
+        handleDeleteLike
     };
 }
 

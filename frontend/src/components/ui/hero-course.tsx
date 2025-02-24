@@ -1,15 +1,31 @@
-import { ArrowUpRight, BookMarked, CalendarClock, Check, DollarSign, Landmark, MessageSquareText, SquareStack, Star } from "lucide-react";
+import { ArrowUpRight, BookMarked, CalendarClock, Check, DollarSign, Landmark, MessageSquareText, SquareStack, Star, ThumbsUp } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import CourseInterface from "@/interfaces/course";
+import { useAuth } from "@/providers/AuthProvider";
+import useLike from "@/hooks/useLike";
+import React from "react";
+import ConfettiExplosion from 'react-confetti-explosion';
+import LikeInterface from "@/interfaces/like";
 
 interface HeroCourseProps {
     course: CourseInterface;
     handlePrimaryButton?: () => void;
+    handleCreateLike: (like: LikeInterface) => void;
+    handleDeleteLike: (id: string) => void;
 }
 
-const HeroCourse = ({ course, handlePrimaryButton }: HeroCourseProps) => {
+const HeroCourse = ({ 
+    course, 
+    handlePrimaryButton,
+    handleCreateLike,
+    handleDeleteLike 
+}: HeroCourseProps) => {
+
+    const authHook = useAuth();
+    const likeHook = useLike();
+    const [isExploding, setIsExploding] = React.useState(false);
 
     function getAverageRating(): number {
         if (!course.reviews) return 0;
@@ -81,7 +97,7 @@ const HeroCourse = ({ course, handlePrimaryButton }: HeroCourseProps) => {
                             ))}
                         </span>
                         <div>
-                            <div className="flex items-center gap-1">
+                            <div className="flex items-center gap-1 justify-center sm:justify-start">
                                 {[...Array(5)].map((_, index) => (
                                     <Star
                                         key={index}
@@ -100,6 +116,34 @@ const HeroCourse = ({ course, handlePrimaryButton }: HeroCourseProps) => {
                                 )}
                             </p>
                         </div>
+                        <span className="flex items-center gap-2 sm:ml-6">
+                            {course.likes.length}
+                            {authHook?.user ? (
+                                <>
+                                    <ThumbsUp 
+                                        className={`cursor-pointer text-gray-400 hover:text-gray-900`} 
+                                        onClick={async () => {
+                                            if (course.likes.some(l => l.user?.id === authHook.user?.id)) {
+                                                const currentLike = course.likes.find(l => l.user?.id === authHook.user?.id);
+                                                if (currentLike && await likeHook.handleDeleteLike(currentLike?.id)) {
+                                                    handleDeleteLike(currentLike.id);
+                                                    setIsExploding(false);
+                                                };
+                                            } else {
+                                                const like: LikeInterface | null = await likeHook.handleCreateLike(course.id);
+                                                if (like) {
+                                                    setIsExploding(true);
+                                                    handleCreateLike(like);
+                                                }
+                                            }
+                                        }}
+                                    />
+                                    {isExploding && <ConfettiExplosion />}
+                                </>
+                            ) : (
+                                <ThumbsUp className="text-gray-400" />
+                            )}
+                        </span>
                     </div>
                     <div className="flex w-full flex-col justify-center gap-2 sm:flex-row lg:justify-start">
                         <Button onClick={() => {
@@ -134,8 +178,9 @@ const HeroCourse = ({ course, handlePrimaryButton }: HeroCourseProps) => {
                             </h1>
                         </div>
                         <div className="mx-auto flex flex-col">
-                            {options.map(option => (
+                            {options.map((option, index) => (
                                 <div
+                                    key={index}
                                     className="flex items-center justify-between border-b py-6"
                                 >
                                     <p className="font-semibold inline-flex gap-2">
@@ -165,7 +210,7 @@ const HeroCourse = ({ course, handlePrimaryButton }: HeroCourseProps) => {
                         </div>
                         <div className="mx-auto flex flex-col">
                             {course.contents.slice(0, 4).map((content, _) => (
-                                <p className="pt-6 text-muted-foreground lg:text-xl inline-flex">
+                                <p key={content.id} className="pt-6 text-muted-foreground lg:text-xl inline-flex">
                                     <Check className="size-5 min-w-5 min-h-5 mr-1 mt-1" />
                                     <span className="line-clamp-3">{content.description}</span>
                                 </p>

@@ -23,6 +23,7 @@ import com.api.flux.courseed.persistence.repositories.UserRepository;
 import com.api.flux.courseed.projections.dtos.CourseDto;
 import com.api.flux.courseed.projections.dtos.CourseWithRatingAvg;
 import com.api.flux.courseed.projections.dtos.CourseWithReviewsCountAndLikesCount;
+import com.api.flux.courseed.projections.dtos.LikeDto;
 import com.api.flux.courseed.projections.dtos.ReviewDto;
 import com.api.flux.courseed.projections.dtos.SaveCourseDto;
 import com.api.flux.courseed.projections.dtos.UserDto;
@@ -122,7 +123,14 @@ public class CourseService implements InterfaceCourseService {
                 Mono<Category> categoryMono = categoryRepository.findById(course.getCategoryId());
                 Mono<Institution> institutionMono = institutionRepository.findById(course.getInstitutionId());
                 Flux<Content> contentFlux = contentRepository.findByCourseId(course.getId());
-                Flux<Like> likeFlux = likeRepository.findByCourseId(course.getId());
+                Flux<LikeDto> likeFlux = likeRepository.findByCourseId(course.getId())
+                    .flatMap(like -> userRepository.findById(like.getUserId())
+                        .flatMap(user -> {
+                            LikeDto likeDto = likeMapper.toLikeDto(like);
+                            likeDto.setUser(new UserDto(user.getId(), user.getEmail()));
+                            return Mono.just(likeDto);
+                        })
+                    );
                 Flux<ReviewDto> reviewFlux = reviewRepository.findByCourseId(course.getId())
                     .flatMap(review -> userRepository.findById(review.getUserId())
                         .flatMap(user -> {
@@ -142,7 +150,6 @@ public class CourseService implements InterfaceCourseService {
                             .toList()
                         );
                         courseDto.setLikes(tuple.getT4().stream()
-                            .map(likeMapper::toLikeDto)
                             .toList()
                         );
                         courseDto.setReviews(tuple.getT5().stream()

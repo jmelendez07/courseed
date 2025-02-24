@@ -26,6 +26,8 @@ enum APIS {
     REVIEWS_UPDATE = 'api/reviews/',
     REVIEWS_DELETE = 'api/reviews/',
     LIKES_BY_AUTH_USER = 'api/likes/auth',
+    LIKE_CREATE = 'api/likes/',
+    LIKE_DELETE = 'api/likes/',
     FACULTIES = 'api/categories',
     ROLES_WITH_USERS_COUNT = 'api/roles/users/count',
 }

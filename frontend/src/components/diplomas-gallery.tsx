@@ -7,7 +7,7 @@ function DiplomasGallery() {
     return (
         <GalleryCourseItems
             heading="Diplomados" 
-            url="/cursos"
+            url="/educacion"
             linkText="Descubre todos los diplomados que ofrecemos."
             items={courseHook.courses}
         />

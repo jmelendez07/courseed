@@ -7,7 +7,7 @@ function WorkShopsGallery() {
     return (
         <GalleryCourseItems
             heading="Talleres" 
-            url="/cursos"
+            url="/educacion"
             linkText="Descubre todos los talleres que ofrecemos."
             items={courseHook.courses}
         />

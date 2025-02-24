@@ -30,6 +30,8 @@ function Course() {
                     handlePrimaryButton={() => {
                         if (BlogReviewsRef.current) BlogReviewsRef.current.scrollIntoView({ behavior: 'smooth' });
                     }}
+                    handleCreateLike={(like) => courseHook.handleCreateLike(like)}
+                    handleDeleteLike={(id) => courseHook.handleDeleteLike(id)}
                 />
             )}
             <BlogReviews

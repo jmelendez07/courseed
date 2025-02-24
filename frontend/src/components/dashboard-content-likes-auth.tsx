@@ -1,6 +1,7 @@
 import useLikesAuth from "@/hooks/useLikesAuth";
 import { Button } from "./ui/button";
-import { ArrowUpRight } from "lucide-react";
+import { ArrowUpRight, LoaderCircle } from "lucide-react";
+import Course from "./ui/course";
 
 interface DashboardContentLikesAuthProps {
     className?: string;
@@ -10,9 +11,18 @@ function DashboardContentLikesAuth({ className }: DashboardContentLikesAuthProps
     const likesHook = useLikesAuth({});
 
     return (
-        <div className={`flex flex-col gap-4 h-full ${className}`}>
+        likesHook.loading ? (
+            <div className="flex items-center justify-center w-full h-full">
+                <LoaderCircle className="animate-spin" />
+            </div>
+        ) : (
+        <div className={`grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6 ${className}`}>
             {likesHook.likes.length > 0 ? (
-                <></>
+                <>
+                    {likesHook.likes.map(like => (
+                        like.course && (<Course key={like.id} course={like.course} optionsEnable={false} />)
+                    ))}
+                </>
             ) : (
                 <div className="flex flex-1 flex-col items-center justify-center p-4 text-center gap-4">
                     <svg className="max-w-full lg:max-w-[50%] h-min" xmlns="http://www.w3.org/2000/svg" width="646" height="478.40178" viewBox="0 0 646 478.40178" role="img">
@@ -63,6 +73,7 @@ function DashboardContentLikesAuth({ className }: DashboardContentLikesAuthProps
                 </div>
             )}
         </div>
+        )
     );
 }
 

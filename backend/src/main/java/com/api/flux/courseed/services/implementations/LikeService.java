@@ -2,6 +2,10 @@ package com.api.flux.courseed.services.implementations;
 
 import java.security.Principal;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.api.flux.courseed.persistence.documents.Category;
@@ -99,9 +103,11 @@ public class LikeService implements InterfaceLikeService {
     }
 
     @Override
-    public Flux<LikeDto> getLikesByAuthUser(Principal principal) {
+    public Mono<Page<LikeDto>> getLikesByAuthUser(Principal principal, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+
         return userRepository.findByEmail(principal.getName())
-            .flatMapMany(user -> likeRepository.findByUserId(user.getId())
+            .flatMapMany(user -> likeRepository.findByUserId(user.getId(), pageable)
                 .flatMap(like -> courseRepository.findById(like.getCourseId())
                     .flatMap(course -> {
                         Mono<Category> categoryMono = categoryRepository.findById(course.getCategoryId());
@@ -139,7 +145,10 @@ public class LikeService implements InterfaceLikeService {
                     "auth", 
                     "No se encontraron 'me gusta' del usuario autenticado. Te sugerimos que verifiques la información y lo intentes de nuevo."
                 ).getWebExchangeBindException()
-            ));
+            ))
+            .collectList()
+            .zipWith(reviewRepository.count())
+            .map(p -> new PageImpl<>(p.getT1(), pageable, p.getT2()));
     }
 
     @Override

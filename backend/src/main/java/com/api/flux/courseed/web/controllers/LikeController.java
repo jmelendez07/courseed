@@ -36,17 +36,13 @@ public class LikeController {
 
     public Mono<ServerResponse> getLikesByAuthUser(ServerRequest serverRequest) {
         return serverRequest.principal()
-            .flatMap(principal -> likeService.getLikesByAuthUser(principal)
-                .collectList().flatMap(list -> {
-                    if (!list.isEmpty()) {
-                        return ServerResponse.ok()
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .body(Flux.fromIterable(list), LikeDto.class);
-                    } else {
-                        return ServerResponse.notFound().build();
-                    }
-                })
-            );
+            .flatMap(principal -> likeService.getLikesByAuthUser(
+                principal,
+                Integer.parseInt(serverRequest.queryParam("page").orElse("0")), 
+                Integer.parseInt(serverRequest.queryParam("size").orElse("10"))
+            ))
+            .flatMap(likes -> ServerResponse.ok().bodyValue(likes))
+            .switchIfEmpty(ServerResponse.notFound().build()); 
     }
 
     public Mono<ServerResponse> createLike(ServerRequest serverRequest) {

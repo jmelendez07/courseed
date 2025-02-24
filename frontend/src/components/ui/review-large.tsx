@@ -1,9 +1,10 @@
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./dropdown-menu";
 import { Button } from "./button";
-import { Edit, MoreVertical, Star, Trash2 } from "lucide-react";
+import { ArrowUpRight, Edit, MoreVertical, Star, Trash2 } from "lucide-react";
 import ReviewCourseUserInterface from "@/interfaces/review-course-user";
 import { Avatar, AvatarFallback } from "./avatar";
+import { Link } from "react-router-dom";
 
 interface ReviewComponentProps {
 	review: ReviewCourseUserInterface;
@@ -15,31 +16,46 @@ interface ReviewComponentProps {
 function ReviewLarge({ review, handleEdit, handleDelete, className }: ReviewComponentProps) {
 	return (
 		<Card
-			className={`flex flex-col bg-white ease-in-out hover:shadow-lg transition-shadow duration-300 ${className}`}
+			className={`flex flex-col bg-white ease-in-out hover:shadow-lg transition-shadow duration-300 group ${className}`}
 		>
-			<CardHeader className="flex flex-row items-start justify-between space-y-0 pb-2">
+			<CardHeader className="flex flex-row items-start justify-between gap-2 space-y-0 pb-2">
 				<h2 className="text-lg font-semibold leading-tight">{review.course.title}</h2>
-				<DropdownMenu>
-					<DropdownMenuTrigger asChild>
-						<Button variant="ghost" className="h-8 w-8 p-0 min-w-8">
-							<MoreVertical className="h-4 w-4" />
-						</Button>
-					</DropdownMenuTrigger>
-					<DropdownMenuContent align="end">
-						<DropdownMenuItem onClick={() => {
-							if (handleEdit) handleEdit(review);
-						}}>
-							<Edit className="mr-2 h-4 w-4" />
-							<span>Editar</span>
-						</DropdownMenuItem>
-						<DropdownMenuItem onClick={() => {
-							if (handleDelete) handleDelete(review);
-						}}>
-							<Trash2 className="mr-2 h-4 w-4" />
-							<span>Eliminar</span>
-						</DropdownMenuItem>
-					</DropdownMenuContent>
-				</DropdownMenu>
+				{(handleDelete || handleEdit) ? (
+					<DropdownMenu>
+						<DropdownMenuTrigger asChild>
+							<Button variant="ghost" className="h-8 w-8 p-0 min-w-8">
+								<MoreVertical className="h-4 w-4" />
+							</Button>
+						</DropdownMenuTrigger>
+						<DropdownMenuContent align="end">
+							<DropdownMenuItem onClick={() => {
+								if (handleEdit) handleEdit(review);
+							}}>
+								<Edit className="mr-2 h-4 w-4" />
+								<span>Editar</span>
+							</DropdownMenuItem>
+							<DropdownMenuItem onClick={() => {
+								if (handleDelete) handleDelete(review);
+							}}>
+								<Trash2 className="mr-2 h-4 w-4" />
+								<span>Eliminar</span>
+							</DropdownMenuItem>
+						</DropdownMenuContent>
+					</DropdownMenu>
+				) : (
+					<Button 
+						className="px-2 transition-transform group-hover:translate-x-1"
+						size="sm"
+						asChild
+					>
+						<Link 
+							to={`/educacion/${review.course.id}`}
+							target="_blank"
+						>
+							<ArrowUpRight />
+						</Link>
+					</Button>
+				)}
 			</CardHeader>
 			<CardContent>
 				<div className="relative w-full overflow-hidden mb-2">
