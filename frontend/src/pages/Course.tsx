@@ -34,13 +34,6 @@ function Course() {
                     handleDeleteLike={(id) => courseHook.handleDeleteLike(id)}
                 />
             )}
-            <BlogReviews
-                ref={BlogReviewsRef}
-                reviews={courseHook.course?.reviews ? courseHook.course.reviews : []}
-                tagline = "Opiniones compartidas"
-                heading = "Reseñas"
-                description = "Conoce las valoraciones de otros participantes y toma una decisión informada. Las reseñas te permiten conocer tanto los aspectos positivos como las áreas de mejora que los estudiantes han experimentado, lo que te ayudará a tener una visión completa del curso."
-            />
             <Footer />
         </>
     );

@@ -5,6 +5,7 @@ import axios, { AxiosResponse } from "axios";
 import APIS from "@/enums/apis";
 import ReviewCourseUserInterface from "@/interfaces/review-course-user";
 import LikeWithCourseUser from "@/interfaces/like-with-course-user";
+import { Button } from "./ui/button";
 
 interface ResponseReviewProps {
     content: ReviewCourseUserInterface[];
@@ -65,13 +66,15 @@ function DashboardStatsProfile() {
                                         {review.course.title}. <span className="text-xs text-gray-600">{new Date(review.createdAt).toLocaleDateString()}</span>
                                     </p>
                                 </div>
-                                <a
-                                    href={`/educacion/${review.course.id}`}
-                                    target="_blank"
-                                    className="p-2 rounded bg-gray-950 text-white transition-transform group-hover:translate-x-1"
-                                >
-                                    <ArrowUpRight className="size-4" />
-                                </a>
+                                <Button asChild size="sm">
+                                    <a
+                                        href={`/educacion/${review.course.id}`}
+                                        target="_blank"
+                                        className="px-[0.5rem] rounded transition-transform group-hover:translate-x-1"
+                                    >
+                                        <ArrowUpRight className="size-4" />
+                                    </a>
+                                </Button>
                             </li>
                         )) : (
                             <div className="w-full flex items-center justify-center h-64 overflow-hidden">
@@ -101,13 +104,15 @@ function DashboardStatsProfile() {
                                 <p className="font-medium text-sm line-clamp-3">
                                     {like.course.title}. <span className="text-xs text-gray-600">{new Date(like.createdAt).toLocaleDateString()}</span>
                                 </p>
-                                <a
-                                    href={`/educacion/${like.course.id}`}
-                                    target="_blank"
-                                    className="p-2 rounded bg-gray-950 text-white transition-transform group-hover:translate-x-1"
-                                >
-                                    <ArrowUpRight className="size-4" />
-                                </a>
+                                <Button asChild size="sm">
+                                    <a
+                                        href={`/educacion/${like.course.id}`}
+                                        target="_blank"
+                                        className="px-[0.5rem] rounded transition-transform group-hover:translate-x-1"
+                                    >
+                                        <ArrowUpRight className="size-4" />
+                                    </a>
+                                </Button>
                             </li>
                         )) : (
                             <div className="w-full flex items-center justify-center h-64 overflow-hidden">

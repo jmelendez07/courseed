@@ -215,7 +215,11 @@ function UserDataTable() {
 					className="max-w-sm"
 				/>
 			</div>
-			<div className="rounded-md border">
+			<div 
+				className="rounded-md border border-zinc-200 dark:border-zinc-800 
+				dark:file:text-zinc-50 dark:placeholder:text-zinc-400 
+				dark:focus-visible:ring-zinc-300"
+			>
 				<Table>
 					<TableHeader>
 						{table.getHeaderGroups().map((headerGroup) => (
@@ -252,7 +256,7 @@ function UserDataTable() {
 						) : (
 							<TableRow>
 								<TableCell colSpan={columns.length} className="h-24 text-center">
-									No results.
+									No hay Usuarios.
 								</TableCell>
 							</TableRow>
 						)}

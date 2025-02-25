@@ -20,7 +20,7 @@ const BlogReviews = forwardRef<HTMLElement, BlogReviewsProps>(({
 }, ref) => {
     return (
         <section ref={ref} className="py-12">
-            <div className="container mx-auto flex px-4 md:px-8 xl:px-12 2xl:px-16 flex-col items-center gap-16 lg:px-16">
+            <div className="w-full mx-auto flex px-4 md:px-8 xl:px-12 2xl:px-16 flex-col items-center gap-16 lg:px-16">
                 <div className="text-center">
                     <Badge variant="secondary" className="mb-6">
                         {tagline}
@@ -33,7 +33,7 @@ const BlogReviews = forwardRef<HTMLElement, BlogReviewsProps>(({
                     </p>
                 </div>
                 {reviews.length > 0 ? (
-                    <div className="w-full grid gap-6 md:grid-cols-2 lg:grid-cols-3 lg:gap-8">
+                    <div className="w-full grid gap-6 md:grid-cols-2 lg:grid-cols-3 lg:gap-8 2xl:flex 2xl:flex-wrap 2xl:items-center">
                         {reviews.map(review => (
                             <Review
                                 key={review.id}

@@ -77,7 +77,7 @@ const HeroCourse = ({
 
     return (
         <section className="py-12 flex justify-center">
-            <div className="container grid items-start px-4 md:px-8 xl:px-12 2xl:px-16 gap-10 lg:grid-cols-2 lg:gap-20">
+            <div className="w-full grid items-start px-4 md:px-8 xl:px-12 2xl:px-16 gap-10 lg:grid-cols-2 lg:gap-20">
                 <div
                     className="mx-auto flex flex-col items-center text-center md:ml-auto lg:max-w-3xl 
                     lg:items-start lg:text-left top-0 h-fit lg:sticky"
@@ -91,7 +91,7 @@ const HeroCourse = ({
                     <div className="mb-12 flex w-fit flex-col items-center gap-4 sm:flex-row">
                         <span className="inline-flex items-center -space-x-4">
                             {course.reviews && course.reviews.map((review, index) => (
-                                <Avatar key={index} className="size-12 border">
+                                <Avatar key={index} className="size-12 border dark:border-0">
                                     <AvatarFallback className="rounded-lg">{review.user.email.slice(0, 2).toUpperCase()}</AvatarFallback>
                                 </Avatar>
                             ))}

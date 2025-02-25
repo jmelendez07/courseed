@@ -41,8 +41,7 @@ function Course({ className, course, optionsEnable, handleEdit, handleDelete }: 
 	return (
 		<Card
 			className={`
-				flex flex-col bg-white/25 border border-gray-200 rounded-lg 
-				hover:shadow-lg transition-shadow duration-300 ${className}
+				flex flex-col rounded-lg hover:shadow-lg transition-shadow duration-300 ${className}
 			`}
 		>
 			<div className="relative">
@@ -51,7 +50,7 @@ function Course({ className, course, optionsEnable, handleEdit, handleDelete }: 
 					alt={course.title}
 					className="w-full h-[200px] object-cover rounded-t-lg"
 				/>
-				<Badge className={`absolute top-2 ${optionsEnable ? "left-2" : "right-2"}  bg-gray-100 text-gray-800 hover:bg-gray-200`}>
+				<Badge variant="secondary" className={`absolute top-2 ${optionsEnable ? "left-2" : "right-2"}`}>
 					{course.category.name}
 				</Badge>
 				{optionsEnable && (
@@ -80,7 +79,7 @@ function Course({ className, course, optionsEnable, handleEdit, handleDelete }: 
 				)}
 			</div>
 			<CardHeader className="space-y-1 py-3">
-				<CardTitle className="text-xl text-gray-900 line-clamp-3">{course.title}</CardTitle>
+				<CardTitle className="text-xl line-clamp-3">{course.title}</CardTitle>
 			</CardHeader>
 			<CardContent className="flex-grow space-y-4 flex flex-col justify-between">
 				<div className="space-y-4">
@@ -94,7 +93,7 @@ function Course({ className, course, optionsEnable, handleEdit, handleDelete }: 
 					</p>
 				</div>
 				<div className="flex flex-wrap justify-between gap-x-2 gap-y-1">
-					<p className="text-lg font-bold text-gray-900">
+					<p className="text-lg font-bold">
 						{getFormatPrice()}
 					</p>
 					<div className="flex items-center gap-1">
