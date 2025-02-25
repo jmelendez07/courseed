@@ -19,7 +19,6 @@ interface PieChartProps {
     title?: string;
     description?: string;
     chartData: ChartItem[];
-    chartConfig?: ChartConfig;
     className?: string;
 }
 
@@ -41,9 +40,16 @@ function PieChart({
     title = "Pie Chart - Label List",
     description = "January - June 2024",
     chartData,
-    chartConfig = {},
     className
 }: PieChartProps) {
+
+    const chartConfig = {
+        desktop: {
+            label: "Desktop",
+            color: "oklch(0.588 0.158 241.966)",
+        }
+    } satisfies ChartConfig
+
     return (
         <Card className={`bg-white border border-gray-200 rounded-lg hover:shadow-lg 
             transition-shadow duration-300 grid grid-rows-[auto_1fr] ${className}`}>
@@ -51,11 +57,8 @@ function PieChart({
                 <CardTitle>{title}</CardTitle>
                 <CardDescription>{description}</CardDescription>
             </CardHeader>
-            <CardContent className="flex-1 pb-0">
-                <ChartContainer
-                    config={chartConfig}
-                    className="mx-auto aspect-square [&_.recharts-text]:fill-background max-h-[250px]"
-                >
+            <CardContent className="overflow-hidden">
+                <ChartContainer config={chartConfig} className="mx-auto aspect-square max-h-[250px] overflow-hidden">
                     <PieChartRechart>
                         <ChartTooltip
                             content={<ChartTooltipContent nameKey="value" hideLabel />}
@@ -65,8 +68,8 @@ function PieChart({
                                 dataKey="label"
                                 offset={8}
                                 fontWeight={2}
-                                fill="#fff"
                                 fontSize={12}
+                                className="fill-foreground"
                                 formatter={renderLabel}
                             />
                         </Pie>

@@ -42,7 +42,7 @@ const BlogCourses = ({
 
     return (
         <section className="py-20 lg:py-32">
-            <div className="container mx-auto flex flex-col items-center gap-16 px-4 md:px-8 lg:px-16">
+            <div className="w-full mx-auto flex flex-col items-center gap-16 px-4 md:px-8 lg:px-16">
                 <div className="flex flex-col items-center">
                     <Badge variant="secondary" className="mb-6">
                         {courseHook.totalCourses} Cursos, Diplomados y Talleres
@@ -111,7 +111,7 @@ const BlogCourses = ({
                         </div>
                     </div>
                 </div>
-                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 lg:gap-8">
+                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 lg:gap-8 2xl:flex 2xl:flex-wrap 2xl:justify-center">
                     {courseHook.courses.map((course) => (
                         <Course
                             key={course.id}
