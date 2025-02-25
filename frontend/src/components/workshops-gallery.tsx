@@ -3,6 +3,7 @@ import useCourses from "@/hooks/useCourses";
 
 function WorkShopsGallery() {
     const courseHook = useCourses({});
+    console.log(1)
 
     return (
         <GalleryCourseItems
