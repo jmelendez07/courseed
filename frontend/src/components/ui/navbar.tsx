@@ -33,6 +33,7 @@ import { Avatar, AvatarFallback } from "./avatar";
 import React from "react";
 import ROLES from "@/enums/roles";
 import { THEME, ThemeContext } from "@/providers/ThemeProvider";
+import Color from "./Color";
 interface MenuItem {
     title: string;
     url: string;
@@ -121,6 +122,7 @@ const Navbar = ({
                         </div>
                     </div>
                     <div className="flex items-center gap-4">
+                        <Color />
                         <div>
                             {themeContext?.theme === THEME.LIGHT ? (
                                 <Moon
@@ -213,6 +215,7 @@ const Navbar = ({
                             <span className="text-lg font-semibold">{logo.title}</span>
                         </Link>
                         <div className="flex items-center gap-4">
+                            <Color />
                             <div>
                                 {themeContext?.theme === THEME.LIGHT ? (
                                     <Moon

@@ -25,14 +25,23 @@ function Course() {
             <HeadProvider title={`Courseed ${courseHook.course && '| ' + courseHook.course.title}`} />
             <Navbar />
             {courseHook.course && (
-                <HeroCourse 
-                    course={courseHook.course}
-                    handlePrimaryButton={() => {
-                        if (BlogReviewsRef.current) BlogReviewsRef.current.scrollIntoView({ behavior: 'smooth' });
-                    }}
-                    handleCreateLike={(like) => courseHook.handleCreateLike(like)}
-                    handleDeleteLike={(id) => courseHook.handleDeleteLike(id)}
-                />
+                <>
+                    <HeroCourse 
+                        course={courseHook.course}
+                        handlePrimaryButton={() => {
+                            if (BlogReviewsRef.current) BlogReviewsRef.current.scrollIntoView({ behavior: 'smooth' });
+                        }}
+                        handleCreateLike={(like) => courseHook.handleCreateLike(like)}
+                        handleDeleteLike={(id) => courseHook.handleDeleteLike(id)}
+                    />
+                    <BlogReviews
+                        ref={BlogReviewsRef}
+                        reviews={courseHook.course.reviews ? courseHook.course.reviews : []}
+                        tagline = "Opiniones compartidas"
+                        heading = "Reseñas"
+                        description = "Conoce las valoraciones de otros participantes y toma una decisión informada. Las reseñas te permiten conocer tanto los aspectos positivos como las áreas de mejora que los estudiantes han experimentado, lo que te ayudará a tener una visión completa del curso."
+                    />
+                </>
             )}
             <Footer />
         </>

@@ -35,9 +35,8 @@ function DashboardStatsProfile() {
                 size: 4
             }
         })
-            .then((response: AxiosResponse<LikeWithCourseUser[]>) => {
-                console.log(response);
-                setLikes(response.data);
+            .then((response: AxiosResponse<{ content: LikeWithCourseUser[] }>) => {
+                setLikes(response.data.content);
             })
             .catch(() => setLikes([]));
     }, []);
@@ -95,15 +94,17 @@ function DashboardStatsProfile() {
                     <ul className="space-y-6">
                         {likes.length > 0 ? likes.map((like) => (
                             <li key={like.id} className="flex justify-between items-center gap-2 group">
-                                <img
-                                    src={like.course.image}
-                                    alt={like.course.title}
-                                    title={like.course.title}
-                                    className="size-14 rounded-md object-cover"
-                                />
-                                <p className="font-medium text-sm line-clamp-3">
-                                    {like.course.title}. <span className="text-xs text-gray-600">{new Date(like.createdAt).toLocaleDateString()}</span>
-                                </p>
+                                <div className="flex items-center gap-2 flex-1">
+                                    <img
+                                        src={like.course.image}
+                                        alt={like.course.title}
+                                        title={like.course.title}
+                                        className="size-14 rounded-md object-cover"
+                                    />
+                                    <p className="font-medium text-sm line-clamp-3">
+                                        {like.course.title}. <span className="text-xs text-gray-600">{new Date(like.createdAt).toLocaleDateString()}</span>
+                                    </p>
+                                </div>
                                 <Button asChild size="sm">
                                     <a
                                         href={`/educacion/${like.course.id}`}

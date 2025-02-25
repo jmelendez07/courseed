@@ -55,7 +55,7 @@ const Hero = ({
                                 {institutionHook.institutions.map((institution, index) => (
                                     <Avatar
                                         key={index}
-                                        className={`relative z-${index + 1}0 flex h-12 w-12 flex-shrink-0 rounded-full border-2 border-white object-cover`}
+                                        className={`relative z-${index + 1}0 flex h-12 w-12 flex-shrink-0 rounded-full border-2 dark:border-0 object-cover`}
                                     >
                                         <AvatarImage src={institution.name} alt="" />
                                         <AvatarFallback>{institution.name?.slice(0, 2).toUpperCase()}</AvatarFallback>
@@ -76,7 +76,7 @@ const Hero = ({
                         <div className="w-full">
                             <AspectRatio ratio={1 / 1} className="h-full w-full">
                                 <div className="grid h-full w-full grid-cols-2 grid-rows-2 gap-[3.5%]">
-                                    <div className="overflow-hidden rounded-[5.2%] bg-gray-100">
+                                    <div className="overflow-hidden rounded-[5.2%] bg-gray-100 dark:bg-zinc-950">
                                         {courseHook.courses.length > 0 && (
                                             <img
                                                 src={courseHook.courses[0].image}
@@ -85,7 +85,7 @@ const Hero = ({
                                             />
                                         )}
                                     </div>
-                                    <div className="relative overflow-hidden rounded-[5.2%] bg-gray-100">
+                                    <div className="relative overflow-hidden rounded-[5.2%] bg-gray-100 dark:bg-zinc-950">
                                         {courseHook.courses.length > 1 && (
                                             <div className="absolute left-[5%] top-1/2 w-[110%] max-w-[25rem] -translate-y-1/2 overflow-hidden rounded-md">
                                                 <AspectRatio ratio={1.739130435 / 1}>
@@ -98,7 +98,7 @@ const Hero = ({
                                             </div>
                                         )}
                                     </div>
-                                    <div className="relative overflow-hidden rounded-[5.2%] bg-gray-100">
+                                    <div className="relative overflow-hidden rounded-[5.2%] bg-gray-100 dark:bg-zinc-950">
                                         {courseHook.courses.length > 2 && (
                                             <div className="absolute left-[9%] top-[9%] w-[200%] max-w-[37.5rem] overflow-hidden rounded-md">
                                                 <AspectRatio ratio={1.6 / 1}>
@@ -111,7 +111,7 @@ const Hero = ({
                                             </div>
                                         )}
                                     </div>
-                                    <div className="relative overflow-hidden rounded-[5.2%] bg-gray-100">
+                                    <div className="relative overflow-hidden rounded-[5.2%] bg-gray-100 dark:bg-zinc-950">
                                         <div className="relative left-[50%] top-[12%] w-[70%] max-w-[17.5rem] -translate-x-[50%]">
                                             <AspectRatio ratio={0.52 / 1}>
                                                 <img

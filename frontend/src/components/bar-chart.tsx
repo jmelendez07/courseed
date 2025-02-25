@@ -2,6 +2,10 @@ import { Bar, BarChart as BarChartRechart, CartesianGrid, XAxis } from "recharts
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent } from "@/components/ui/chart";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
 import { useMediaQuery } from "@/hooks/use-media-query";
+import { ColorContext } from "@/providers/ColorProvider";
+import React from "react";
+import resolveConfig from "tailwindcss/resolveConfig";
+import tailwindConfig from "tailwindcss/defaultConfig";
 
 interface BarChartProps {
     title?: string;
@@ -27,14 +31,24 @@ function BarChart({
     className
 }: BarChartProps) {
 
+    const colorHook = React.useContext(ColorContext);
+    const fullConfig = resolveConfig(tailwindConfig);
+    function getTailwindColor(color: string, shade: number = 600): string {
+        const colors = fullConfig.theme?.colors as Record<string, any>;
+        if (colors[color]) {
+          return typeof colors[color] === "string" ? colors[color] : colors[color]?.[shade] || null;
+        }
+        return "oklch(0.588 0.158 241.966)";
+    }
+    
     const chartConfig = {
         bar1: {
             label: labelBar1,
-            color: "rgba(2, 132, 199)",
+            color: getTailwindColor(colorHook ? colorHook.color : "sky", 600),
         },
         bar2: {
             label: labelBar2,
-            color: "#0ea5e9",
+            color: getTailwindColor(colorHook ? colorHook.color : "sky", 500),
         },
     } satisfies ChartConfig
 

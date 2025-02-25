@@ -85,11 +85,11 @@ function Course({ className, course, optionsEnable, handleEdit, handleDelete }: 
 				<div className="space-y-4">
 					<p className="text-sm flex items-start gap-2">
 						<CalendarClock className="size-5 min-w-5" />
-						<span className="text-gray-600 line-clamp-1">{course.duration}</span>
+						<span className="text-gray-600 dark:text-gray-300 line-clamp-1">{course.duration}</span>
 					</p>
 					<p className="text-sm flex items-start gap-2">
 						<GraduationCap className="size-5 min-w-5" />
-						<span className="text-gray-600 line-clamp-1">{course.modality}</span>
+						<span className="text-gray-600 dark:text-gray-300 line-clamp-1">{course.modality}</span>
 					</p>
 				</div>
 				<div className="flex flex-wrap justify-between gap-x-2 gap-y-1">

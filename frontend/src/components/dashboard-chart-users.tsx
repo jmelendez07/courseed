@@ -6,6 +6,11 @@ import RolesWithUsersCount from "@/interfaces/roles-with-users-count";
 import APIS from "@/enums/apis";
 import ROLES from "@/enums/roles";
 import MonthsWithUsersCount from "@/interfaces/months-with-users-count";
+import { ColorContext } from "@/providers/ColorProvider";
+import resolveConfig from "tailwindcss/resolveConfig";
+import tailwindConfig from "tailwindcss/defaultConfig";
+
+const tailwindShades: number[] = [700, 600, 500, 400, 300, 200, 100];
 
 function DashboardChartUsers() {
     const [rolesWithUsersCount, setRolesWithUsersCount] = React.useState<RolesWithUsersCount[]>([]); 
@@ -27,6 +32,16 @@ function DashboardChartUsers() {
             .catch(error => console.log(error))
     }, []);
 
+    const colorHook = React.useContext(ColorContext);
+    const fullConfig = resolveConfig(tailwindConfig);
+    function getTailwindColor(color: string, shade: number = 600): string {
+        const colors = fullConfig.theme?.colors as Record<string, any>;
+        if (colors[color]) {
+          return typeof colors[color] === "string" ? colors[color] : colors[color]?.[shade] || null;
+        }
+        return "oklch(0.588 0.158 241.966)";
+    }
+
     return (
         <div className="grid auto-rows-min gap-4 md:grid-cols-3">
             <PieChart 
@@ -34,9 +49,9 @@ function DashboardChartUsers() {
                 description="Analiza la cantidad de usuarios en cada rol y su proporción relativa."
                 chartData={rolesWithUsersCount.sort((a, b) => (a.totalUsers > b.totalUsers ? -1 : 1)).map((role, index) => ({ 
                     label: role.role === ROLES.ADMIN ? 'Administradores' : role.role === ROLES.USER ? 'Usuarios' : role.role, 
-                    value: role.totalUsers, 
-                    fill: `rgba(2, 132, 199, ${(1 + (1 / rolesWithUsersCount.length)) - (1 / rolesWithUsersCount.length * (index + 1))})`
-                }))} 
+                    value: role.totalUsers,
+                    fill: getTailwindColor(colorHook ? colorHook.color : "sky", tailwindShades[index] || 100)
+                }))}
             />
             <AreaChart 
                 title="Progreso de Usuarios Creados en los Últimos 6 Meses 📈"

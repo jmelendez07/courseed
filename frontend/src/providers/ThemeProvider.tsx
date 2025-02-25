@@ -31,7 +31,7 @@ function ThemeProvider({ children }: { children: React.ReactNode }) {
         }
 
         localStorage.setItem("theme", theme); 
-    }, [theme])
+    }, [theme]);
 
     const contextValue: ThemeProps = React.useMemo(
         () => ({

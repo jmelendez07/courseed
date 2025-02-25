@@ -5,6 +5,11 @@ import InstitutionsWithCoursesCount from "@/interfaces/institutions-with-courses
 import axios, { AxiosResponse } from "axios";
 import APIS from "@/enums/apis";
 import CoursesWithReviewsLikesCount from "@/interfaces/courses-with-reviews-likes-count";
+import { ColorContext } from "@/providers/ColorProvider";
+import resolveConfig from "tailwindcss/resolveConfig";
+import tailwindConfig from "tailwindcss/defaultConfig";
+
+const tailwindShades: number[] = [700, 600, 500, 400, 300, 200, 100];
 
 function DashboardChartCourses() {
 	const institutionsSize = 3;
@@ -34,6 +39,16 @@ function DashboardChartCourses() {
 			.catch(() => setCourses([]));
 	}, []);
 
+	const colorHook = React.useContext(ColorContext);
+    const fullConfig = resolveConfig(tailwindConfig);
+    function getTailwindColor(color: string, shade: number = 600): string {
+        const colors = fullConfig.theme?.colors as Record<string, any>;
+        if (colors[color]) {
+          return typeof colors[color] === "string" ? colors[color] : colors[color]?.[shade] || null;
+        }
+        return "oklch(0.588 0.158 241.966)";
+    }
+
 	return (
 		<div className="grid gap-4 md:grid-cols-3">
 			<BarChart 
@@ -54,7 +69,7 @@ function DashboardChartCourses() {
 				chartData={institutions.map((institution, index) => ({
 					label: institution.name,
 					value: institution.totalCourses,
-					fill: `rgba(2, 132, 199, ${(1 + (1 / institutions.length)) - (1 / institutions.length * (index + 1))})`,
+					fill: getTailwindColor(colorHook ? colorHook.color : "sky", tailwindShades[index] || 100),
 				}))}
 			/>
 		</div>

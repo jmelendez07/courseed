@@ -13,6 +13,10 @@ import {
     ChartTooltipContent,
 } from "@/components/ui/chart";
 import { useMediaQuery } from "@/hooks/use-media-query";
+import tailwindConfig from "tailwindcss/defaultConfig";
+import React from "react";
+import { ColorContext } from "@/providers/ColorProvider";
+import resolveConfig from "tailwindcss/resolveConfig";
 
 interface LineChartProps {
     title?: string;
@@ -35,10 +39,19 @@ function LineChart({
     className
 }: LineChartProps) {
     const isDesktop = useMediaQuery("(min-width: 768px)");
+    const colorHook = React.useContext(ColorContext);
+    const fullConfig = resolveConfig(tailwindConfig);
+    function getTailwindColor(color: string, shade: number = 600): string {
+        const colors = fullConfig.theme?.colors as Record<string, any>;
+        if (colors[color]) {
+          return typeof colors[color] === "string" ? colors[color] : colors[color]?.[shade] || null;
+        }
+        return "oklch(0.588 0.158 241.966)";
+    }
     const chartConfig = {
         desktop: {
             label: "Desktop",
-            color: "oklch(0.588 0.158 241.966)",
+            color: getTailwindColor(colorHook ? colorHook.color : "sky", 600),
         },
         count: {
             label: labelValueToolTip,

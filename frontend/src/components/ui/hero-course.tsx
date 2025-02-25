@@ -121,7 +121,7 @@ const HeroCourse = ({
                             {authHook?.user ? (
                                 <>
                                     <ThumbsUp 
-                                        className={`cursor-pointer text-gray-400 hover:text-gray-900`} 
+                                        className={`cursor-pointer`} 
                                         onClick={async () => {
                                             if (course.likes.some(l => l.user?.id === authHook.user?.id)) {
                                                 const currentLike = course.likes.find(l => l.user?.id === authHook.user?.id);

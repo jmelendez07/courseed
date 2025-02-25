@@ -42,11 +42,10 @@ function PieChart({
     chartData,
     className
 }: PieChartProps) {
-
     const chartConfig = {
         desktop: {
             label: "Desktop",
-            color: "oklch(0.588 0.158 241.966)",
+            color: "#991b1b",
         }
     } satisfies ChartConfig
 
