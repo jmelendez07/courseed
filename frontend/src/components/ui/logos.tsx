@@ -20,7 +20,7 @@ const Logos = ({
 
 	return (
 		<section className="py-12 flex items-center flex-col">
-			<div className="container flex flex-col items-center text-center ">
+			<div className="w-full flex flex-col items-center text-center ">
 				<h1 className="my-6 text-pretty text-2xl font-bold lg:text-4xl">
 					{heading}
 				</h1>

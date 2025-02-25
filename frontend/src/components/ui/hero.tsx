@@ -33,11 +33,11 @@ const Hero = ({
 
     return (
         <section className="py-12 md:py-20 flex justify-center">
-            <div className="container px-4 md:px-8 xl:px-12 2xl:px-16">
+            <div className="w-full px-4 md:px-8 xl:px-12 2xl:px-16">
                 <div className="flex flex-col items-center gap-8 md:flex-row">
                     <div className="flex-1">
                         <div className="flex flex-col gap-4 lg:gap-8">
-                            <h1 className="max-w-[80%] text-4xl font-semibold leading-tight text-foreground lg:text-5xl xl:text-7xl">
+                            <h1 className="max-w-[80%] text-4xl font-semibold leading-tight text-foreground lg:text-5xl xl:text-7xl 2xl:text-8xl">
                                 {heading}
                             </h1>
                             <p className="text-lg leading-relaxed text-muted-foreground xl:text-2xl">
@@ -73,7 +73,7 @@ const Hero = ({
                         </div>
                     </div>
                     <div className="w-full flex-1">
-                        <div className="w-full max-w-[50rem]">
+                        <div className="w-full">
                             <AspectRatio ratio={1 / 1} className="h-full w-full">
                                 <div className="grid h-full w-full grid-cols-2 grid-rows-2 gap-[3.5%]">
                                     <div className="overflow-hidden rounded-[5.2%] bg-gray-100">

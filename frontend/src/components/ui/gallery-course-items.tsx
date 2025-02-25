@@ -44,7 +44,7 @@ const GalleryCourseItems = ({
     }, [carouselApi]);
     return (
         <section className="py-12 flex flex-col items-center">
-            <div className="container px-4 md:px-8 xl:px-12 2xl:px-16">
+            <div className="w-full px-4 md:px-8 xl:px-12 2xl:px-16">
                 <div className="mb-8 flex flex-col justify-between md:mb-14 md:flex-row md:items-end lg:mb-16">
                     <div>
                         <h2 className="mb-3 text-3xl font-semibold md:mb-4 md:text-4xl lg:mb-6">
@@ -96,7 +96,7 @@ const GalleryCourseItems = ({
                     }}
                     className="relative"
                 > 
-                    <CarouselContent className="mx-0 mr-4 md:mx-4 xl:mx-8 2xl:mx-[max(3rem,calc(50vw-730px))]">
+                    <CarouselContent className="mx-0 mr-4 md:mx-4 xl:mx-8 2xl:mx-[max(3rem,calc(50vw-1000px))]">
                         {items.map((item) => (
                             <CarouselItem key={item.id} className="pl-4 md:max-w-[400px] grid">
                                 <Course 
