@@ -36,7 +36,7 @@ interface ColorProps {
 export const ColorContext = React.createContext<ColorProps | null>(null);
 
 function ColorProvider({ children }: { children: React.ReactNode }) {
-    const [color, setColor] = React.useState<ColorType | string>(localStorage.getItem("color") || "bg-sky");
+    const [color, setColor] = React.useState<ColorType | string>(localStorage.getItem("color") || "sky");
 
     React.useEffect(() => localStorage.setItem("color", color), [color]);
 

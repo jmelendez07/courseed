@@ -21,13 +21,13 @@ function DialogCourses() {
     }, []);
 
     return (
-        <>
+        <div className="flex items-center gap-2">
             <Button size="icon" onClick={() => setOpen(true)}>
                 <Search />
             </Button>
             <p className="text-sm text-gray-600 hidden lg:block">
                 Presiona{" "}
-                <kbd className="pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border bg-gray-100 px-1.5 font-mono text-[10px] font-medium text-gray-600 opacity-100">
+                <kbd className="pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded bg-gray-100 dark:bg-zinc-950 border dark:border-0 px-1.5 font-mono text-[10px] font-medium opacity-100">
                     <span className="text-xs">⌘ K</span>
                 </kbd>
             </p>
@@ -61,7 +61,7 @@ function DialogCourses() {
                     )}
                 </CommandList>
             </CommandDialog>
-        </>
+        </div>
     );
 }
 

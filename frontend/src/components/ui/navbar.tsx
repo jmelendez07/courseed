@@ -34,6 +34,8 @@ import React from "react";
 import ROLES from "@/enums/roles";
 import { THEME, ThemeContext } from "@/providers/ThemeProvider";
 import Color from "./Color";
+import { motion } from "motion/react";
+
 interface MenuItem {
     title: string;
     url: string;
@@ -61,6 +63,34 @@ interface NavbarProps {
         };
     };
 }
+
+let easeing = [0.6, -0.05, 0.01, 0.99];
+
+const stagger = {
+    animate: {
+        transition: {
+            delayChildren: 0.4,
+            staggerChildren: 0.2,
+            staggerDirection: 1
+        }
+    }
+}
+
+const header = {
+    initial: {
+        y: -60,
+        opacity: 0,
+        transition: { duration: 0.05, ease: easeing }
+    },
+    animate: {
+        y: 0,
+        opacity: 1,
+        transition: {
+            duration: 0.6,
+            ease: easeing
+        }
+    }
+};
 
 const Navbar = ({
     logo = {
@@ -105,13 +135,13 @@ const Navbar = ({
     }, [authHook?.user?.email]);
 
     return (
-        <section className="py-4 flex justify-center">
+        <motion.section initial="initial" animate="animate" className="py-4 flex justify-center">
             <div className="w-full px-4 md:px-8 xl:px-12 2xl:px-16">
                 <nav className="hidden items-center justify-between lg:flex">
-                    <div className="flex items-center gap-6">
+                    <motion.div variants={stagger} className="flex items-center gap-6">
                         <Link to={logo.url} className="flex items-center gap-2">
-                            <img src={logo.src} className="w-8" alt={logo.alt} />
-                            <span className="text-lg font-semibold">{logo.title}</span>
+                            <motion.img variants={header} src={logo.src} className="w-8" alt={logo.alt} />
+                            <motion.span variants={header} className="text-lg font-semibold">{logo.title}</motion.span>
                         </Link>
                         <div className="flex items-center">
                             <NavigationMenu>
@@ -120,26 +150,13 @@ const Navbar = ({
                                 </NavigationMenuList>
                             </NavigationMenu>
                         </div>
-                    </div>
-                    <div className="flex items-center gap-4">
-                        <Color />
-                        <div>
-                            {themeContext?.theme === THEME.LIGHT ? (
-                                <Moon
-                                    className="cursor-pointer size-5"
-                                    onClick={() => themeContext.handleChange(THEME.DARK)}
-                                />
-                            ) : (
-                                <Sun
-                                    className="cursor-pointer size-5"
-                                    onClick={() => themeContext?.handleChange(THEME.LIGHT)}
-                                />
-                            )}
-                        </div>
+                    </motion.div>
+                    <motion.div variants={stagger} className="flex items-center flex-row-reverse gap-4">
                         {authHook?.user ? (
                             <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
-                                    <div
+                                    <motion.div
+                                        variants={header}
                                         className="flex items-center justify-start gap-3 p-2"
                                     >
                                         <Avatar className="h-8 w-8 rounded-lg">
@@ -150,7 +167,7 @@ const Navbar = ({
                                             <span className="truncate text-xs">{authHook?.user?.email}</span>
                                         </div>
                                         <ChevronsUpDown className="ml-auto size-4" />
-                                    </div>
+                                    </motion.div>
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent
                                     className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
@@ -187,53 +204,63 @@ const Navbar = ({
                                 </DropdownMenuContent>
                             </DropdownMenu>
                         ) : (
-                            <div className="flex gap-2">
-                                <Button asChild variant="outline" size="sm">
-                                    <Link
-                                        to={auth.login.url}
-                                    >
-                                        {auth.login.text}
-                                        <LogIn />
-                                    </Link>
-                                </Button>
-                                <Button asChild size="sm">
-                                    <Link
-                                        to={auth.signup.url}
-                                    >
-                                        {auth.signup.text}
-                                        <UserPlus />
-                                    </Link>
-                                </Button>
+                            <div className="flex flex-row-reverse gap-2">
+                                <motion.div variants={header}>
+                                    <Button asChild size="sm">
+                                        <Link
+                                            to={auth.signup.url}
+                                        >
+                                            {auth.signup.text}
+                                            <UserPlus />
+                                        </Link>
+                                    </Button>
+                                </motion.div>
+                                <motion.div variants={header}>
+                                    <Button asChild variant="outline" size="sm">
+                                        <Link
+                                            to={auth.login.url}
+                                        >
+                                            {auth.login.text}
+                                            <LogIn />
+                                        </Link>
+                                    </Button>
+                                </motion.div>
                             </div>
                         )}
-                    </div>
+                        <motion.div variants={header}>
+                            {themeContext?.theme === THEME.LIGHT ? (
+                                <Moon
+                                    className="cursor-pointer size-5"
+                                    onClick={() => themeContext.handleChange(THEME.DARK)}
+                                />
+                            ) : (
+                                <Sun
+                                    className="cursor-pointer size-5"
+                                    onClick={() => themeContext?.handleChange(THEME.LIGHT)}
+                                />
+                            )}
+                        </motion.div>
+                        <motion.div variants={header}>
+                            <Color />
+                        </motion.div>
+                    </motion.div>
                 </nav>
                 <div className="block lg:hidden">
                     <div className="flex items-center justify-between">
-                        <Link to={logo.url} className="flex items-center gap-2">
-                            <img src={logo.src} className="w-8" alt={logo.alt} />
-                            <span className="text-lg font-semibold">{logo.title}</span>
-                        </Link>
-                        <div className="flex items-center gap-4">
-                            <Color />
-                            <div>
-                                {themeContext?.theme === THEME.LIGHT ? (
-                                    <Moon
-                                        className="cursor-pointer size-5"
-                                        onClick={() => themeContext.handleChange(THEME.DARK)}
-                                    />
-                                ) : (
-                                    <Sun
-                                        className="cursor-pointer size-5"
-                                        onClick={() => themeContext?.handleChange(THEME.LIGHT)}
-                                    />
-                                )}
-                            </div>
+                        <motion.div variants={stagger}>
+                            <Link to={logo.url} className="flex items-center gap-2">
+                                <motion.img variants={header} src={logo.src} className="w-8" alt={logo.alt} />
+                                <motion.span variants={header} className="text-lg font-semibold">{logo.title}</motion.span>
+                            </Link>
+                        </motion.div>
+                        <motion.div variants={stagger} className="flex items-center flex-row-reverse gap-4">
                             <Sheet>
                                 <SheetTrigger asChild>
-                                    <Button variant="outline" size="icon">
-                                        <Menu className="size-4" />
-                                    </Button>
+                                    <motion.div variants={header}>
+                                        <Button variant="outline" size="icon">
+                                            <Menu className="size-4" />
+                                        </Button>
+                                    </motion.div>
                                 </SheetTrigger>
                                 <SheetContent className="overflow-y-auto" side="left">
                                     <SheetHeader>
@@ -323,11 +350,25 @@ const Navbar = ({
                                     </div>
                                 </SheetContent>
                             </Sheet>
-                        </div>
+                            <motion.div variants={header}>
+                                {themeContext?.theme === THEME.LIGHT ? (
+                                    <Moon
+                                        className="cursor-pointer size-5"
+                                        onClick={() => themeContext.handleChange(THEME.DARK)}
+                                    />
+                                ) : (
+                                    <Sun
+                                        className="cursor-pointer size-5"
+                                        onClick={() => themeContext?.handleChange(THEME.LIGHT)}
+                                    />
+                                )}
+                            </motion.div>
+                            <motion.div variants={header}><Color /></motion.div>
+                        </motion.div>
                     </div>
                 </div>
             </div>
-        </section>
+        </motion.section>
     );
 };
 
@@ -335,14 +376,16 @@ const renderMenuItem = (item: MenuItem) => {
     if (item.items) {
         return (
             <NavigationMenuItem key={item.title} className="text-muted-foreground">
-                <NavigationMenuTrigger>{item.title}</NavigationMenuTrigger>
+                <motion.div variants={header}>
+                    <NavigationMenuTrigger className="dark:bg-none">{item.title}</NavigationMenuTrigger>
+                </motion.div>
                 <NavigationMenuContent>
                     <ul className="w-80 p-3">
                         <NavigationMenuLink>
                             {item.items.map((subItem, _) => (
                                 <li key={subItem.id}>
                                     <Link
-                                        className="flex select-none gap-4 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-muted hover:text-accent-foreground group"
+                                        className="flex select-none gap-4 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:text-accent-foreground group"
                                         to={`/educacion?${item.paramKey}=${subItem.id}`}
                                     >
                                         <ArrowUpRight className="w-5 min-w-5 transition-transform group-hover:translate-x-1" />
@@ -362,13 +405,15 @@ const renderMenuItem = (item: MenuItem) => {
     }
 
     return (
-        <Link
-            key={item.title}
-            className="group inline-flex h-10 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-accent-foreground"
-            to={item.url}
-        >
-            {item.title}
-        </Link>
+        <motion.div variants={header}>
+            <Link
+                key={item.title}
+                className="group inline-flex h-10 w-max items-center justify-center rounded-md px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:text-accent-foreground"
+                to={item.url}
+            >
+                {item.title}
+            </Link>
+        </motion.div>
     );
 };
 
@@ -383,7 +428,7 @@ const renderMobileMenuItem = (item: MenuItem) => {
                     {item.items.map((subItem, _) => (
                         <Link
                             key={subItem.id}
-                            className="flex select-none gap-4 rounded-md p-3 leading-none outline-none transition-colors hover:bg-muted hover:text-accent-foreground group"
+                            className="flex select-none gap-4 rounded-md p-3 leading-none outline-none transition-colors hover:text-accent-foreground group"
                             to={`/educacion?${item.paramKey}=${subItem.id}`}
                         >
                             <ArrowUpRight className="w-5 min-w-5 transition-transform group-hover:translate-x-1" />

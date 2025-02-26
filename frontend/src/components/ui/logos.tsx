@@ -65,4 +65,4 @@ const Logos = ({
 	);
 };
 
-export { Logos };
+export default Logos;

@@ -3,10 +3,11 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import useCourses from "@/hooks/useCourses";
 import useInstitution from "@/hooks/useInstitution";
-import { GraduationCap, LucideProps} from "lucide-react";
+import { GraduationCap, LucideProps } from "lucide-react";
 import { Link } from "react-router-dom";
 import DialogCourses from "../dialog-courses";
 import React from "react";
+import { motion } from "motion/react";
 
 interface HeroProps {
     heading?: string;
@@ -16,6 +17,120 @@ interface HeroProps {
         icon: React.ForwardRefExoticComponent<Omit<LucideProps, "ref"> & React.RefAttributes<SVGSVGElement>>
         url: string;
     };
+}
+
+let easeing = [0.6, -0.05, 0.01, 0.99];
+const transition = { duration: 1.4, ease: [0.6, 0.01, -0.05, 0.9] };
+
+const firstName = {
+    animate: {
+        transition: {
+            delayChildren: 0.4,
+            staggerChildren: 0.2,
+            staggerDirection: 1
+        }
+    }
+}
+
+const lastName = {
+    initial: {
+        y: -20,
+    },
+    animate: {
+        y: 0,
+        transition: {
+            delayChildren: 0.4,
+            staggerChildren: 0.04,
+            staggerDirection: 1
+        }
+    }
+}
+
+const letter = {
+    initial: {
+        y: 400,
+    },
+    animate: {
+        y: 0,
+        transition: transition
+    }
+};
+
+const btnGroup = {
+    initial: {
+        y: -60,
+        opacity: 0,
+        transition: { duration: 0.6, ease: easeing }
+    },
+    animate: {
+        y: 0,
+        opacity: 1,
+        transition: {
+            duration: 0.6,
+            ease: easeing
+        }
+    }
+};
+
+const star = {
+    initial: {
+        y: 60,
+        opacity: 0,
+        transition: { duration: 0.8, ease: easeing }
+    },
+    animate: {
+        y: 0,
+        opacity: 1,
+        transition: {
+            duration: 0.6,
+            ease: easeing
+        }
+    }
+};
+
+const stagger = {
+    animate: {
+        transition: {
+            delayChildren: 0.4,
+            staggerChildren: 0.2,
+            staggerDirection: 1
+        }
+    }
+}
+
+const fadeInUp = {
+    initial: {
+        y: -60,
+        opacity: 0,
+        transition: {
+            duration: 0.6, ease: easeing
+        }
+    },
+    animate: {
+        y: 0,
+        opacity: 1,
+        transition: {
+            duration: 0.6,
+            delay: 0.5,
+            ease: easeing
+        }
+    }
+};
+
+const img = {
+    initial: {
+        x: 200, 
+        opacity: 0,
+        transition: { duration: 0.6, ease: easeing }
+    },
+    animate: {
+        x: 0, 
+        opacity: 1, 
+        transition: {
+            duration: 0.6,
+            ease: easeing
+        }
+    } 
 }
 
 const Hero = ({
@@ -32,51 +147,72 @@ const Hero = ({
     const courseHook = useCourses({ size: 4 });
 
     return (
-        <section className="py-12 md:py-20 flex justify-center">
-            <div className="w-full px-4 md:px-8 xl:px-12 2xl:px-16">
+        <motion.section
+            className="py-12 md:py-12 flex justify-center"
+            initial="initial"
+            animate="animate"
+        >
+            <motion.div
+                initial={{ opacity: 0, scale: 0 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.3, ease: easeing }}
+                className="w-full px-4 md:px-8 xl:px-12 2xl:px-16"
+            >
                 <div className="flex flex-col items-center gap-8 md:flex-row">
                     <div className="flex-1">
                         <div className="flex flex-col gap-4 lg:gap-8">
-                            <h1 className="max-w-[80%] text-4xl font-semibold leading-tight text-foreground lg:text-5xl xl:text-7xl 2xl:text-8xl">
-                                {heading}
-                            </h1>
-                            <p className="text-lg leading-relaxed text-muted-foreground xl:text-2xl">
+                            <motion.h1 className="max-w-[80%] text-4xl font-semibold leading-tight text-foreground lg:text-5xl xl:text-7xl">
+                                <motion.span variants={firstName} initial="initial" animate="animate">
+                                    {heading.split("").map(headingLetter => (
+                                        <motion.span variants={letter}>{headingLetter}</motion.span>
+                                    ))}
+                                </motion.span>
+                            </motion.h1>
+                            <motion.p variants={fadeInUp} className="text-lg leading-relaxed text-muted-foreground xl:text-2xl">
                                 {description}
-                            </p>
+                            </motion.p>
                         </div>
-                        <div className="my-6 lg:my-10 flex items-center gap-2">
-                            <Button asChild size="lg">
-                                <Link to={button.url}>{button.text}<button.icon /></Link>
-                            </Button>
-                            <DialogCourses />
-                        </div>
-                        <div className="flex flex-wrap items-center gap-3">
+                        <motion.div variants={stagger} className="my-6 lg:my-10 flex items-center gap-2">
+                            <motion.div variants={btnGroup}>
+                                <Button asChild size="lg">
+                                    <Link to={button.url}>{button.text}<button.icon /></Link>
+                                </Button>
+                            </motion.div>
+                            <motion.div variants={btnGroup}>
+                                <DialogCourses />
+                            </motion.div>
+                        </motion.div>
+                        <motion.div variants={stagger} className="flex flex-wrap items-center gap-3">
                             <div className="relative flex -space-x-[1.5rem]">
                                 {institutionHook.institutions.map((institution, index) => (
-                                    <Avatar
-                                        key={index}
-                                        className={`relative z-${index + 1}0 flex h-12 w-12 flex-shrink-0 rounded-full border-2 dark:border-0 object-cover`}
-                                    >
-                                        <AvatarImage src={institution.name} alt="" />
-                                        <AvatarFallback>{institution.name?.slice(0, 2).toUpperCase()}</AvatarFallback>
-                                    </Avatar>
+                                    <motion.div key={index} variants={star} whileHover={{scale:1.2, borderRadius:'100%',cursor:'pointer', zIndex:2}}>
+                                        <Avatar
+                                            className={`relative flex h-12 w-12 flex-shrink-0 rounded-full border-2 dark:border-0 object-cover`}
+                                        >
+                                            <AvatarImage src={institution.name} alt="" />
+                                            <AvatarFallback>{institution.name?.slice(0, 2).toUpperCase()}</AvatarFallback>
+                                        </Avatar>
+                                    </motion.div>
                                 ))}
                             </div>
                             <div>
-                                <p className="mb-1 text-sm italic text-muted2-foreground">
+                                <motion.p variants={star} className="mb-1 text-sm italic text-muted2-foreground">
                                     &quot;Cursos diseñados para tu éxito&quot;
-                                </p>
-                                <p className="text-sm font-medium text-muted2-foreground xl:max-w-[70%]">
+                                </motion.p>
+                                <motion.p variants={star} className="text-sm font-medium text-muted2-foreground xl:max-w-[70%]">
                                     {institutionHook.institutions.map(i => i.name).join(", ")}.
-                                </p>
+                                </motion.p>
                             </div>
-                        </div>
+                        </motion.div>
                     </div>
                     <div className="w-full flex-1">
                         <div className="w-full">
-                            <AspectRatio ratio={1 / 1} className="h-full w-full">
-                                <div className="grid h-full w-full grid-cols-2 grid-rows-2 gap-[3.5%]">
-                                    <div className="overflow-hidden rounded-[5.2%] bg-gray-100 dark:bg-zinc-950">
+                            <AspectRatio ratio={1 / 1} className="h-full w-full overflow-hidden">
+                                <motion.div 
+                                    className="grid h-full w-full grid-cols-2 grid-rows-2 gap-[3.5%]"
+                                    variants={stagger}
+                                >
+                                    <motion.div variants={img} className="overflow-hidden rounded-[5.2%] bg-gray-100 dark:bg-zinc-950">
                                         {courseHook.courses.length > 0 && (
                                             <img
                                                 src={courseHook.courses[0].image}
@@ -84,8 +220,8 @@ const Hero = ({
                                                 className="object-cover h-full w-full object-center"
                                             />
                                         )}
-                                    </div>
-                                    <div className="relative overflow-hidden rounded-[5.2%] bg-gray-100 dark:bg-zinc-950">
+                                    </motion.div>
+                                    <motion.div variants={img} className="relative overflow-hidden rounded-[5.2%] bg-gray-100 dark:bg-zinc-950">
                                         {courseHook.courses.length > 1 && (
                                             <div className="absolute left-[5%] top-1/2 w-[110%] max-w-[25rem] -translate-y-1/2 overflow-hidden rounded-md">
                                                 <AspectRatio ratio={1.739130435 / 1}>
@@ -97,8 +233,8 @@ const Hero = ({
                                                 </AspectRatio>
                                             </div>
                                         )}
-                                    </div>
-                                    <div className="relative overflow-hidden rounded-[5.2%] bg-gray-100 dark:bg-zinc-950">
+                                    </motion.div>
+                                    <motion.div variants={img} className="relative overflow-hidden rounded-[5.2%] bg-gray-100 dark:bg-zinc-950">
                                         {courseHook.courses.length > 2 && (
                                             <div className="absolute left-[9%] top-[9%] w-[200%] max-w-[37.5rem] overflow-hidden rounded-md">
                                                 <AspectRatio ratio={1.6 / 1}>
@@ -110,8 +246,8 @@ const Hero = ({
                                                 </AspectRatio>
                                             </div>
                                         )}
-                                    </div>
-                                    <div className="relative overflow-hidden rounded-[5.2%] bg-gray-100 dark:bg-zinc-950">
+                                    </motion.div>
+                                    <motion.div variants={img} className="relative overflow-hidden rounded-[5.2%] bg-gray-100 dark:bg-zinc-950">
                                         <div className="relative left-[50%] top-[12%] w-[70%] max-w-[17.5rem] -translate-x-[50%]">
                                             <AspectRatio ratio={0.52 / 1}>
                                                 <img
@@ -120,22 +256,22 @@ const Hero = ({
                                                     className="absolute z-20 w-full"
                                                 />
                                                 {courseHook.courses.length > 3 && (
-                                                <img
-                                                    src={courseHook.courses[3].image}
-                                                    alt=""
-                                                    className="absolute z-10 w-full rounded-[16%] h-full object-cover"
-                                                />
+                                                    <img
+                                                        src={courseHook.courses[3].image}
+                                                        alt=""
+                                                        className="absolute z-10 w-full rounded-[16%] h-full object-cover"
+                                                    />
                                                 )}
                                             </AspectRatio>
                                         </div>
-                                    </div>
-                                </div>
+                                    </motion.div>
+                                </motion.div>
                             </AspectRatio>
                         </div>
                     </div>
                 </div>
-            </div>
-        </section>
+            </motion.div>
+        </motion.section>
     );
 };
 
