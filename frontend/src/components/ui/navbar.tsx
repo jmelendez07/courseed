@@ -35,6 +35,7 @@ import ROLES from "@/enums/roles";
 import { THEME, ThemeContext } from "@/providers/ThemeProvider";
 import Color from "./Color";
 import { motion } from "motion/react";
+import FadeItem from "./fadeItem";
 
 interface MenuItem {
     title: string;
@@ -137,46 +138,34 @@ const Navbar = ({
     return (
         <motion.section initial="initial" animate="animate" className="py-4 flex justify-center">
             <div className="w-full px-4 md:px-8 xl:px-12 2xl:px-16">
-                <nav className="hidden items-center justify-between lg:flex">
-                    <motion.div variants={stagger} className="flex items-center gap-6">
-                        <Link to={logo.url} className="flex items-center gap-2">
-                            <motion.img variants={header} src={logo.src} className="w-8" alt={logo.alt} />
-                            <motion.span variants={header} className="text-lg font-semibold">{logo.title}</motion.span>
-                        </Link>
-                        <div className="flex items-center">
-                            <NavigationMenu>
-                                <NavigationMenuList>
-                                    {menu.map((item) => renderMenuItem(item))}
-                                </NavigationMenuList>
-                            </NavigationMenu>
-                        </div>
-                    </motion.div>
-                    <motion.div variants={stagger} className="flex items-center flex-row-reverse gap-4">
-                        {authHook?.user ? (
-                            <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                    <motion.div
-                                        variants={header}
-                                        className="flex items-center justify-start gap-3 p-2"
-                                    >
-                                        <Avatar className="h-8 w-8 rounded-lg">
-                                            <AvatarFallback className="rounded-lg">{authHook?.user?.email.slice(0, 2).toUpperCase()}</AvatarFallback>
-                                        </Avatar>
-                                        <div className="grid flex-1 text-left text-sm leading-tight">
-                                            <span className="truncate font-semibold">{getName()}</span>
-                                            <span className="truncate text-xs">{authHook?.user?.email}</span>
-                                        </div>
-                                        <ChevronsUpDown className="ml-auto size-4" />
-                                    </motion.div>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent
-                                    className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
-                                    side="bottom"
-                                    align="end"
-                                    sideOffset={4}
-                                >
-                                    <DropdownMenuLabel className="p-0 font-normal">
-                                        <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
+                <FadeItem>
+                    <nav className="hidden items-center justify-between lg:flex">
+                        <motion.div variants={stagger} className="flex items-center gap-6">
+                            <Link to={logo.url} className="flex items-center gap-2">
+                                <motion.img 
+                                    variants={header} 
+                                    src={logo.src} 
+                                    className="w-8" 
+                                    alt={logo.alt} 
+                                />
+                                <motion.span variants={header} className="text-lg font-semibold">{logo.title}</motion.span>
+                            </Link>
+                            <div className="flex items-center">
+                                <NavigationMenu>
+                                    <NavigationMenuList>
+                                        {menu.map((item) => renderMenuItem(item))}
+                                    </NavigationMenuList>
+                                </NavigationMenu>
+                            </div>
+                        </motion.div>
+                        <motion.div variants={stagger} className="flex items-center flex-row-reverse gap-4">
+                            {authHook?.user ? (
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                        <motion.div
+                                            variants={header}
+                                            className="flex items-center justify-start gap-3 p-2"
+                                        >
                                             <Avatar className="h-8 w-8 rounded-lg">
                                                 <AvatarFallback className="rounded-lg">{authHook?.user?.email.slice(0, 2).toUpperCase()}</AvatarFallback>
                                             </Avatar>
@@ -184,172 +173,67 @@ const Navbar = ({
                                                 <span className="truncate font-semibold">{getName()}</span>
                                                 <span className="truncate text-xs">{authHook?.user?.email}</span>
                                             </div>
-                                        </div>
-                                    </DropdownMenuLabel>
-                                    <DropdownMenuSeparator />
-                                    <DropdownMenuGroup>
-                                        <Link to={authHook.user.roles.some(r => r === ROLES.ADMIN) ? '/administrador' : '/usuario'}>
-                                            <DropdownMenuItem>
-                                                <LayoutPanelLeft />
-                                                Panel
-                                            </DropdownMenuItem>
-                                        </Link>
-                                        <Link to="/salir">
-                                            <DropdownMenuItem>
-                                                <LogOut />
-                                                Cerrar Sesión
-                                            </DropdownMenuItem>
-                                        </Link>
-                                    </DropdownMenuGroup>
-                                </DropdownMenuContent>
-                            </DropdownMenu>
-                        ) : (
-                            <div className="flex flex-row-reverse gap-2">
-                                <motion.div variants={header}>
-                                    <Button asChild size="sm">
-                                        <Link
-                                            to={auth.signup.url}
-                                        >
-                                            {auth.signup.text}
-                                            <UserPlus />
-                                        </Link>
-                                    </Button>
-                                </motion.div>
-                                <motion.div variants={header}>
-                                    <Button asChild variant="outline" size="sm">
-                                        <Link
-                                            to={auth.login.url}
-                                        >
-                                            {auth.login.text}
-                                            <LogIn />
-                                        </Link>
-                                    </Button>
-                                </motion.div>
-                            </div>
-                        )}
-                        <motion.div variants={header}>
-                            {themeContext?.theme === THEME.LIGHT ? (
-                                <Moon
-                                    className="cursor-pointer size-5"
-                                    onClick={() => themeContext.handleChange(THEME.DARK)}
-                                />
+                                            <ChevronsUpDown className="ml-auto size-4" />
+                                        </motion.div>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent
+                                        className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
+                                        side="bottom"
+                                        align="end"
+                                        sideOffset={4}
+                                    >
+                                        <DropdownMenuLabel className="p-0 font-normal">
+                                            <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
+                                                <Avatar className="h-8 w-8 rounded-lg">
+                                                    <AvatarFallback className="rounded-lg">{authHook?.user?.email.slice(0, 2).toUpperCase()}</AvatarFallback>
+                                                </Avatar>
+                                                <div className="grid flex-1 text-left text-sm leading-tight">
+                                                    <span className="truncate font-semibold">{getName()}</span>
+                                                    <span className="truncate text-xs">{authHook?.user?.email}</span>
+                                                </div>
+                                            </div>
+                                        </DropdownMenuLabel>
+                                        <DropdownMenuSeparator />
+                                        <DropdownMenuGroup>
+                                            <Link to={authHook.user.roles.some(r => r === ROLES.ADMIN) ? '/administrador' : '/usuario'}>
+                                                <DropdownMenuItem>
+                                                    <LayoutPanelLeft />
+                                                    Panel
+                                                </DropdownMenuItem>
+                                            </Link>
+                                            <Link to="/salir">
+                                                <DropdownMenuItem>
+                                                    <LogOut />
+                                                    Cerrar Sesión
+                                                </DropdownMenuItem>
+                                            </Link>
+                                        </DropdownMenuGroup>
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
                             ) : (
-                                <Sun
-                                    className="cursor-pointer size-5"
-                                    onClick={() => themeContext?.handleChange(THEME.LIGHT)}
-                                />
-                            )}
-                        </motion.div>
-                        <motion.div variants={header}>
-                            <Color />
-                        </motion.div>
-                    </motion.div>
-                </nav>
-                <div className="block lg:hidden">
-                    <div className="flex items-center justify-between">
-                        <motion.div variants={stagger}>
-                            <Link to={logo.url} className="flex items-center gap-2">
-                                <motion.img variants={header} src={logo.src} className="w-8" alt={logo.alt} />
-                                <motion.span variants={header} className="text-lg font-semibold">{logo.title}</motion.span>
-                            </Link>
-                        </motion.div>
-                        <motion.div variants={stagger} className="flex items-center flex-row-reverse gap-4">
-                            <Sheet>
-                                <SheetTrigger asChild>
+                                <div className="flex flex-row-reverse gap-2">
                                     <motion.div variants={header}>
-                                        <Button variant="outline" size="icon">
-                                            <Menu className="size-4" />
+                                        <Button asChild size="sm">
+                                            <Link
+                                                to={auth.signup.url}
+                                            >
+                                                {auth.signup.text}
+                                                <UserPlus />
+                                            </Link>
                                         </Button>
                                     </motion.div>
-                                </SheetTrigger>
-                                <SheetContent className="overflow-y-auto" side="left">
-                                    <SheetHeader>
-                                        <SheetTitle>
-                                            <a href={logo.url} className="flex items-center gap-2">
-                                                <img src={logo.src} className="w-8" alt={logo.alt} />
-                                                <span className="text-lg font-semibold">
-                                                    {logo.title}
-                                                </span>
-                                            </a>
-                                        </SheetTitle>
-                                    </SheetHeader>
-                                    <div className="my-6 flex flex-col gap-6">
-                                        <Accordion
-                                            type="single"
-                                            collapsible
-                                            className="flex w-full flex-col gap-4"
-                                        >
-                                            {menu.map((item) => renderMobileMenuItem(item))}
-                                        </Accordion>
-                                        {authHook?.user ? (
-                                            <DropdownMenu>
-                                                <DropdownMenuTrigger asChild>
-                                                    <div
-                                                        className="flex items-center justify-start gap-3 p-2"
-                                                    >
-                                                        <Avatar className="h-8 w-8 rounded-lg">
-                                                            <AvatarFallback className="rounded-lg">{authHook?.user?.email.slice(0, 2).toUpperCase()}</AvatarFallback>
-                                                        </Avatar>
-                                                        <div className="grid flex-1 text-left text-sm leading-tight">
-                                                            <span className="truncate font-semibold">{getName()}</span>
-                                                            <span className="truncate text-xs">{authHook?.user?.email}</span>
-                                                        </div>
-                                                        <ChevronsUpDown className="ml-auto size-4" />
-                                                    </div>
-                                                </DropdownMenuTrigger>
-                                                <DropdownMenuContent
-                                                    className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
-                                                    side="bottom"
-                                                    align="end"
-                                                    sideOffset={4}
-                                                >
-                                                    <DropdownMenuLabel className="p-0 font-normal">
-                                                        <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
-                                                            <Avatar className="h-8 w-8 rounded-lg">
-                                                                <AvatarFallback className="rounded-lg">{authHook?.user?.email.slice(0, 2).toUpperCase()}</AvatarFallback>
-                                                            </Avatar>
-                                                            <div className="grid flex-1 text-left text-sm leading-tight">
-                                                                <span className="truncate font-semibold">{getName()}</span>
-                                                                <span className="truncate text-xs">{authHook?.user?.email}</span>
-                                                            </div>
-                                                        </div>
-                                                    </DropdownMenuLabel>
-                                                    <DropdownMenuSeparator />
-                                                    <DropdownMenuGroup>
-                                                        <Link to={authHook.user.roles.some(r => r === ROLES.ADMIN) ? '/administrador' : '/usuario'}>
-                                                            <DropdownMenuItem>
-                                                                <LayoutPanelLeft />
-                                                                Panel
-                                                            </DropdownMenuItem>
-                                                        </Link>
-                                                        <Link to="/salir">
-                                                            <DropdownMenuItem>
-                                                                <LogOut />
-                                                                Cerrar Sesión
-                                                            </DropdownMenuItem>
-                                                        </Link>
-                                                    </DropdownMenuGroup>
-                                                </DropdownMenuContent>
-                                            </DropdownMenu>
-                                        ) : (
-                                            <div className="flex flex-col gap-3 border-t py-4">
-                                                <Button asChild variant="outline">
-                                                    <Link to={auth.login.url}>
-                                                        {auth.login.text}
-                                                        <LogIn />
-                                                    </Link>
-                                                </Button>
-                                                <Button asChild>
-                                                    <Link to={auth.signup.url}>
-                                                        {auth.signup.text}
-                                                        <UserPlus />
-                                                    </Link>
-                                                </Button>
-                                            </div>
-                                        )}
-                                    </div>
-                                </SheetContent>
-                            </Sheet>
+                                    <motion.div variants={header}>
+                                        <Button asChild variant="outline" size="sm">
+                                            <Link
+                                                to={auth.login.url}
+                                            >
+                                                {auth.login.text}
+                                                <LogIn />
+                                            </Link>
+                                        </Button>
+                                    </motion.div>
+                                </div>
+                            )}
                             <motion.div variants={header}>
                                 {themeContext?.theme === THEME.LIGHT ? (
                                     <Moon
@@ -363,10 +247,134 @@ const Navbar = ({
                                     />
                                 )}
                             </motion.div>
-                            <motion.div variants={header}><Color /></motion.div>
+                            <motion.div variants={header}>
+                                <Color />
+                            </motion.div>
                         </motion.div>
+                    </nav>
+                    <div className="block lg:hidden">
+                        <div className="flex items-center justify-between">
+                            <motion.div variants={stagger}>
+                                <Link to={logo.url} className="flex items-center gap-2">
+                                    <motion.img variants={header} src={logo.src} className="w-8" alt={logo.alt} />
+                                    <motion.span variants={header} className="text-lg font-semibold">{logo.title}</motion.span>
+                                </Link>
+                            </motion.div>
+                            <motion.div variants={stagger} className="flex items-center flex-row-reverse gap-4">
+                                <Sheet>
+                                    <SheetTrigger asChild>
+                                        <motion.div variants={header}>
+                                            <Button variant="outline" size="icon">
+                                                <Menu className="size-4" />
+                                            </Button>
+                                        </motion.div>
+                                    </SheetTrigger>
+                                    <SheetContent className="overflow-y-auto" side="left">
+                                        <SheetHeader>
+                                            <SheetTitle>
+                                                <a href={logo.url} className="flex items-center gap-2">
+                                                    <img src={logo.src} className="w-8" alt={logo.alt} />
+                                                    <span className="text-lg font-semibold">
+                                                        {logo.title}
+                                                    </span>
+                                                </a>
+                                            </SheetTitle>
+                                        </SheetHeader>
+                                        <div className="my-6 flex flex-col gap-6">
+                                            <Accordion
+                                                type="single"
+                                                collapsible
+                                                className="flex w-full flex-col gap-4"
+                                            >
+                                                {menu.map((item) => renderMobileMenuItem(item))}
+                                            </Accordion>
+                                            {authHook?.user ? (
+                                                <DropdownMenu>
+                                                    <DropdownMenuTrigger asChild>
+                                                        <div
+                                                            className="flex items-center justify-start gap-3 p-2"
+                                                        >
+                                                            <Avatar className="h-8 w-8 rounded-lg">
+                                                                <AvatarFallback className="rounded-lg">{authHook?.user?.email.slice(0, 2).toUpperCase()}</AvatarFallback>
+                                                            </Avatar>
+                                                            <div className="grid flex-1 text-left text-sm leading-tight">
+                                                                <span className="truncate font-semibold">{getName()}</span>
+                                                                <span className="truncate text-xs">{authHook?.user?.email}</span>
+                                                            </div>
+                                                            <ChevronsUpDown className="ml-auto size-4" />
+                                                        </div>
+                                                    </DropdownMenuTrigger>
+                                                    <DropdownMenuContent
+                                                        className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
+                                                        side="bottom"
+                                                        align="end"
+                                                        sideOffset={4}
+                                                    >
+                                                        <DropdownMenuLabel className="p-0 font-normal">
+                                                            <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
+                                                                <Avatar className="h-8 w-8 rounded-lg">
+                                                                    <AvatarFallback className="rounded-lg">{authHook?.user?.email.slice(0, 2).toUpperCase()}</AvatarFallback>
+                                                                </Avatar>
+                                                                <div className="grid flex-1 text-left text-sm leading-tight">
+                                                                    <span className="truncate font-semibold">{getName()}</span>
+                                                                    <span className="truncate text-xs">{authHook?.user?.email}</span>
+                                                                </div>
+                                                            </div>
+                                                        </DropdownMenuLabel>
+                                                        <DropdownMenuSeparator />
+                                                        <DropdownMenuGroup>
+                                                            <Link to={authHook.user.roles.some(r => r === ROLES.ADMIN) ? '/administrador' : '/usuario'}>
+                                                                <DropdownMenuItem>
+                                                                    <LayoutPanelLeft />
+                                                                    Panel
+                                                                </DropdownMenuItem>
+                                                            </Link>
+                                                            <Link to="/salir">
+                                                                <DropdownMenuItem>
+                                                                    <LogOut />
+                                                                    Cerrar Sesión
+                                                                </DropdownMenuItem>
+                                                            </Link>
+                                                        </DropdownMenuGroup>
+                                                    </DropdownMenuContent>
+                                                </DropdownMenu>
+                                            ) : (
+                                                <div className="flex flex-col gap-3 border-t py-4">
+                                                    <Button asChild variant="outline">
+                                                        <Link to={auth.login.url}>
+                                                            {auth.login.text}
+                                                            <LogIn />
+                                                        </Link>
+                                                    </Button>
+                                                    <Button asChild>
+                                                        <Link to={auth.signup.url}>
+                                                            {auth.signup.text}
+                                                            <UserPlus />
+                                                        </Link>
+                                                    </Button>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </SheetContent>
+                                </Sheet>
+                                <motion.div variants={header}>
+                                    {themeContext?.theme === THEME.LIGHT ? (
+                                        <Moon
+                                            className="cursor-pointer size-5"
+                                            onClick={() => themeContext.handleChange(THEME.DARK)}
+                                        />
+                                    ) : (
+                                        <Sun
+                                            className="cursor-pointer size-5"
+                                            onClick={() => themeContext?.handleChange(THEME.LIGHT)}
+                                        />
+                                    )}
+                                </motion.div>
+                                <motion.div variants={header}><Color /></motion.div>
+                            </motion.div>
+                        </div>
                     </div>
-                </div>
+                </FadeItem>
             </div>
         </motion.section>
     );
@@ -405,9 +413,8 @@ const renderMenuItem = (item: MenuItem) => {
     }
 
     return (
-        <motion.div variants={header}>
+        <motion.div key={item.title} variants={header}>
             <Link
-                key={item.title}
                 className="group inline-flex h-10 w-max items-center justify-center rounded-md px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:text-accent-foreground"
                 to={item.url}
             >

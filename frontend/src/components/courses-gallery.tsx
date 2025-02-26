@@ -1,17 +1,17 @@
-import { GalleryCourseItems } from "./ui/gallery-course-items";
 import useCourses from "@/hooks/useCourses";
+import { Gallery } from "./ui/gallery";
 
 function CoursesGallery() {
-    const courseHook = useCourses({});
+    const courseHook = useCourses({ size: 8 });
 
     return (
-        <GalleryCourseItems
-            heading="Cursos" 
-            url="/educacion"
+        <Gallery 
+            heading="Cursos 🎓"
             linkText="Descubre todos los cursos que ofrecemos."
+            url="/educacion"
             items={courseHook.courses}
         />
-    );
+    )
 }
 
 export default CoursesGallery;
