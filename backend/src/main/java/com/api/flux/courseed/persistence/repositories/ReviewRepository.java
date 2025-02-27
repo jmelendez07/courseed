@@ -1,6 +1,7 @@
 package com.api.flux.courseed.persistence.repositories;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.Aggregation;
@@ -40,4 +41,5 @@ public interface ReviewRepository extends ReactiveMongoRepository<Review, String
         "{ '$project': { 'year': '$_id.year', 'month': '$_id.monthName', 'count': 1 } }"
     })
     Flux<ReviewCountByMonth> countReviewsLastSixMonths(LocalDate fromDate);
+    Mono<Long> countByCreatedAtBetween(LocalDateTime start, LocalDateTime end);
 }

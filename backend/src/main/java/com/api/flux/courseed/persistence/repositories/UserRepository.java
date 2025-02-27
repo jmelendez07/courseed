@@ -18,4 +18,5 @@ public interface UserRepository extends ReactiveMongoRepository<User, String> {
     Mono<User> findByEmailAndIdNot(String email, String id);
     Flux<User> findByRolesContaining(String role);
     Flux<User> findByCreatedAtBetween(LocalDateTime startDate, LocalDateTime endDate);
+    Mono<Long> countByCreatedAtBetween(LocalDateTime start, LocalDateTime end);
 }

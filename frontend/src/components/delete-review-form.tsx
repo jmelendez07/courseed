@@ -7,10 +7,11 @@ import dayjs from "dayjs";
 import React from "react";
 import { Button } from "./ui/button";
 import { LoaderCircle } from "lucide-react";
+import ReviewInterface from "@/interfaces/review";
 
 interface DeleteReviewForm {
-    review: ReviewCourseUserInterface,
-    onDeleted?: (review: ReviewCourseUserInterface) => void
+    review: ReviewCourseUserInterface | ReviewInterface,
+    onDeleted?: (review: ReviewCourseUserInterface | ReviewInterface) => void
 }
 
 interface ErrorProps {
@@ -34,7 +35,7 @@ function DeleteReviewForm({ review, onDeleted }: DeleteReviewForm) {
                     open: false
                 });
                 toast({
-                    title: `Reseña de ${review.course.title} Eliminado!`,
+                    title: `Reseña de ${review.user.email} Eliminada!`,
                     description: dayjs().format("LLL"),
                 });
                 if (onDeleted) onDeleted(review);
@@ -45,7 +46,7 @@ function DeleteReviewForm({ review, onDeleted }: DeleteReviewForm) {
                     open: false
                 });
                 toast({
-                    title: `Reseña de ${review.course.title}. Algo salió mal!`,
+                    title: `Reseña de ${review.user.email} salió mal!`,
                     description: error.response?.data.auth || error.response?.data.reviewId || error.message,
                     variant: "destructive",
                 });

@@ -21,6 +21,12 @@ public class UserController {
     @Autowired
     private ValidationService validationService;
 
+    public Mono<ServerResponse> getTotalUsers(ServerRequest serverRequest) {
+        return userService.getTotalUsers()
+            .flatMap(user -> ServerResponse.ok().bodyValue(user))
+            .switchIfEmpty(ServerResponse.notFound().build());
+    } 
+
     public Mono<ServerResponse> getAllUsers(ServerRequest serverRequest) {
         return userService
             .getAllUsers(

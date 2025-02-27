@@ -2,6 +2,7 @@ package com.api.flux.courseed.services.implementations;
 
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.temporal.TemporalAdjusters;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -22,6 +23,7 @@ import com.api.flux.courseed.persistence.repositories.LikeRepository;
 import com.api.flux.courseed.persistence.repositories.ReviewRepository;
 import com.api.flux.courseed.persistence.repositories.UserRepository;
 import com.api.flux.courseed.projections.dtos.CreateUserDto;
+import com.api.flux.courseed.projections.dtos.TotalUsersDto;
 import com.api.flux.courseed.projections.dtos.UpdateUserEmailDto;
 import com.api.flux.courseed.projections.dtos.UpdateUserPasswordDto;
 import com.api.flux.courseed.projections.dtos.UpdateUserRolesDto;
@@ -52,6 +54,18 @@ public class UserService implements InterfaceUserService {
 
     @Autowired    
     private PasswordEncoder passwordEncoder;
+
+    @Override
+    public Mono<TotalUsersDto> getTotalUsers() {
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime startOfMonth = now.with(TemporalAdjusters.firstDayOfMonth()).withHour(0).withMinute(0).withSecond(0).withNano(0);
+        LocalDateTime endOfMonth = now.with(TemporalAdjusters.lastDayOfMonth()).withHour(23).withMinute(59).withSecond(59).withNano(999999999);
+
+        return userRepository.count()
+            .flatMap(total -> userRepository.countByCreatedAtBetween(startOfMonth, endOfMonth)
+                .map(lastMonth -> new TotalUsersDto(total, lastMonth))
+            );
+    }
 
     @Override
     public Mono<Page<UserDto>> getAllUsers(int page, int size) {

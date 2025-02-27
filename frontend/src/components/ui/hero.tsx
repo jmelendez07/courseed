@@ -97,7 +97,7 @@ const img = {
 }
 
 const Hero = ({
-    heading = "Tu educación continuada en un solo lugar.",
+    heading = "Tu educación continua en un solo lugar.",
     description = "¡Bienvenido a CourSeed! Navega entre cursos, talleres y diplomados. Lleva tu educación al siguiente nivel.",
     button = {
         text: "Explorar Educación",

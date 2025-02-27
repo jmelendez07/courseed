@@ -3,26 +3,19 @@ import axios, { AxiosResponse } from "axios";
 import APIS from "@/enums/apis";
 import TOKEN from "@/enums/token";
 import ROLES from "@/enums/roles";
+import UserInterface from "@/interfaces/user";
 
 interface ChildrenProps {
     children: React.ReactNode
 }
 
-interface AuthUserProps {
-    id: string;
-    email: string;
-    roles: string[];
-    likes: number;
-    reviews: number;
-}
-
 interface AuthContextProps {
     token: string | null;
-    user: AuthUserProps | null;
+    user: UserInterface | null;
     loading: boolean;
     handleToken: (newToken: string) => undefined;
     handleUser: () => Promise<any>;
-    setUser: React.Dispatch<React.SetStateAction<AuthUserProps | null>>;
+    setUser: React.Dispatch<React.SetStateAction<UserInterface | null>>;
     setLoading: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
@@ -30,7 +23,7 @@ const AuthContext = React.createContext<AuthContextProps | null>(null);
 
 function AuthProvider({ children }: ChildrenProps) {
     const [token, setToken] = React.useState(localStorage.getItem('token'));
-    const [user, setUser] = React.useState<AuthUserProps | null>(null);
+    const [user, setUser] = React.useState<UserInterface | null>(null);
     const [loading, setLoading] = React.useState<boolean>(true);
 
     const handleToken = function(newToken: string): undefined {
@@ -43,6 +36,8 @@ function AuthProvider({ children }: ChildrenProps) {
             const res = await axios.get(APIS.USER_AUTHENTICATED);
             setUser(typeof res.data === "object" ? res.data : null);
         } catch (error) {
+            delete axios.defaults.headers.common['Authorization'];
+            localStorage.removeItem('token');
             console.error(error);
         }
     }
@@ -117,7 +112,7 @@ function useIsAdmin() {
                     Authorization: `${TOKEN.PREFIX} ${localStorage.getItem('token')}`
                 }
             })
-                .then((response: AxiosResponse<AuthUserProps | null>) => {
+                .then((response: AxiosResponse<UserInterface | null>) => {
                     setIsAdmin(
                         typeof response.data === "object" && 
                         Array.isArray(response.data?.roles) &&
@@ -144,7 +139,7 @@ function useIsUser() {
                     Authorization: `${TOKEN.PREFIX} ${localStorage.getItem('token')}`
                 }
             })
-                .then((response: AxiosResponse<AuthUserProps | null>) => {
+                .then((response: AxiosResponse<UserInterface | null>) => {
                     setIsUser(
                         typeof response.data === "object" && 
                         Array.isArray(response.data?.roles) &&

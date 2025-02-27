@@ -1,6 +1,7 @@
 import APIS from "@/enums/apis";
 import CourseInterface from "@/interfaces/course";
 import LikeInterface from "@/interfaces/like";
+import ReviewInterface from "@/interfaces/review";
 import axios, { AxiosError, AxiosResponse } from "axios";
 import React from "react";
 
@@ -41,13 +42,40 @@ function useCourse({ id }: useCourseProps) {
         });
     }
 
+    const newReview = (newReview: ReviewInterface) => {
+        if (!course) return;
+        setCourse({
+            ...course,
+            reviews: [newReview, ...course.reviews]
+        });
+    }
+
+    const updateReview = (review: ReviewInterface) => {
+        if (!course) return;
+        setCourse({ 
+            ...course, 
+            reviews: course.reviews.map(r => r.id === review.id ? review : r) 
+        });
+    }
+
+    const deleteReview = (review: ReviewInterface) => {
+        if (!course) return;
+        setCourse({
+            ...course,
+            reviews: course.reviews.filter(r => r.id !== review.id)
+        });
+    } 
+
     return {
         course,
         loading,
         setCourse,
         setLoading,
         handleCreateLike,
-        handleDeleteLike
+        handleDeleteLike,
+        newReview,
+        updateReview,
+        deleteReview
     };
 }
 

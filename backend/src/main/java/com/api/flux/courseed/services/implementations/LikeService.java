@@ -1,6 +1,8 @@
 package com.api.flux.courseed.services.implementations;
 
 import java.security.Principal;
+import java.time.LocalDateTime;
+import java.time.temporal.TemporalAdjusters;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -22,6 +24,7 @@ import com.api.flux.courseed.persistence.repositories.UserRepository;
 import com.api.flux.courseed.projections.dtos.CourseDto;
 import com.api.flux.courseed.projections.dtos.LikeDto;
 import com.api.flux.courseed.projections.dtos.SaveLikeDto;
+import com.api.flux.courseed.projections.dtos.TotalLikesDto;
 import com.api.flux.courseed.projections.dtos.UserDto;
 import com.api.flux.courseed.projections.mappers.CategoryMapper;
 import com.api.flux.courseed.projections.mappers.ContentMapper;
@@ -69,6 +72,18 @@ public class LikeService implements InterfaceLikeService {
         this.categoryMapper = categoryMapper;
         this.institutionMapper = institutionMapper;
         this.reviewMapper = reviewMapper;
+    }
+
+    @Override
+    public Mono<TotalLikesDto> getTotalLikes() {
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime startOfMonth = now.with(TemporalAdjusters.firstDayOfMonth()).withHour(0).withMinute(0).withSecond(0).withNano(0);
+        LocalDateTime endOfMonth = now.with(TemporalAdjusters.lastDayOfMonth()).withHour(23).withMinute(59).withSecond(59).withNano(999999999);
+
+        return likeRepository.count()
+            .flatMap(total -> likeRepository.countByCreatedAtBetween(startOfMonth, endOfMonth)
+                .map(lastMonth -> new TotalLikesDto(total, lastMonth))
+            );
     }
 
     @Override

@@ -19,6 +19,12 @@ public class ReviewController {
     @Autowired
     private ValidationService validationService;
 
+    public Mono<ServerResponse> getTotalReviews(ServerRequest serverRequest) {
+        return reviewService.getTotalReviews()
+            .flatMap(user -> ServerResponse.ok().bodyValue(user))
+            .switchIfEmpty(ServerResponse.notFound().build());
+    } 
+
     public Mono<ServerResponse> getAllReviews(ServerRequest serverRequest) {
         return reviewService
             .getAllReviews(

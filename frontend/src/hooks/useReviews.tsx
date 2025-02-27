@@ -1,4 +1,5 @@
 import APIS from "@/enums/apis";
+import ReviewInterface from "@/interfaces/review";
 import ReviewCourseUserInterface from "@/interfaces/review-course-user";
 import UserInterface from "@/interfaces/user";
 import axios, { AxiosResponse } from "axios";
@@ -74,13 +75,7 @@ function useReviews({ size }: UseReviewsProps) {
             },
         })
             .then((response: AxiosResponse<ResponseReviewProps>) => {
-                setReviews(currentReviews => params.pageNumber === 0
-                    ? response.data.content
-                    : [
-                        ...currentReviews,
-                        ...response.data.content
-                    ]
-                );
+                setReviews(response.data.content);
                 setIsLastPage(response.data.last || response.data.empty);
                 setTotalCourses(response.data.totalElements);
             })
@@ -94,7 +89,7 @@ function useReviews({ size }: UseReviewsProps) {
         }));
     }
     
-    const handleReviewDeleted = (review: ReviewCourseUserInterface) => {
+    const handleReviewDeleted = (review: ReviewCourseUserInterface | ReviewInterface) => {
         setReviews(reviews.filter(r => r.id !== review.id));
     }
 

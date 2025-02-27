@@ -10,11 +10,13 @@ import { Info, LoaderCircle } from "lucide-react";
 import { DialogContext } from "@/providers/DialogProvider";
 import dayjs from "dayjs";
 import { useToast } from "@/hooks/use-toast";
-import ReviewInterface from "@/interfaces/review";
+import UserInterface from "@/interfaces/user";
+import CourseInterface from "@/interfaces/course";
 
 interface FormProps {
     rating: number;
     content: string;
+    courseId: string;
 }
 
 interface ErrorProps {
@@ -24,16 +26,18 @@ interface ErrorProps {
     content: string | null;
 }
 
-interface UpdateReviewFormProps {
-    review: ReviewCourseUserInterface | ReviewInterface;
-    onUpdated?: (review: ReviewCourseUserInterface) => void;
+interface CreateReviewFormProps {
+    user: UserInterface;
+    course: CourseInterface;
+    onCreated?: (review: ReviewCourseUserInterface) => void;
 }
 
-function UpdateReviewForm({ review, onUpdated }: UpdateReviewFormProps) {
+function CreateReviewForm({ user, course, onCreated }: CreateReviewFormProps) {
     const dialogContext = React.useContext(DialogContext);
     const [form, setForm] = React.useState<FormProps>({
-        rating: review.rating,
-        content: review.content
+        rating: 5,
+        content: "",
+        courseId: course.id,
     });
     const [errors, setErrors] = React.useState<ErrorProps>({
         auth: null,
@@ -47,28 +51,29 @@ function UpdateReviewForm({ review, onUpdated }: UpdateReviewFormProps) {
     const handleSubmit = (e: React.ChangeEvent<HTMLFormElement>) => {
         e.preventDefault();
         setLoading(true);
-        axios.put(APIS.REVIEWS_UPDATE + review.id, form)
+        axios.post(APIS.REVIEWS_CREATE, form)
             .then((response: AxiosResponse<ReviewCourseUserInterface>) => {
                 dialogContext?.setContext({
                     ...dialogContext.context,
                     open: false
                 });
                 toast({
-                    title: `Reseña de ${response.data.course.title} Actualizado!`,
+                    title: `Reseña Creada!`,
                     description: dayjs().format("LLL"),
                 });
-                if (onUpdated) {
-                    onUpdated(response.data);
+                if (onCreated) {
+                    onCreated(response.data);
                 }
             })
             .catch((error: AxiosError<ErrorProps>) => {
+                console.log(error);
                 if (error.response?.data.auth || error.response?.data.reviewId) {
                     dialogContext?.setContext({
                         ...dialogContext.context,
                         open: false
                     });
                     toast({
-                        title: `Reseña de ${review.user.email} salió mal!`,
+                        title: `Reseña de ${user.email} salió mal!`,
                         description: error.response.data.auth ? error.response.data.auth : error.response.data.reviewId,
                         variant: "destructive",
                     });
@@ -131,7 +136,7 @@ function UpdateReviewForm({ review, onUpdated }: UpdateReviewFormProps) {
                 disabled={loading}
                 className="flex items-center gap-2 overflow-hidden"
             >
-                <p className="truncate">Actualizar Reseña</p>
+                <p className="truncate">Crear Reseña</p>
                 {loading && (
                     <LoaderCircle className="animate-spin" />
                 )}
@@ -140,4 +145,4 @@ function UpdateReviewForm({ review, onUpdated }: UpdateReviewFormProps) {
     );
 }
 
-export default UpdateReviewForm;
+export default CreateReviewForm;

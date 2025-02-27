@@ -21,6 +21,12 @@ public class LikeController {
     @Autowired
     private ValidationService validationService;
 
+    public Mono<ServerResponse> getTotalLikes(ServerRequest serverRequest) {
+        return likeService.getTotalLikes()
+            .flatMap(user -> ServerResponse.ok().bodyValue(user))
+            .switchIfEmpty(ServerResponse.notFound().build());
+    } 
+
     public Mono<ServerResponse> getLikesByCourseId(ServerRequest serverRequest) {
         return likeService.getLikesByCourseId(serverRequest.pathVariable("courseId"))
             .collectList().flatMap(list -> {

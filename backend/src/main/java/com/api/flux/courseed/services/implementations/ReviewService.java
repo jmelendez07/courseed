@@ -2,7 +2,9 @@ package com.api.flux.courseed.services.implementations;
 
 import java.security.Principal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.TextStyle;
+import java.time.temporal.TemporalAdjusters;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
@@ -34,6 +36,7 @@ import com.api.flux.courseed.projections.dtos.CourseDto;
 import com.api.flux.courseed.projections.dtos.CreateReviewDto;
 import com.api.flux.courseed.projections.dtos.ReviewCountByMonth;
 import com.api.flux.courseed.projections.dtos.ReviewDto;
+import com.api.flux.courseed.projections.dtos.TotalReviewsDto;
 import com.api.flux.courseed.projections.dtos.UpdateReviewDto;
 import com.api.flux.courseed.projections.dtos.UserDto;
 import com.api.flux.courseed.projections.mappers.CategoryMapper;
@@ -94,6 +97,18 @@ public class ReviewService implements InterfaceReviewService {
         this.institutionMapper = institutionMapper;
         this.likeMapper = likeMapper;
         this.contentMapper = contentMapper;
+    }
+
+    @Override
+    public Mono<TotalReviewsDto> getTotalReviews() {
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime startOfMonth = now.with(TemporalAdjusters.firstDayOfMonth()).withHour(0).withMinute(0).withSecond(0).withNano(0);
+        LocalDateTime endOfMonth = now.with(TemporalAdjusters.lastDayOfMonth()).withHour(23).withMinute(59).withSecond(59).withNano(999999999);
+
+        return reviewRepository.count()
+            .flatMap(total -> reviewRepository.countByCreatedAtBetween(startOfMonth, endOfMonth)
+                .map(lastMonth -> new TotalReviewsDto(total, lastMonth))
+            );
     }
 
     @Override

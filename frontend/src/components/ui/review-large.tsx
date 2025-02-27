@@ -65,7 +65,7 @@ function ReviewLarge({ review, handleEdit, handleDelete, className }: ReviewComp
 						className="w-full object-cover rounded-lg h-32 max-h-32"
 					/>
 				</div>
-				<p className="text-sm text-gray-600 mb-2 line-clamp-2">{review.content}</p>
+				<p className="text-sm text-gray-600 mb-2 line-clamp-3">{review.content}</p>
 				<div className="flex items-center justify-between gap-2">
 					<div className="flex items-center text-xs text-gray-500 gap-2 overflow-hidden">
 						<Avatar className="h-8 w-8 rounded-lg">

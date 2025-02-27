@@ -90,13 +90,7 @@ function useCourses({ size, institutionParam, facultyParam }: UseCoursesProps) {
             },
         })
             .then((response: AxiosResponse<ResponseCourseProps>) => {
-                setCourses(currentCourses => params.pageNumber === 0
-                    ? response.data.content
-                    : [
-                        ...currentCourses,
-                        ...response.data.content
-                    ]
-                );
+                setCourses(response.data.content);
                 setIsLastPage(response.data.last || response.data.empty);
                 setTotalCourses(response.data.totalElements);
             })

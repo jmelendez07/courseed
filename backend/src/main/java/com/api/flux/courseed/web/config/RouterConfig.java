@@ -104,6 +104,7 @@ public class RouterConfig {
     private RouterFunction<ServerResponse> likeRoutes(LikeController likeController) {
         return RouterFunctions
             .route()
+            .GET("/total/this-month", likeController::getTotalLikes)
             .GET("/course/{courseId}", likeController::getLikesByCourseId)
             .GET("/auth", likeController::getLikesByAuthUser)
             .POST(likeController::createLike)
@@ -116,6 +117,7 @@ public class RouterConfig {
             .route()
             .GET("", reviewController::getAllReviews)
             .GET("/months/count", reviewController::getReviewCountsForLastSixMonths)
+            .GET("/total/this-month", reviewController::getTotalReviews)
             .GET("/course/{courseId}", reviewController::getReviewsByCourseId)
             .GET("/auth", reviewController::getReviewsByAuthUser)
             .POST(reviewController::createReview)
@@ -130,6 +132,7 @@ public class RouterConfig {
             .GET("", userController::getAllUsers)
             .GET("/{id}", userController::getUserById)
             .GET("/email/{email}", userController::getUserByEmail)
+            .GET("/total/this-month", userController::getTotalUsers)
             .GET("/months/count", userController::getUserCountForLastSixMonths)
             .POST("/create", userController::createUser)
             .PUT("/email/{id}", userController::updateUserEmail)
