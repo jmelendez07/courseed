@@ -9,15 +9,14 @@ public class CourseDto implements Serializable {
     private String title;
     private String image;
     private String description;
-    private String prerequisites;
     private Double price;
     private String duration;
     private String modality;
     private CategoryDto category;
     private InstitutionDto institution;
     private List<ContentDto> contents;
-    private List<LikeDto> likes;
     private List<ReviewDto> reviews;
+    private List<ReactionDto> reactions;
     
     public String getId() {
         return id;
@@ -48,12 +47,6 @@ public class CourseDto implements Serializable {
     }
     public void setDescription(String description) {
         this.description = description;
-    }
-    public String getPrerequisites() {
-        return prerequisites;
-    }
-    public void setPrerequisites(String prerequisites) {
-        this.prerequisites = prerequisites;
     }
     public Double getPrice() {
         return price;
@@ -91,16 +84,16 @@ public class CourseDto implements Serializable {
     public void setContents(List<ContentDto> contents) {
         this.contents = contents;
     }
-    public List<LikeDto> getLikes() {
-        return likes;
-    }
-    public void setLikes(List<LikeDto> likes) {
-        this.likes = likes;
-    }
     public List<ReviewDto> getReviews() {
         return reviews;
     }
     public void setReviews(List<ReviewDto> reviews) {
         this.reviews = reviews;
+    }
+    public List<ReactionDto> getReactions() {
+        return reactions;
+    }
+    public void setReactions(List<ReactionDto> reactions) {
+        this.reactions = reactions;
     }
 }

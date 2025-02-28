@@ -1,6 +1,6 @@
 import APIS from "@/enums/apis";
 import CourseInterface from "@/interfaces/course";
-import LikeInterface from "@/interfaces/like";
+import ReactionInterface from "@/interfaces/reaction";
 import ReviewInterface from "@/interfaces/review";
 import axios, { AxiosError, AxiosResponse } from "axios";
 import React from "react";
@@ -26,19 +26,27 @@ function useCourse({ id }: useCourseProps) {
             .finally(() => setLoading(false));
     }, [id]);
 
-    const handleDeleteLike = (id: string) => {
+    const handleCreatedReaction = (reaction: ReactionInterface) => {
         if (!course) return;
         setCourse({
             ...course,
-            likes: course.likes.filter(l => l.id !== id)
+            reactions: [...course.reactions, reaction]
         });
     }
 
-    const handleCreateLike = (like: LikeInterface) => {
+    const handleUpdatedReaction = (reaction: ReactionInterface) => {
         if (!course) return;
         setCourse({
             ...course,
-            likes: [...course.likes, like]
+            reactions: course.reactions.map(r => r.id === reaction.id ? reaction : r)
+        });
+    }
+
+    const handleDeletedReaction = (id: string) => {
+        if (!course) return;
+        setCourse({
+            ...course,
+            reactions: course.reactions.filter(reaction => reaction.id !== id)
         });
     }
 
@@ -71,8 +79,9 @@ function useCourse({ id }: useCourseProps) {
         loading,
         setCourse,
         setLoading,
-        handleCreateLike,
-        handleDeleteLike,
+        handleCreatedReaction,
+        handleUpdatedReaction,
+        handleDeletedReaction,
         newReview,
         updateReview,
         deleteReview

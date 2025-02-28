@@ -4,10 +4,10 @@ import PieChart from "./pie-chart";
 import InstitutionsWithCoursesCount from "@/interfaces/institutions-with-courses-count";
 import axios, { AxiosResponse } from "axios";
 import APIS from "@/enums/apis";
-import CoursesWithReviewsLikesCount from "@/interfaces/courses-with-reviews-likes-count";
 import { ColorContext } from "@/providers/ColorProvider";
 import resolveConfig from "tailwindcss/resolveConfig";
 import tailwindConfig from "tailwindcss/defaultConfig";
+import CoursesWithReviewsReactionsCount from "@/interfaces/courses-with-reviews-reactions-count";
 
 const tailwindShades: number[] = [700, 600, 500, 400, 300, 200, 100];
 
@@ -15,7 +15,7 @@ function DashboardChartCourses() {
 	const institutionsSize = 3;
 	const coursesSize = 9;
 	const [institutions, setInstitutions] = React.useState<InstitutionsWithCoursesCount[]>([]);
-	const [courses, setCourses] = React.useState<CoursesWithReviewsLikesCount[]>([]);
+	const [courses, setCourses] = React.useState<CoursesWithReviewsReactionsCount[]>([]);
 
 	React.useEffect(() => {
 		axios.get(APIS.INSTITUTIONS_COURSES_COUNT, {
@@ -30,10 +30,10 @@ function DashboardChartCourses() {
 	}, []);
 
 	React.useEffect(() => {
-		axios.get(APIS.COURSES_REVIEWS_LIKES_COUNT, {
+		axios.get(APIS.COURSES_REVIEWS_REACTIONS_COUNT, {
 			params: { page: 0, size: coursesSize }
 		})
-			.then((response: AxiosResponse<CoursesWithReviewsLikesCount[]>) => {
+			.then((response: AxiosResponse<CoursesWithReviewsReactionsCount[]>) => {
 				setCourses(response.data);
 			})
 			.catch(() => setCourses([]));
@@ -63,10 +63,10 @@ function DashboardChartCourses() {
 					chartData={courses.map((course) => ({
 						label: course.title,
 						bar1: course.totalReviews,
-						bar2: course.totalLikes
+						bar2: course.totalReactions
 					}))}
 					labelBar1="Reseñas"
-					labelBar2="Likes"
+					labelBar2="Reacciones"
 				/>
 				<PieChart
 					title={`Top ${institutionsSize} Instituciones con Mayor Oferta Académica 🎓`}

@@ -10,7 +10,7 @@ import com.api.flux.courseed.web.controllers.CategoryController;
 import com.api.flux.courseed.web.controllers.ContentController;
 import com.api.flux.courseed.web.controllers.CourseController;
 import com.api.flux.courseed.web.controllers.InstitutionController;
-import com.api.flux.courseed.web.controllers.LikeController;
+import com.api.flux.courseed.web.controllers.ReactionController;
 import com.api.flux.courseed.web.controllers.ReviewController;
 import com.api.flux.courseed.web.controllers.RoleController;
 import com.api.flux.courseed.web.controllers.UserController;
@@ -22,9 +22,9 @@ public class RouterConfig {
     RouterFunction<ServerResponse> routes(
         AuthController authController, CategoryController categoryController,
         ContentController contentController, CourseController courseController,
-        InstitutionController institutionController, LikeController likeController,
+        InstitutionController institutionController,
         ReviewController reviewController, UserController userController,
-        RoleController roleController
+        RoleController roleController, ReactionController reactionController
     ) {
         return RouterFunctions.route()
             .path("/auth", () -> authRoutes(authController))
@@ -32,10 +32,10 @@ public class RouterConfig {
             .path("/contents", () -> contentRoutes(contentController))
             .path("/courses", () -> courseRoutes(courseController))
             .path("/institutions", () -> institutionRoutes(institutionController))
-            .path("/likes", () -> likeRoutes(likeController))
             .path("/reviews", () -> reviewRoutes(reviewController))
             .path("/users", () -> userRoutes(userController))
             .path("/roles", () -> roleRoutes(roleController))
+            .path("/reactions", () -> reactionRoutes(reactionController))
             .build();
     }
 
@@ -81,7 +81,7 @@ public class RouterConfig {
             .GET("/{id}", courseController::getCourseById)
             .GET("/category/{categoryId}", courseController::getCoursesByCategoryId)
             .GET("/institution/{institutionId}", courseController::getCoursesByInstitutionId)
-            .GET("/reviews-likes/count", courseController::getTopCoursesWithReviewsAndLikes)
+            .GET("/reviews-reactions/count", courseController::getTopCoursesWithReviewsAndReactions)
             .POST(courseController::createCourse)
             .PUT("/{id}", courseController::updateCourse)
             .DELETE("/{id}", courseController::deleteCourse)
@@ -101,14 +101,13 @@ public class RouterConfig {
             .build();
     }
 
-    private RouterFunction<ServerResponse> likeRoutes(LikeController likeController) {
+    private RouterFunction<ServerResponse> reactionRoutes(ReactionController reactionController) {
         return RouterFunctions
             .route()
-            .GET("/total/this-month", likeController::getTotalLikes)
-            .GET("/course/{courseId}", likeController::getLikesByCourseId)
-            .GET("/auth", likeController::getLikesByAuthUser)
-            .POST(likeController::createLike)
-            .DELETE("/{id}", likeController::deleteLike)
+            .GET("/course/{courseId}", reactionController::findReactionsByCourseId)
+            .POST(reactionController::createReaction)
+            .PUT(reactionController::updateReaction)
+            .DELETE("/{id}", reactionController::deleteReaction)
             .build();
     }
 
@@ -176,8 +175,8 @@ public class RouterConfig {
     }
 
     @Bean
-    LikeController likeController() {
-        return new LikeController();
+    ReactionController reactionController() {
+        return new ReactionController();
     }
 
     @Bean

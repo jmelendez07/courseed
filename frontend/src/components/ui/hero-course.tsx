@@ -1,32 +1,35 @@
-import { ArrowUpRight, BookMarked, CalendarClock, Check, DollarSign, Landmark, MessageSquareText, SquareStack, Star, ThumbsUp } from "lucide-react";
+import { ArrowUpRight, BookMarked, CalendarClock, Check, DollarSign, Landmark, MessageSquareText, SquareStack, Star } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import CourseInterface from "@/interfaces/course";
 import { useAuth } from "@/providers/AuthProvider";
-import useLike from "@/hooks/useLike";
 import React from "react";
 import ConfettiExplosion from 'react-confetti-explosion';
-import LikeInterface from "@/interfaces/like";
 import FadeItem from "./fadeItem";
+import REACTION from "@/enums/reaction";
+import ReactionInterface from "@/interfaces/reaction";
+import useReaction from "@/hooks/useReaction";
 
 interface HeroCourseProps {
     course: CourseInterface;
     handlePrimaryButton?: () => void;
-    handleCreateLike: (like: LikeInterface) => void;
-    handleDeleteLike: (id: string) => void;
+    handleCreatedReaction: (reaction: ReactionInterface) => void;
+    handleUpdatedReaction: (reaction: ReactionInterface) => void;
+    handleDeletedReaction: (id: string) => void;
 }
 
-const HeroCourse = ({ 
-    course, 
+const HeroCourse = ({
+    course,
     handlePrimaryButton,
-    handleCreateLike,
-    handleDeleteLike 
+    handleCreatedReaction,
+    handleUpdatedReaction,
+    handleDeletedReaction
 }: HeroCourseProps) => {
 
     const authHook = useAuth();
-    const likeHook = useLike();
-    const [isExploding, setIsExploding] = React.useState(false);
+    const reactionHook = useReaction();
+    const [isExploding, setIsExploding] = React.useState<boolean>(false);
 
     function getAverageRating(): number {
         if (!course.reviews) return 0;
@@ -36,17 +39,17 @@ const HeroCourse = ({
 
     const getFormatPrice = (): string => {
 
-		if (course.price === 0) return "Gratuito";
+        if (course.price === 0) return "Gratuito";
 
-		return course.price
-			? course.price.toLocaleString('es-CO', {
-				style: 'currency',
-				currency: 'COP',
-				minimumFractionDigits: 2,
-				maximumFractionDigits: 2
-			}).replace("$", "").trim() + " COP"
-			: "Sin información";
-	}
+        return course.price
+            ? course.price.toLocaleString('es-CO', {
+                style: 'currency',
+                currency: 'COP',
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            }).replace("$", "").trim() + " COP"
+            : "Sin información";
+    }
 
     const options = [
         {
@@ -75,6 +78,34 @@ const HeroCourse = ({
             "value": getFormatPrice()
         }
     ];
+
+    const handleReaction = React.useCallback(async (type: keyof typeof REACTION) => {
+        if (!authHook?.user) return;
+        
+        setIsExploding(false);
+        const currentReaction = course.reactions.find(reaction => reaction.user.id === authHook?.user?.id);
+
+        if (currentReaction?.type === type) {
+            if (await reactionHook.handleDelete(currentReaction.id)) handleDeletedReaction(currentReaction.id);
+        } else if (currentReaction) {
+            const updatedReaction = await reactionHook.handleUpdate(course.id, type);  
+            if (updatedReaction) handleUpdatedReaction(updatedReaction);
+        } else {
+            const createdReaction = await reactionHook.handleCreate(course.id, type); 
+            if (createdReaction) {
+                if (REACTION[createdReaction.type as keyof typeof REACTION] === REACTION.GOOD) setIsExploding(true);
+                handleCreatedReaction(createdReaction);
+            }
+        }
+    }, [reactionHook, authHook, course.reactions]);
+    
+    const getReactionCount = React.useCallback(() => {
+        return Object.keys(REACTION)
+            .map(type => ({
+                type: type as keyof typeof REACTION,
+                total: course.reactions.filter(reaction => reaction.type === type).length
+            }))
+    }, [course.reactions, authHook?.user]);
 
     return (
         <section className="py-12 flex justify-center">
@@ -126,36 +157,25 @@ const HeroCourse = ({
                                 </p>
                             </FadeItem>
                         </div>
-                        <FadeItem>
-                            <span className="flex items-center gap-2 sm:ml-6">
-                                {course.likes.length}
-                                {authHook?.user ? (
-                                    <>
-                                        <ThumbsUp 
-                                            className={`cursor-pointer`} 
-                                            onClick={async () => {
-                                                if (course.likes.some(l => l.user?.id === authHook.user?.id)) {
-                                                    const currentLike = course.likes.find(l => l.user?.id === authHook.user?.id);
-                                                    if (currentLike && await likeHook.handleDeleteLike(currentLike?.id)) {
-                                                        handleDeleteLike(currentLike.id);
-                                                        setIsExploding(false);
-                                                    };
-                                                } else {
-                                                    const like: LikeInterface | null = await likeHook.handleCreateLike(course.id);
-                                                    if (like) {
-                                                        setIsExploding(true);
-                                                        handleCreateLike(like);
-                                                    }
-                                                }
-                                            }}
-                                        />
-                                        {isExploding && <ConfettiExplosion />}
-                                    </>
-                                ) : (
-                                    <ThumbsUp className="text-gray-400" />
-                                )}
-                            </span>
-                        </FadeItem>
+                        <span className="inline-flex items-center -space-x-4">
+                            {getReactionCount().map((reaction, index) => (
+                                <FadeItem 
+                                    key={index} 
+                                    className={`
+                                        text-4xl rounded-full bg-white dark:bg-zinc-800 drop-shadow-lg py-1 flex items-center justify-center
+                                        ${reaction.total > 0 ? 'group' : 'grayscale'}
+                                        ${authHook?.user && 'cursor-pointer hover:bg-zinc-100'}
+                                    `}
+                                    onClick={() => handleReaction(reaction.type)}
+                                >
+                                    {REACTION[reaction.type]}
+                                    <span className="text-3xl opacity-0 group-hover:opacity-100 hidden group-hover:inline-block group-hover:mr-4 transition">
+                                        {reaction.total}
+                                    </span>
+                                </FadeItem>
+                            ))}
+                            {isExploding && <ConfettiExplosion />}
+                        </span>
                     </div>
                     <div className="flex w-full flex-col justify-center gap-2 sm:flex-row lg:justify-start">
                         <FadeItem>
@@ -223,25 +243,27 @@ const HeroCourse = ({
                             ))}
                         </div>
                     </section>
-                    <section className="py-12">
-                        <div className="text-center lg:text-left">
-                            <FadeItem>
-                                <h1 className="text-left text-3xl font-medium md:text-4xl">
-                                    Contenidos
-                                </h1>
-                            </FadeItem>
-                        </div>
-                        <div className="mx-auto flex flex-col">
-                            {course.contents.slice(0, 4).map((content, _) => (
-                                <FadeItem key={content.id}>
-                                    <p className="pt-6 text-muted-foreground lg:text-xl inline-flex">
-                                        <Check className="size-5 min-w-5 min-h-5 mr-1 mt-1" />
-                                        <span className="line-clamp-3">{content.description}</span>
-                                    </p>
+                    {course.contents.length > 0 && (
+                        <section className="py-12">
+                            <div className="text-center lg:text-left">
+                                <FadeItem>
+                                    <h1 className="text-left text-3xl font-medium md:text-4xl">
+                                        Contenidos
+                                    </h1>
                                 </FadeItem>
-                            ))}
-                        </div>
-                    </section>
+                            </div>
+                            <div className="mx-auto flex flex-col">
+                                {course.contents.slice(0, 4).map((content, _) => (
+                                    <FadeItem key={content.id}>
+                                        <p className="pt-6 text-muted-foreground lg:text-xl inline-flex">
+                                            <Check className="size-5 min-w-5 min-h-5 mr-1 mt-1" />
+                                            <span className="line-clamp-3">{content.description}</span>
+                                        </p>
+                                    </FadeItem>
+                                ))}
+                            </div>
+                        </section>
+                    )}
                 </div>
             </div>
         </section>

@@ -10,7 +10,7 @@ import com.api.flux.courseed.projections.dtos.UserDto;
 
 @Mapper(componentModel = "spring")
 public interface UserMapper {
-    @Mapping(target = "likes", ignore = true)
+    @Mapping(target = "reactions", ignore = true)
     @Mapping(target = "reviews", ignore = true)
     UserDto toUserDto(User user);
 

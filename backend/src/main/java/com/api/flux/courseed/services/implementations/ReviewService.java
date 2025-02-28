@@ -22,14 +22,14 @@ import org.springframework.stereotype.Service;
 import com.api.flux.courseed.persistence.documents.Category;
 import com.api.flux.courseed.persistence.documents.Content;
 import com.api.flux.courseed.persistence.documents.Institution;
-import com.api.flux.courseed.persistence.documents.Like;
+import com.api.flux.courseed.persistence.documents.Reaction;
 import com.api.flux.courseed.persistence.documents.Review;
 import com.api.flux.courseed.persistence.documents.User;
 import com.api.flux.courseed.persistence.repositories.CategoryRepository;
 import com.api.flux.courseed.persistence.repositories.ContentRepository;
 import com.api.flux.courseed.persistence.repositories.CourseRepository;
 import com.api.flux.courseed.persistence.repositories.InstitutionRepository;
-import com.api.flux.courseed.persistence.repositories.LikeRepository;
+import com.api.flux.courseed.persistence.repositories.ReactionRepository;
 import com.api.flux.courseed.persistence.repositories.ReviewRepository;
 import com.api.flux.courseed.persistence.repositories.UserRepository;
 import com.api.flux.courseed.projections.dtos.CourseDto;
@@ -43,7 +43,7 @@ import com.api.flux.courseed.projections.mappers.CategoryMapper;
 import com.api.flux.courseed.projections.mappers.ContentMapper;
 import com.api.flux.courseed.projections.mappers.CourseMapper;
 import com.api.flux.courseed.projections.mappers.InstitutionMapper;
-import com.api.flux.courseed.projections.mappers.LikeMapper;
+import com.api.flux.courseed.projections.mappers.ReactionMapper;
 import com.api.flux.courseed.projections.mappers.ReviewMapper;
 import com.api.flux.courseed.services.interfaces.InterfaceReviewService;
 import com.api.flux.courseed.services.interfaces.Roles;
@@ -61,13 +61,13 @@ public class ReviewService implements InterfaceReviewService {
     private CategoryRepository categoryRepository;
     private InstitutionRepository institutionRepository;
     private ContentRepository contentRepository;
-    private LikeRepository likeRepository;
+    private ReactionRepository reactionRepository;
     private ReviewMapper reviewMapper;
     private CourseMapper courseMapper;
     private CategoryMapper categoryMapper;
     private InstitutionMapper institutionMapper;
-    private LikeMapper likeMapper;
     private ContentMapper contentMapper;
+    private ReactionMapper reactionMapper;
 
     private final Map<String, String> MONTH_TRANSLATIONS = Map.ofEntries(
             Map.entry("January", "Enero"), Map.entry("February", "Febrero"),
@@ -79,23 +79,23 @@ public class ReviewService implements InterfaceReviewService {
 
     public ReviewService(
             ReviewRepository reviewRepository, UserRepository userRepository,
-            CourseRepository courseRepository, CategoryRepository categoryRepository,
+            CourseRepository courseRepository, CategoryRepository categoryRepository, ReactionRepository reactionRepository,
             InstitutionRepository institutionRepository, ContentRepository contentRepository,
-            LikeRepository likeRepository, ReviewMapper reviewMapper, CourseMapper courseMapper,
-            CategoryMapper categoryMapper, InstitutionMapper institutionMapper, LikeMapper likeMapper,
-            ContentMapper contentMapper) {
+            ReviewMapper reviewMapper, CourseMapper courseMapper,
+            CategoryMapper categoryMapper, InstitutionMapper institutionMapper,
+            ContentMapper contentMapper, ReactionMapper reactionMapper) {
         this.reviewRepository = reviewRepository;
         this.userRepository = userRepository;
         this.courseRepository = courseRepository;
         this.categoryRepository = categoryRepository;
         this.institutionRepository = institutionRepository;
         this.contentRepository = contentRepository;
-        this.likeRepository = likeRepository;
+        this.reactionRepository = reactionRepository;
         this.reviewMapper = reviewMapper;
         this.courseMapper = courseMapper;
         this.categoryMapper = categoryMapper;
         this.institutionMapper = institutionMapper;
-        this.likeMapper = likeMapper;
+        this.reactionMapper = reactionMapper;
         this.contentMapper = contentMapper;
     }
 
@@ -131,12 +131,12 @@ public class ReviewService implements InterfaceReviewService {
                                     Mono<Institution> institutionMono = institutionRepository
                                             .findById(course.getInstitutionId());
                                     Flux<Content> contentFlux = contentRepository.findByCourseId(course.getId());
-                                    Flux<Like> likeFlux = likeRepository.findByCourseId(course.getId());
                                     Flux<Review> reviewsFlux = reviewRepository.findByCourseId(course.getId());
+                                    Flux<Reaction> reactionFlux = reactionRepository.findByCourseId(course.getId());
 
                                     return Mono
                                             .zip(categoryMono, institutionMono, contentFlux.collectList(),
-                                                    likeFlux.collectList(), reviewsFlux.collectList())
+                                                    reactionFlux.collectList(), reviewsFlux.collectList())
                                             .map(tuple -> {
                                                 ReviewDto reviewDto = reviewMapper.toReviewDto(review);
                                                 CourseDto courseDto = courseMapper.toCourseDto(course);
@@ -146,8 +146,8 @@ public class ReviewService implements InterfaceReviewService {
                                                 courseDto.setContents(tuple.getT3().stream()
                                                         .map(contentMapper::toContentDto)
                                                         .toList());
-                                                courseDto.setLikes(tuple.getT4().stream()
-                                                        .map(likeMapper::toLikeDto)
+                                                courseDto.setReactions(tuple.getT4().stream()
+                                                        .map(reactionMapper::toReactionDto)
                                                         .toList());
                                                 courseDto.setReviews(tuple.getT5().stream()
                                                         .map(reviewMapper::toReviewDto)
@@ -209,12 +209,12 @@ public class ReviewService implements InterfaceReviewService {
                             Mono<Institution> institutionMono = institutionRepository
                                     .findById(course.getInstitutionId());
                             Flux<Content> contentFlux = contentRepository.findByCourseId(course.getId());
-                            Flux<Like> likeFlux = likeRepository.findByCourseId(course.getId());
+                            Flux<Reaction> reactionFlux = reactionRepository.findByCourseId(course.getId());
                             Flux<Review> reviewFlux = reviewRepository.findByCourseId(course.getId());
                             
                             return Mono
                                     .zip(categoryMono, institutionMono, contentFlux.collectList(),
-                                            likeFlux.collectList(), reviewFlux.collectList())
+                                            reactionFlux.collectList(), reviewFlux.collectList())
                                     .map(tuple -> {
                                         ReviewDto reviewDto = reviewMapper.toReviewDto(review);
                                         CourseDto courseDto = courseMapper.toCourseDto(course);
@@ -223,8 +223,8 @@ public class ReviewService implements InterfaceReviewService {
                                         courseDto.setContents(tuple.getT3().stream()
                                                 .map(contentMapper::toContentDto)
                                                 .toList());
-                                        courseDto.setLikes(tuple.getT4().stream()
-                                                .map(likeMapper::toLikeDto)
+                                        courseDto.setReactions(tuple.getT4().stream()
+                                                .map(reactionMapper::toReactionDto)
                                                 .toList());
                                         courseDto.setReviews(tuple.getT5().stream()
                                                 .map(reviewMapper::toReviewDto)
@@ -280,13 +280,13 @@ public class ReviewService implements InterfaceReviewService {
                                                         .findById(course.getInstitutionId());
                                                 Flux<Content> contentFlux = contentRepository
                                                         .findByCourseId(course.getId());
-                                                Flux<Like> likeFlux = likeRepository.findByCourseId(course.getId());
+                                                Flux<Reaction> reactionFlux = reactionRepository.findByCourseId(course.getId());
                                                 Flux<Review> reviewFlux = reviewRepository
                                                         .findByCourseId(course.getId());
 
                                                 return Mono
                                                         .zip(categoryMono, institutionMono, contentFlux.collectList(),
-                                                                likeFlux.collectList(), reviewFlux.collectList())
+                                                                reactionFlux.collectList(), reviewFlux.collectList())
                                                         .map(tuple -> {
                                                             ReviewDto reviewDto = reviewMapper.toReviewDto(review);
                                                             CourseDto courseDto = courseMapper.toCourseDto(course);
@@ -297,8 +297,8 @@ public class ReviewService implements InterfaceReviewService {
                                                             courseDto.setContents(tuple.getT3().stream()
                                                                     .map(contentMapper::toContentDto)
                                                                     .toList());
-                                                            courseDto.setLikes(tuple.getT4().stream()
-                                                                    .map(likeMapper::toLikeDto)
+                                                            courseDto.setReactions(tuple.getT4().stream()
+                                                                    .map(reactionMapper::toReactionDto)
                                                                     .toList());
                                                             courseDto.setReviews(tuple.getT5().stream()
                                                                     .map(reviewMapper::toReviewDto)
@@ -344,7 +344,7 @@ public class ReviewService implements InterfaceReviewService {
                                                             .findById(course.getInstitutionId());
                                                     Flux<Content> contentFlux = contentRepository
                                                             .findByCourseId(course.getId());
-                                                    Flux<Like> likeFlux = likeRepository.findByCourseId(course.getId());
+                                                    Flux<Reaction> reactionFlux = reactionRepository.findByCourseId(course.getId());
                                                     Flux<Review> reviewFlux = reviewRepository
                                                             .findByCourseId(course.getId());
                                                     Mono<User> userMono = userRepository
@@ -352,7 +352,7 @@ public class ReviewService implements InterfaceReviewService {
 
                                                     return Mono
                                                             .zip(categoryMono, institutionMono,
-                                                                    contentFlux.collectList(), likeFlux.collectList(),
+                                                                    contentFlux.collectList(), reactionFlux.collectList(),
                                                                     reviewFlux.collectList(), userMono)
                                                             .map(tuple -> {
                                                                 ReviewDto reviewDto = reviewMapper.toReviewDto(review);
@@ -364,8 +364,8 @@ public class ReviewService implements InterfaceReviewService {
                                                                 courseDto.setContents(tuple.getT3().stream()
                                                                         .map(contentMapper::toContentDto)
                                                                         .toList());
-                                                                courseDto.setLikes(tuple.getT4().stream()
-                                                                        .map(likeMapper::toLikeDto)
+                                                                courseDto.setReactions(tuple.getT4().stream()
+                                                                        .map(reactionMapper::toReactionDto)
                                                                         .toList());
                                                                 courseDto.setReviews(tuple.getT5().stream()
                                                                         .map(reviewMapper::toReviewDto)

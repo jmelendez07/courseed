@@ -1,16 +1,16 @@
 package com.api.flux.courseed.projections.dtos;
 
-public class CourseWithReviewsCountAndLikesCount {
+public class CourseWithReviewsCountAndReactionsCount {
     private String id;
     private String title;
     private Long totalReviews;
-    private Long totalLikes;
+    private Long totalReactions;
 
-    public CourseWithReviewsCountAndLikesCount(String id, String title, Long totalReviews, Long totalLikes) {
+    public CourseWithReviewsCountAndReactionsCount(String id, String title, Long totalReviews, Long totalReactions) {
         this.id = id;
         this.title = title;
         this.totalReviews = totalReviews;
-        this.totalLikes = totalLikes;
+        this.totalReactions = totalReactions;
     }
 
     public String getId() {
@@ -37,11 +37,11 @@ public class CourseWithReviewsCountAndLikesCount {
         this.totalReviews = totalReviews;
     }
 
-    public Long getTotalLikes() {
-        return totalLikes;
+    public Long getTotalReactions() {
+        return totalReactions;
     }
 
-    public void setTotalLikes(Long totalLikes) {
-        this.totalLikes = totalLikes;
-    }  
+    public void setTotalReactions(Long totalReactions) {
+        this.totalReactions = totalReactions;
+    }
 }

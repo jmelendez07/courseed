@@ -2,6 +2,7 @@ import CategoryInterface from "./category";
 import ContentInterface from "./content";
 import InstitutionInterface from "./institution";
 import LikeInterface from "./like";
+import ReactionInterface from "./reaction";
 import ReviewInterface from "./review";
 
 interface CourseInterface {
@@ -18,6 +19,7 @@ interface CourseInterface {
     institution: InstitutionInterface;
     contents: ContentInterface[];
     likes: LikeInterface[];
+    reactions: ReactionInterface[];
     reviews: ReviewInterface[];
 }
 

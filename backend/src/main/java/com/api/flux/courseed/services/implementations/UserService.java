@@ -16,10 +16,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.api.flux.courseed.persistence.documents.Like;
+import com.api.flux.courseed.persistence.documents.Reaction;
 import com.api.flux.courseed.persistence.documents.Review;
 import com.api.flux.courseed.persistence.documents.User;
-import com.api.flux.courseed.persistence.repositories.LikeRepository;
+import com.api.flux.courseed.persistence.repositories.ReactionRepository;
 import com.api.flux.courseed.persistence.repositories.ReviewRepository;
 import com.api.flux.courseed.persistence.repositories.UserRepository;
 import com.api.flux.courseed.projections.dtos.CreateUserDto;
@@ -44,10 +44,10 @@ public class UserService implements InterfaceUserService {
     private UserRepository userRepository;
 
     @Autowired
-    private LikeRepository likeRepository;
+    private ReviewRepository reviewRepository;
 
     @Autowired
-    private ReviewRepository reviewRepository;
+    private ReactionRepository reactionRepository;
 
     @Autowired
     private UserMapper userMapper;
@@ -73,13 +73,13 @@ public class UserService implements InterfaceUserService {
 
         return userRepository.findAllBy(pageable)
             .flatMap(user -> {
-                Flux<Like> likeFLux = likeRepository.findByUserId(user.getId());
+                Flux<Reaction> reactionFlux = reactionRepository.findByUserId(user.getId());
                 Flux<Review> reviewFlux = reviewRepository.findByUserId(user.getId());
 
-                return Mono.zip(likeFLux.collectList(), reviewFlux.collectList())
+                return Mono.zip(reactionFlux.collectList(), reviewFlux.collectList())
                     .map(tuple -> {
                         UserDto userDto = userMapper.toUserDto(user);
-                        userDto.setLikes(tuple.getT1().size());
+                        userDto.setReactions(tuple.getT1().size());
                         userDto.setReviews(tuple.getT2().size());
                         return userDto;
                     });

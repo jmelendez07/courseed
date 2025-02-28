@@ -31,8 +31,9 @@ function Course() {
                         handlePrimaryButton={() => {
                             if (BlogReviewsRef.current) BlogReviewsRef.current.scrollIntoView({ behavior: 'smooth' });
                         }}
-                        handleCreateLike={(like) => courseHook.handleCreateLike(like)}
-                        handleDeleteLike={(id) => courseHook.handleDeleteLike(id)}
+                        handleCreatedReaction={(reaction) => courseHook.handleCreatedReaction(reaction)}
+                        handleUpdatedReaction={(reaction) => courseHook.handleUpdatedReaction(reaction)}
+                        handleDeletedReaction={(id) => courseHook.handleDeletedReaction(id)}
                     />
                     <BlogReviews
                         ref={BlogReviewsRef}

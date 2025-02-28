@@ -6,13 +6,14 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-@Document(collection = "likes")
-public class Like {
+@Document(collection = "reactions")
+public class Reaction {
     
     @Id
     private String id;
     private String userId;
     private String courseId;
+    private String type;
 
     @CreatedDate
     private LocalDateTime createdAt;
@@ -48,4 +49,13 @@ public class Like {
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+    
 }

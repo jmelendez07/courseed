@@ -10,10 +10,10 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.api.flux.courseed.persistence.documents.Like;
+import com.api.flux.courseed.persistence.documents.Reaction;
 import com.api.flux.courseed.persistence.documents.Review;
 import com.api.flux.courseed.persistence.documents.User;
-import com.api.flux.courseed.persistence.repositories.LikeRepository;
+import com.api.flux.courseed.persistence.repositories.ReactionRepository;
 import com.api.flux.courseed.persistence.repositories.ReviewRepository;
 import com.api.flux.courseed.persistence.repositories.UserRepository;
 import com.api.flux.courseed.projections.dtos.LoginUserDto;
@@ -40,10 +40,10 @@ public class AuthService implements InterfaceAuthService {
     private ReviewRepository reviewRepository;
 
     @Autowired
-    private LikeRepository likeRepository;
+    private UserMapper userMapper;
 
     @Autowired
-    private UserMapper userMapper;
+    private ReactionRepository reactionRepository;
 
     @Autowired
     private ReactiveAuthenticationManager reactiveAuthenticationManager;
@@ -59,13 +59,13 @@ public class AuthService implements InterfaceAuthService {
         return userRepository.findByEmail(principal.getName())
             .flatMap(user -> {
                 Flux<Review> reviewFlux = reviewRepository.findByUserId(user.getId());
-                Flux<Like> likeFlux = likeRepository.findByUserId(user.getId());
+                Flux<Reaction> reactionFlux = reactionRepository.findByCourseId(user.getId());
 
-                return Mono.zip(reviewFlux.collectList(), likeFlux.collectList())
+                return Mono.zip(reviewFlux.collectList(), reactionFlux.collectList())
                     .map(tuple -> {
                         UserDto userDto = userMapper.toUserDto(user);
                         userDto.setReviews(tuple.getT1().size());
-                        userDto.setLikes(tuple.getT2().size());
+                        userDto.setReactions(tuple.getT2().size());
 
                         return userDto;
                     });
