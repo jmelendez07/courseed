@@ -1,4 +1,4 @@
-import { Star, TrendingDown, TrendingUp } from "lucide-react";
+import { Star, TrendingDown } from "lucide-react";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "./ui/card";
 import { Button } from "./ui/button";
 
@@ -23,7 +23,7 @@ function DashboardReports() {
                         color: "text-orange-500",
                     },
                 ].map((report, i) => (
-                    <Card key={i}>
+                    <Card key={i} className="hover:shadow-lg transition-shadow duration-300">
                         <CardHeader className="flex flex-row items-center gap-2">
                             <report.icon className={`h-5 w-5 ${report.color}`} />
                             <CardTitle className="text-base">{report.title}</CardTitle>

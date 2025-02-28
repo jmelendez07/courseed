@@ -39,6 +39,7 @@ import { useAuth } from "@/providers/AuthProvider";
 import UpdateUserForm from "./update-user-form";
 import { DialogContext } from "@/providers/DialogProvider";
 import DeleteUserForm from "./delete-user-form";
+import { Avatar, AvatarFallback } from "./ui/avatar";
 
 function UserDataTable() {
 	const userHook = useUsers({ replaceUsers: true });
@@ -59,6 +60,17 @@ function UserDataTable() {
 					</Button>
 				)
 			},
+			cell: ({ row }) => {
+				const email: string = row.getValue('email');
+				return (
+					<div className="flex items-center gap-2 pl-3.5">
+						<Avatar>
+							<AvatarFallback>{email.slice(0, 2).toUpperCase()}</AvatarFallback>
+						</Avatar>
+						<p>{email}</p>
+					</div>
+				);
+			}
 		},
 		{
 			accessorKey: "roles",
@@ -88,7 +100,7 @@ function UserDataTable() {
 			cell: ({ row }) => {
 				const reviews = parseFloat(row.getValue("reviews"))
 	
-				return <div className="flex items-center">
+				return <div className="flex items-center pl-3.5">
 					{reviews}
 					<MessageSquareText className="ml-2 h-4 w-4" />
 				</div>
@@ -110,7 +122,7 @@ function UserDataTable() {
 			cell: ({ row }) => {
 				const likes = parseFloat(row.getValue("likes"));
 	
-				return <div className="flex items-center">
+				return <div className="flex items-center pl-3.5">
 					{likes}
 					<Heart className="ml-2 h-4 w-4" />
 				</div>
@@ -133,7 +145,11 @@ function UserDataTable() {
 				const createdAt: string = row.getValue("createdAt");
 				const formatedCreatedAt: string = dayjs(createdAt).format("LLLL");
 	
-				return formatedCreatedAt.charAt(0).toUpperCase() + formatedCreatedAt.slice(1);
+				return (
+					<p className="pl-3.5">
+						{formatedCreatedAt.charAt(0).toUpperCase() + formatedCreatedAt.slice(1)}
+					</p>
+				)
 			}
 		},
 		{
@@ -205,7 +221,10 @@ function UserDataTable() {
 
 	return (
 		<div className="w-full">
-			<div className="flex items-center py-4">
+			<div className="flex items-center pb-4 flex-col gap-2 sm:flex-row sm:justify-between">
+				<div className="flex items-center">
+					<h2 className="text-xl font-semibold">Gestion de Usuarios</h2>
+				</div>
 				<Input
 					placeholder="Buscar por correo electronico..."
 					value={(table.getColumn("email")?.getFilterValue() as string) ?? ""}
@@ -247,7 +266,7 @@ function UserDataTable() {
 									data-state={row.getIsSelected() && "selected"}
 								>
 									{row.getVisibleCells().map((cell) => (
-										<TableCell key={cell.id}>
+										<TableCell key={cell.id} className="py-5">
 											{flexRender(cell.column.columnDef.cell, cell.getContext())}
 										</TableCell>
 									))}

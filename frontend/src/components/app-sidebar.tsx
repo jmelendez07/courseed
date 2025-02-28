@@ -30,7 +30,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 	const authHook = useAuth();
 
 	const isAdmin = (): boolean | undefined => {
-		return authHook?.user?.roles.some(r => r === ROLES.ADMIN);
+		return authHook?.user?.roles?.some(r => r === ROLES.ADMIN);
 	}
 
 	const userForm = {
@@ -41,8 +41,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 	}
 
 	const courseForm = {
-		title: "Crea un Nuevo Curso",
-		description: "Añade un nuevo curso a la plataforma con su titulo, precio, duración...",
+		title: "Crea un Nuevo Programa",
+		description: "Añade un nuevo programa a la plataforma con su titulo, precio, duración...",
 		open: true,
 		dialogChildren: <CourseForm />
 	}
@@ -55,7 +55,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 				action: () => dialogContext?.setContext(userForm)
 			},
 			{
-				name: "Nueva Educación Continuada",
+				name: "Nuevo Programa",
 				logo: GraduationCap,
 				action: () => dialogContext?.setContext(courseForm)
 			},
@@ -81,7 +81,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 				],
 			},
 			{
-				title: "Educación Continuada",
+				title: "Educación Continua",
 				icon: GraduationCap,
 				items: [
 					{
@@ -128,7 +128,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 			<SidebarHeader>
 				<TeamSwitcher 
 					teams={isAdmin() ? dataAdmin.actions : dataUser.actions} 
-					roles={authHook?.user ? authHook.user.roles : []}
+					roles={authHook?.user?.roles ? authHook.user.roles : []}
 				/>
 			</SidebarHeader>
 			<SidebarContent>

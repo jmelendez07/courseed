@@ -28,21 +28,27 @@ function DashboardChartReviews() {
     }, []);
 
     return (
-        <div className="grid auto-rows-min gap-4 md:grid-cols-3">
-            <LineChart 
-                title="Reseñas Recibidas Mensualmente (Último Semestre) 📅"
-                description={dayjs().format("MMM - MMMM YYYY")}
-                className="md:col-span-2"
-                labelValueToolTip="Reseñas"
-                chartData={monthsWithReviewsCount.map(m => ({ month: m.month + " - " + m.year, count: m.count }))}
-            />
-            <BarChartHorizontal 
-                title={`Top ${coursesWithRatingAvg.length} Cursos con Mejores Reseñas 🏆`}
-                description="Estos son los cursos más valorados por su calidad, contenido y enseñanza."
-                labelValueToolTip="Calificación"
-                chartData={coursesWithRatingAvg.sort((a, b) => (a.avgRating > b.avgRating ? -1 : 1)).map(c => ({ label: c.title, value: c.avgRating }))}
-            />
-        </div>
+        <>
+            <div>
+                <h1 className="text-3xl font-bold tracking-tight">Panel de Reseñas</h1>
+                <p className="text-muted-foreground">Analiza reseñas y mejora la calidad del contenido.</p>
+            </div>
+            <div className="grid auto-rows-min gap-4 md:grid-cols-3">
+                <LineChart
+                    title="Reseñas Recibidas Mensualmente (Último Semestre) 📅"
+                    description={dayjs().format("MMM - MMMM YYYY")}
+                    className="md:col-span-2"
+                    labelValueToolTip="Reseñas"
+                    chartData={monthsWithReviewsCount.map(m => ({ month: m.month + " - " + m.year, count: m.count }))}
+                />
+                <BarChartHorizontal
+                    title={`Top ${coursesWithRatingAvg.length} Cursos con Mejores Reseñas 🏆`}
+                    description="Estos son los cursos más valorados por su calidad, contenido y enseñanza."
+                    labelValueToolTip="Calificación"
+                    chartData={coursesWithRatingAvg.sort((a, b) => (a.avgRating > b.avgRating ? -1 : 1)).map(c => ({ label: c.title, value: c.avgRating }))}
+                />
+            </div>
+        </>
     );
 }
 

@@ -1,4 +1,6 @@
 import { AppSidebar } from "@/components/app-sidebar";
+import DashboardCourseOferts from "@/components/dashboard-courses-oferts";
+import DashboardRecomendedCourses from "@/components/dashboard-recomended-courses";
 import {
     Breadcrumb,
     BreadcrumbItem,
@@ -15,8 +17,21 @@ import {
     SidebarTrigger,
 } from "@/components/ui/sidebar";
 import Theme from "@/components/ui/theme";
+import { useAuth } from "@/providers/AuthProvider";
+import React from "react";
 
 function Dashboard() {
+
+    const authHook = useAuth();
+
+    const getName = React.useCallback(() => {
+        const name = authHook?.user?.email.split('@')[0].replace(".", " ");
+        if (name) {
+            return name.charAt(0).toUpperCase() + name.slice(1);
+        }
+        return '';
+    }, [authHook?.user?.email]);
+
     return (
         <SidebarProvider>
             <AppSidebar />
@@ -45,12 +60,12 @@ function Dashboard() {
                     </div>
                 </header>
                 <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
-                    <div className="grid auto-rows-min gap-4 md:grid-cols-3">
-                        <div className="aspect-video rounded-xl bg-zinc-100/50 dark:bg-zinc-800/50" />
-                        <div className="aspect-video rounded-xl bg-zinc-100/50 dark:bg-zinc-800/50" />
-                        <div className="aspect-video rounded-xl bg-zinc-100/50 dark:bg-zinc-800/50" />
+                    <div>
+                        <h1 className="text-3xl font-bold tracking-tight">Bienvenid@, {getName()}</h1>
+                        <p className="text-muted-foreground">Continúa aprendiendo donde lo dejaste</p>
                     </div>
-                    <div className="min-h-[100vh] flex-1 rounded-xl bg-zinc-100/50 md:min-h-min dark:bg-zinc-800/50" />
+                    <DashboardRecomendedCourses />
+                    <DashboardCourseOferts />
                 </div>
             </SidebarInset>
         </SidebarProvider>

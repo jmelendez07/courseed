@@ -37,10 +37,10 @@ function DashboardStats() {
         <>
             <div>
                 <h1 className="text-3xl font-bold tracking-tight">Panel de Administración</h1>
-                <p className="text-muted-foreground">Gestiona cursos, usuarios y reseñas</p>
+                <p className="text-muted-foreground">Gestiona programas, usuarios y reseñas</p>
             </div>
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-                <Card>
+                <Card className="hover:shadow-lg transition-shadow duration-300">
                     <CardHeader className="flex flex-row items-center justify-between pb-2">
                         <CardTitle className="text-sm font-medium">Usuarios</CardTitle>
                         <Users className={`h-4 w-4 text-blue-500`} />
@@ -55,7 +55,7 @@ function DashboardStats() {
                         </p>
                     </CardContent>
                 </Card>
-                <Card>
+                <Card className="hover:shadow-lg transition-shadow duration-300">
                     <CardHeader className="flex flex-row items-center justify-between pb-2">
                         <CardTitle className="text-sm font-medium">Reseñas</CardTitle>
                         <Star className={`h-4 w-4 text-yellow-500`} />
@@ -70,7 +70,7 @@ function DashboardStats() {
                         </p>
                     </CardContent>
                 </Card>
-                <Card>
+                <Card className="hover:shadow-lg transition-shadow duration-300">
                     <CardHeader className="flex flex-row items-center justify-between pb-2">
                         <CardTitle className="text-sm font-medium">Reacciones</CardTitle>
                         <ThumbsUp className={`h-4 w-4 text-purple-500`} />
@@ -85,7 +85,7 @@ function DashboardStats() {
                         </p>
                     </CardContent>
                 </Card>
-                <Card>
+                <Card className="hover:shadow-lg transition-shadow duration-300">
                     <CardHeader className="flex flex-row items-center justify-between pb-2">
                         <CardTitle className="text-sm font-medium">Visitas</CardTitle>
                         <Eye className={`h-4 w-4 text-green-500`} />

@@ -1,21 +1,53 @@
-import { Badge } from "./ui/badge";
+import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { ScrollArea } from "./ui/scroll-area";
+import InstitutionsWithCoursesCount from "@/interfaces/institutions-with-courses-count";
+import axios, { AxiosResponse } from "axios";
+import APIS from "@/enums/apis";
+import { Link } from "react-router-dom";
+import { ArrowUpRight } from "lucide-react";
 
 function DashboardMap() {
+    const mapRef = React.useRef<HTMLDivElement | null>(null);
+    const [mapHeight, setMapHeight] = React.useState<number>(0);
+    const [institutions, setInstitutions] = React.useState<InstitutionsWithCoursesCount[]>([]);
 
+    React.useEffect(() => {
+		axios.get(APIS.INSTITUTIONS_COURSES_COUNT, {
+			params: { page: 0, size: 10 }
+		})
+			.then((response: AxiosResponse<InstitutionsWithCoursesCount[]>) => {
+				setInstitutions(response.data);
+			})
+			.catch(() => {
+				setInstitutions([]);
+			})
+	}, []);
 
+    React.useEffect(() => {
+        const observer = new ResizeObserver(entries => {
+            if (entries[0]) {
+                setMapHeight(entries[0].contentRect.height);
+            }
+        });
+
+        if (mapRef.current) {
+            observer.observe(mapRef.current);
+        }
+
+        return () => observer.disconnect();
+    }, []);
 
     return (
         <>
             <div className="flex items-center">
-                <h2 className="text-xl font-semibold">Distribución Geográfica de Usuarios</h2>
+                <h2 className="text-xl font-semibold">Distribución Geográfica de Instituciones</h2>
             </div>
             <div className="grid grid-cols-1 xl:grid-cols-4 max-h-full xl:grid-rows-1 gap-4 items-start">
-                <Card className="xl:col-span-3">
+                <Card ref={mapRef} className="xl:col-span-3 hover:shadow-lg transition-shadow duration-300">
                     <CardContent className="p-0">
                         <div className="relative aspect-[16/9] w-full overflow-hidden rounded-lg">
-                            <div className="absolute inset-0 bg-gray-200" />
+                            <div className="absolute inset-0 " />
                             <div className="hidden md:block absolute bottom-4 left-4 right-4">
                                 <div className="grid grid-cols-5 gap-2">
                                     {[
@@ -42,91 +74,31 @@ function DashboardMap() {
                         </div>
                     </CardContent>
                 </Card>
-                <div className="">
-                    <div className="pb-4 md:p-4">
-                        <h3 className="text-xl font-semibold">Cursos por Institución</h3>
-                        <p className="text-base">Total de cursos activos</p>
+                <div 
+                    style={{ height: mapHeight }} 
+                    className="min-h-[600px] xl:min-h-0 xl:h-auto xl:max-h-full flex flex-col"
+                >
+                    <div className="pb-4">
+                        <h3 className="text-xl font-semibold">Programas por Institución</h3>
+                        <p className="text-base">Total de Programas activos</p>
                     </div>
-                    <div className="p-0">
-                        <ScrollArea className="h-[20rem]">
-                            <div className="space-y-2 md:p-4">
-                                {[
-                                    {
-                                        institution: "Universidad de Stanford",
-                                        courses: 156,
-                                        trend: "+12%",
-                                    },
-                                    {
-                                        institution: "MIT",
-                                        courses: 143,
-                                        trend: "+8%",
-                                    },
-                                    {
-                                        institution: "Harvard University",
-                                        courses: 128,
-                                        trend: "+5%",
-                                    },
-                                    {
-                                        institution: "Universidad de Barcelona",
-                                        courses: 98,
-                                        trend: "+15%",
-                                    },
-                                    {
-                                        institution: "Universidad de São Paulo",
-                                        courses: 87,
-                                        trend: "+10%",
-                                    },
-                                    {
-                                        institution: "Universidad de Tokyo",
-                                        courses: 76,
-                                        trend: "+7%",
-                                    },
-                                    {
-                                        institution: "Universidad de Oxford",
-                                        courses: 72,
-                                        trend: "+4%",
-                                    },
-                                    {
-                                        institution: "ETH Zürich",
-                                        courses: 68,
-                                        trend: "+6%",
-                                    },
-                                    {
-                                        institution: "Universidad de Melbourne",
-                                        courses: 64,
-                                        trend: "+9%",
-                                    },
-                                    {
-                                        institution: "Universidad de Cape Town",
-                                        courses: 52,
-                                        trend: "+11%",
-                                    },
-                                    {
-                                        institution: "Universidad Nacional Autónoma de México",
-                                        courses: 48,
-                                        trend: "+13%",
-                                    },
-                                    {
-                                        institution: "Tsinghua University",
-                                        courses: 45,
-                                        trend: "+8%",
-                                    },
-                                ].map((item, i) => (
-                                    <div
+                    <div className="flex-1 overflow-auto">
+                        <ScrollArea className="h-full">
+                            <div className="space-y-2">
+                                {institutions.map((institution, i) => (
+                                    <Link to={`/educacion?institucion=${institution.id}`}
                                         key={i}
-                                        className="flex items-center justify-between rounded-lg border p-3 hover:bg-muted/50 dark:border-zinc-800"
+                                        className="
+                                            flex items-center justify-between rounded-lg border p-3 hover:bg-muted/50 dark:border-zinc-800
+                                            hover:shadow-lg transition-shadow duration-300 group cursor-pointer
+                                        "
                                     >
                                         <div className="space-y-1">
-                                            <p className="font-medium">{item.institution}</p>
-                                            <p className="text-sm text-muted-foreground">{item.courses} cursos</p>
+                                            <p className="font-medium">{institution.name}</p>
+                                            <p className="text-sm text-muted-foreground">{institution.totalCourses} programas</p>
                                         </div>
-                                        <Badge
-                                            variant="outline"
-                                            className={item.trend.startsWith("+") ? "text-green-500" : "text-red-500"}
-                                        >
-                                            {item.trend}
-                                        </Badge>
-                                    </div>
+                                        <ArrowUpRight className="size-5 min-w-5 ml-1 transition-transform group-hover:translate-x-1" />
+                                    </Link>
                                 ))}
                             </div>
                         </ScrollArea>

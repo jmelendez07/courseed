@@ -18,6 +18,9 @@ function DashboardContentReviews({ className }: { className?: string }) {
 
     return (
         <div className={`flex flex-col gap-4 ${className}`}>
+            <div className="flex items-center">
+                <h2 className="text-xl font-semibold">Gestion de Reseñas</h2>
+            </div>
             <div className="grid grid-cols-1 items-center md:grid-cols-[1fr,auto] gap-x-4">
                 <form
                     onSubmit={e => {
@@ -29,7 +32,7 @@ function DashboardContentReviews({ className }: { className?: string }) {
                         });
                         reviewHook.handleFetch();
                     }}
-                    className="flex items-center py-4 gap-2"
+                    className="flex items-center gap-2"
                 >
                     <Input
                         type="text"

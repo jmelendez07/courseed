@@ -40,39 +40,46 @@ function DashboardChartCourses() {
 	}, []);
 
 	const colorHook = React.useContext(ColorContext);
-    const fullConfig = resolveConfig(tailwindConfig);
-    function getTailwindColor(color: string, shade: number = 600): string {
-        const colors = fullConfig.theme?.colors as Record<string, any>;
-        if (colors[color]) {
-          return typeof colors[color] === "string" ? colors[color] : colors[color]?.[shade] || null;
-        }
-        return "oklch(0.588 0.158 241.966)";
-    }
+	const fullConfig = resolveConfig(tailwindConfig);
+	function getTailwindColor(color: string, shade: number = 600): string {
+		const colors = fullConfig.theme?.colors as Record<string, any>;
+		if (colors[color]) {
+			return typeof colors[color] === "string" ? colors[color] : colors[color]?.[shade] || null;
+		}
+		return "oklch(0.588 0.158 241.966)";
+	}
 
 	return (
-		<div className="grid gap-4 md:grid-cols-3">
-			<BarChart 
-				className="md:col-span-2" 
-				title={`Top ${coursesSize} Educaciones continuas con Mayor Interacción 📚`}
-				description="Esta gráfica muestra el ranking de cursos según el número de likes y reseñas recibidos."
-				chartData={courses.map((course) => ({
-					label: course.title,
-					bar1: course.totalReviews,
-					bar2: course.totalLikes
-				}))}
-				labelBar1="Reseñas"
-				labelBar2="Likes"
-			/>
-			<PieChart
-				title={`Top ${institutionsSize} Instituciones con Mayor Oferta Académica 🎓`}
-				description="Esta gráfica muestra las 5 instituciones con el mayor número de cursos disponibles."
-				chartData={institutions.map((institution, index) => ({
-					label: institution.name,
-					value: institution.totalCourses,
-					fill: getTailwindColor(colorHook ? colorHook.color : "sky", tailwindShades[index] || 100),
-				}))}
-			/>
-		</div>
+		<>
+			<div>
+				<h1 className="text-3xl font-bold tracking-tight">Panel de Educación Continua</h1>
+				<p className="text-muted-foreground">Administra tus programas – Crea, edita y organiza contenido fácilmente.</p>
+			</div>
+			<div className="grid gap-4 md:grid-cols-3">
+				<BarChart
+					className="md:col-span-2"
+					title={`Top ${coursesSize} Educaciones continuas con Mayor Interacción 📚`}
+					description="Esta gráfica muestra el ranking de cursos según el número de likes y reseñas recibidos."
+					chartData={courses.map((course) => ({
+						label: course.title,
+						bar1: course.totalReviews,
+						bar2: course.totalLikes
+					}))}
+					labelBar1="Reseñas"
+					labelBar2="Likes"
+				/>
+				<PieChart
+					title={`Top ${institutionsSize} Instituciones con Mayor Oferta Académica 🎓`}
+					description="Esta gráfica muestra las 5 instituciones con el mayor número de cursos disponibles."
+					chartData={institutions.map((institution, index) => ({
+						label: institution.name,
+						value: institution.totalCourses,
+						fill: getTailwindColor(colorHook ? colorHook.color : "sky", tailwindShades[index] || 100),
+					}))}
+				/>
+			</div>
+		</>
+
 	);
 }
 

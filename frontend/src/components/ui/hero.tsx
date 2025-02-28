@@ -25,7 +25,7 @@ let easeing = [0.6, -0.05, 0.01, 0.99];
 const stagger = {
     animate: {
         transition: {
-            delayChildren: 0.4,
+            delayChildren: 0.1,
             staggerChildren: 0.2,
             staggerDirection: 1
         }
