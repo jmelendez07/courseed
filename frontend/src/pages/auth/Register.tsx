@@ -1,5 +1,5 @@
 import { RegisterForm } from "@/components/register-form";
-import RegisterDraw from "@/components/ui/RegisterDraw";
+import RegisterDraw from "@/components/draws/RegisterDraw";
 import { Link } from "react-router-dom";
 
 function Register() {

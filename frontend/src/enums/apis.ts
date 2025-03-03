@@ -24,16 +24,22 @@ enum APIS {
     INSTITUTIONS_COURSES_COUNT = 'api/institutions/courses/count',
     REVIEWS = 'api/reviews',
     REVIEWS_TOTAL = 'api/reviews/total/this-month',
+    REVIEWS_TOTAL_NEGATIVE = 'api/reviews/total/negative',
     REVIEWS_BY_AUTH_USER = 'api/reviews/auth', 
     REVIEWS_COUNT_BY_MONTH = 'api/reviews/months/count',
     REVIEWS_CREATE = 'api/reviews',
     REVIEWS_UPDATE = 'api/reviews/',
     REVIEWS_DELETE = 'api/reviews/',
+    REACTIONS_BY_AUTH_USER = 'api/reactions/auth',
+    REACTIONS_TOTAL = 'api/reactions/total/this-month',
     REACTION_CREATE = 'api/reactions',
     REACTION_UPDATE = 'api/reactions',
     REACTION_DELETE = 'api/reactions/',
     FACULTIES = 'api/categories',
     ROLES_WITH_USERS_COUNT = 'api/roles/users/count',
+    VIEWS_CREATE = 'api/views/create',
+    VIEWS_BY_AUTH_USER = 'api/views/auth',
+    VIEWS_TOTAL = 'api/views/total/this-month',
 }
 
 export default APIS;

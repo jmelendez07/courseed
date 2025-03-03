@@ -4,8 +4,9 @@ import React from "react";
 import axios, { AxiosResponse } from "axios";
 import APIS from "@/enums/apis";
 import ReviewCourseUserInterface from "@/interfaces/review-course-user";
-import LikeWithCourseUser from "@/interfaces/like-with-course-user";
 import { Button } from "./ui/button";
+import ViewInterface from "@/interfaces/view";
+import { Link } from "react-router-dom";
 
 interface ResponseReviewProps {
     content: ReviewCourseUserInterface[];
@@ -13,7 +14,7 @@ interface ResponseReviewProps {
 
 function DashboardStatsProfile() {
     const [reviews, setReviews] = React.useState<ReviewCourseUserInterface[]>([]);
-    const [likes, setLikes] = React.useState<LikeWithCourseUser[]>([]);
+    const [views, setViews] = React.useState<ViewInterface[]>([]);
 
     React.useEffect(() => {
         axios.get(APIS.REVIEWS_BY_AUTH_USER, {
@@ -29,16 +30,16 @@ function DashboardStatsProfile() {
     }, []);
 
     React.useEffect(() => {
-        axios.get(APIS.LIKES_BY_AUTH_USER, {
+        axios.get(APIS.VIEWS_BY_AUTH_USER, {
             params: {
                 page: 0,
                 size: 4
             }
         })
-            .then((response: AxiosResponse<{ content: LikeWithCourseUser[] }>) => {
-                setLikes(response.data.content);
+            .then((response: AxiosResponse<{ content: ViewInterface[] }>) => {
+                setViews(response.data.content);
             })
-            .catch(() => setLikes([]));
+            .catch(() => setViews([]));
     }, []);
 
     return (
@@ -46,7 +47,7 @@ function DashboardStatsProfile() {
             <Card className="hover:shadow-lg transition-shadow duration-300">
                 <CardHeader>
                     <CardTitle className="flex items-center">
-                        Últimos Cursos Reseñados
+                        Últimos Programas Reseñados
                         <CalendarDays className="ml-2 h-4 w-4 min-w-4" />
                     </CardTitle>
                 </CardHeader>
@@ -66,18 +67,17 @@ function DashboardStatsProfile() {
                                     </p>
                                 </div>
                                 <Button asChild size="sm">
-                                    <a
-                                        href={`/educacion/${review.course.id}`}
-                                        target="_blank"
+                                    <Link
+                                        to={`/educacion/${review.course.id}`}
                                         className="px-[0.5rem] rounded transition-transform group-hover:translate-x-1"
                                     >
                                         <ArrowUpRight className="size-4" />
-                                    </a>
+                                    </Link>
                                 </Button>
                             </li>
                         )) : (
                             <div className="w-full flex items-center justify-center h-64 overflow-hidden">
-                                <p className="text-gray-600">No hay cursos reseñados</p>
+                                <p className="text-gray-600">No hay programas reseñados</p>
                             </div>
                         )}
                     </ul>
@@ -86,13 +86,13 @@ function DashboardStatsProfile() {
             <Card className="hover:shadow-lg transition-shadow duration-300">
                 <CardHeader>
                     <CardTitle className="flex items-center">
-                        Últimos Cursos Likeados
+                        Últimos Programas Visitados
                         <CalendarDays className="ml-2 h-4 w-4 min-w-4" />
                     </CardTitle>
                 </CardHeader>
                 <CardContent>
                     <ul className="space-y-6">
-                        {likes.length > 0 ? likes.map((like) => (
+                        {views.length > 0 ? views.map((like) => (
                             <li key={like.id} className="flex justify-between items-center gap-2 group">
                                 <div className="flex items-center gap-2 flex-1">
                                     <img
@@ -106,18 +106,17 @@ function DashboardStatsProfile() {
                                     </p>
                                 </div>
                                 <Button asChild size="sm">
-                                    <a
-                                        href={`/educacion/${like.course.id}`}
-                                        target="_blank"
+                                    <Link
+                                        to={`/educacion/${like.course.id}`}
                                         className="px-[0.5rem] rounded transition-transform group-hover:translate-x-1"
                                     >
                                         <ArrowUpRight className="size-4" />
-                                    </a>
+                                    </Link>
                                 </Button>
                             </li>
                         )) : (
                             <div className="w-full flex items-center justify-center h-64 overflow-hidden">
-                                <p className="text-gray-600">No hay cursos con me gusta</p>
+                                <p className="text-gray-600">No hay programas visitados</p>
                             </div>
                         )}
                     </ul>

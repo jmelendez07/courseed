@@ -1,6 +1,8 @@
 package com.api.flux.courseed.services.implementations;
 
 import java.security.Principal;
+import java.time.LocalDateTime;
+import java.time.temporal.TemporalAdjusters;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -9,13 +11,21 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import com.api.flux.courseed.persistence.documents.Category;
+import com.api.flux.courseed.persistence.documents.Institution;
 import com.api.flux.courseed.persistence.documents.Reaction;
+import com.api.flux.courseed.persistence.repositories.CategoryRepository;
 import com.api.flux.courseed.persistence.repositories.CourseRepository;
+import com.api.flux.courseed.persistence.repositories.InstitutionRepository;
 import com.api.flux.courseed.persistence.repositories.ReactionRepository;
 import com.api.flux.courseed.persistence.repositories.UserRepository;
+import com.api.flux.courseed.projections.dtos.CourseDto;
 import com.api.flux.courseed.projections.dtos.ReactionDto;
 import com.api.flux.courseed.projections.dtos.SaveReactionDto;
+import com.api.flux.courseed.projections.dtos.TotalReactionsDto;
+import com.api.flux.courseed.projections.mappers.CategoryMapper;
 import com.api.flux.courseed.projections.mappers.CourseMapper;
+import com.api.flux.courseed.projections.mappers.InstitutionMapper;
 import com.api.flux.courseed.projections.mappers.ReactionMapper;
 import com.api.flux.courseed.projections.mappers.UserMapper;
 import com.api.flux.courseed.services.interfaces.InterfaceReactionService;
@@ -39,10 +49,22 @@ public class ReactionService implements InterfaceReactionService {
     private CourseRepository courseRepository;
 
     @Autowired
+    private InstitutionRepository institutionRepository;
+
+    @Autowired
+    private CategoryRepository categoryRepository;
+
+    @Autowired
     private CourseMapper courseMapper;
 
     @Autowired
     private UserMapper userMapper;
+
+    @Autowired
+    private InstitutionMapper institutionMapper;
+
+    @Autowired
+    private CategoryMapper categoryMapper;
 
     @Override
     public Mono<Page<ReactionDto>> findReactionsByCourseId(String courseId, int page, int size) {
@@ -64,7 +86,7 @@ public class ReactionService implements InterfaceReactionService {
                         new CustomWebExchangeBindException(
                             saveReactionDto.getCourseId(), 
                             "courseId",
-                            "¡Genial que reacciones al curso! Ten en cuenta que solo se permite una reacción por usuario."
+                            "¡Genial que reacciones al programa! Ten en cuenta que solo se permite una reacción por usuario."
                         ).getWebExchangeBindException()
                     ))
                     .switchIfEmpty(Mono.defer(() -> {
@@ -170,6 +192,51 @@ public class ReactionService implements InterfaceReactionService {
                     "Parece que el usuario autenticado no se encuentra en el sistema. Te recomendamos cerrar sesión y volver a ingresar."
                 ).getWebExchangeBindException()
             ));
+    }
+
+    @Override
+    public Mono<Page<ReactionDto>> findReactionsByAuthUser(Principal principal, String type, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+
+        return userRepository.findByEmail(principal.getName())
+            .flatMap(user -> reactionRepository.findByUserIdAndTypeContaining(user.getId(), type, pageable)
+                .flatMap(reaction -> {
+                    Mono<CourseDto> courseMono = courseRepository.findById(reaction.getCourseId())
+                        .flatMap(course -> {
+                            Mono<Category> categoryMono = categoryRepository.findById(course.getCategoryId());
+                            Mono<Institution> institutionMono = institutionRepository.findById(course.getInstitutionId());
+
+                            return Mono.zip(categoryMono, institutionMono)
+                                .map(tuple -> {
+                                    CourseDto courseDto = courseMapper.toCourseDto(course);
+                                    courseDto.setCategory(categoryMapper.toCategoryDto(tuple.getT1()));
+                                    courseDto.setInstitution(institutionMapper.toInstitutionDto(tuple.getT2()));
+
+                                    return courseDto;
+                                });
+                        });
+
+                    return courseMono.map(courseDto -> {
+                            ReactionDto reactionDto = reactionMapper.toReactionDto(reaction);
+                            reactionDto.setCourse(courseDto);
+                            return reactionDto;
+                        });
+                })
+                .collectList()
+                .zipWith(reactionRepository.count())
+                .map(p -> new PageImpl<>(p.getT1(), pageable, p.getT2())));
+    }
+
+    @Override
+    public Mono<TotalReactionsDto> getTotalReactions() {
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime startOfMonth = now.with(TemporalAdjusters.firstDayOfMonth()).withHour(0).withMinute(0).withSecond(0).withNano(0);
+        LocalDateTime endOfMonth = now.with(TemporalAdjusters.lastDayOfMonth()).withHour(23).withMinute(59).withSecond(59).withNano(999999999);
+
+        return reactionRepository.count()
+            .flatMap(total -> reactionRepository.countByCreatedAtBetween(startOfMonth, endOfMonth)
+                .map(lastMonth -> new TotalReactionsDto(total, lastMonth))
+            );
     }
     
 }

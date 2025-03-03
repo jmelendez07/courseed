@@ -20,6 +20,7 @@ import com.api.flux.courseed.persistence.repositories.InstitutionRepository;
 import com.api.flux.courseed.persistence.repositories.ReactionRepository;
 import com.api.flux.courseed.persistence.repositories.ReviewRepository;
 import com.api.flux.courseed.persistence.repositories.UserRepository;
+import com.api.flux.courseed.persistence.repositories.ViewRepository;
 import com.api.flux.courseed.projections.dtos.CourseDto;
 import com.api.flux.courseed.projections.dtos.CourseWithRatingAvg;
 import com.api.flux.courseed.projections.dtos.CourseWithReviewsCountAndReactionsCount;
@@ -27,12 +28,14 @@ import com.api.flux.courseed.projections.dtos.ReactionDto;
 import com.api.flux.courseed.projections.dtos.ReviewDto;
 import com.api.flux.courseed.projections.dtos.SaveCourseDto;
 import com.api.flux.courseed.projections.dtos.UserDto;
+import com.api.flux.courseed.projections.dtos.ViewDto;
 import com.api.flux.courseed.projections.mappers.CategoryMapper;
 import com.api.flux.courseed.projections.mappers.ContentMapper;
 import com.api.flux.courseed.projections.mappers.CourseMapper;
 import com.api.flux.courseed.projections.mappers.InstitutionMapper;
 import com.api.flux.courseed.projections.mappers.ReactionMapper;
 import com.api.flux.courseed.projections.mappers.ReviewMapper;
+import com.api.flux.courseed.projections.mappers.ViewMapper;
 import com.api.flux.courseed.services.interfaces.InterfaceCourseService;
 import com.api.flux.courseed.web.exceptions.CustomWebExchangeBindException;
 
@@ -48,6 +51,7 @@ public class CourseService implements InterfaceCourseService {
     private ReactionRepository reactionRepository;
     private ContentRepository contentRepository;
     private ReviewRepository reviewRepository;
+    private ViewRepository viewRepository;
     private UserRepository userRepository;
     private CourseMapper courseMapper;
     private CategoryMapper categoryMapper;
@@ -55,13 +59,14 @@ public class CourseService implements InterfaceCourseService {
     private ContentMapper contentMapper;
     private ReviewMapper reviewMapper;
     private ReactionMapper reactionMapper;
+    private ViewMapper viewMapper;
 
     public CourseService(
         CourseRepository courseRepository, CategoryRepository categoryRepository, ReactionRepository reactionRepository,
-        InstitutionRepository institutionRepository, ContentRepository contentRepository,
+        InstitutionRepository institutionRepository, ContentRepository contentRepository, ViewRepository viewRepository,
         ReviewRepository reviewRepository, UserRepository userRepository, CourseMapper courseMapper, CategoryMapper categoryMapper,
         InstitutionMapper institutionMapper, ContentMapper contentMapper,
-        ReviewMapper reviewMapper, ReactionMapper reactionMapper
+        ReviewMapper reviewMapper, ReactionMapper reactionMapper, ViewMapper viewMapper
     ) {
         this.courseRepository = courseRepository;
         this.categoryRepository = categoryRepository;
@@ -70,12 +75,14 @@ public class CourseService implements InterfaceCourseService {
         this.reviewRepository = reviewRepository;
         this.userRepository = userRepository;
         this.reactionRepository = reactionRepository;
+        this.viewRepository = viewRepository;
         this.courseMapper = courseMapper;
         this.categoryMapper = categoryMapper;
         this.institutionMapper = institutionMapper;
         this.contentMapper = contentMapper;
         this.reviewMapper = reviewMapper;
         this.reactionMapper = reactionMapper;
+        this.viewMapper = viewMapper;
     }
 
     @Override
@@ -122,23 +129,32 @@ public class CourseService implements InterfaceCourseService {
                 Flux<Content> contentFlux = contentRepository.findByCourseId(course.getId());
                 Flux<ReactionDto> reactionFlux = reactionRepository.findByCourseId(course.getId())
                     .flatMap(reaction -> userRepository.findById(reaction.getUserId())
-                        .flatMap(user -> {
+                        .map(user -> {
                             ReactionDto reactionDto = reactionMapper.toReactionDto(reaction);
                             reactionDto.setUser(new UserDto(user.getId(), user.getEmail()));
-                            return Mono.just(reactionDto);
+                            return reactionDto;
                         })
                     );
 
                 Flux<ReviewDto> reviewFlux = reviewRepository.findByCourseId(course.getId())
                     .flatMap(review -> userRepository.findById(review.getUserId())
-                        .flatMap(user -> {
+                        .map(user -> {
                             ReviewDto reviewDto = reviewMapper.toReviewDto(review);
                             reviewDto.setUser(new UserDto(user.getId(), user.getEmail()));
-                            return Mono.just(reviewDto);
+                            return reviewDto;
                         })
                     );
 
-                return Mono.zip(categoryMono, institutionMono, contentFlux.collectList(), reactionFlux.collectList(), reviewFlux.collectList())
+                Flux<ViewDto> viewFlux = viewRepository.findByCourseId(course.getId())
+                    .flatMap(view -> userRepository.findById(view.getUserId())
+                        .map(user -> {
+                            ViewDto viewDto = viewMapper.toViewDto(view);
+                            viewDto.setUser(new UserDto(user.getId(), user.getEmail()));
+                            return viewDto;
+                        })
+                    );
+
+                return Mono.zip(categoryMono, institutionMono, contentFlux.collectList(), reactionFlux.collectList(), reviewFlux.collectList(), viewFlux.collectList())
                     .map(tuple -> {
                         CourseDto courseDto = courseMapper.toCourseDto(course);
                         courseDto.setCategory(categoryMapper.toCategoryDto(tuple.getT1()));
@@ -148,9 +164,8 @@ public class CourseService implements InterfaceCourseService {
                             .toList()
                         );
                         courseDto.setReactions(tuple.getT4().stream().toList());
-                        courseDto.setReviews(tuple.getT5().stream()
-                            .toList()
-                        );
+                        courseDto.setReviews(tuple.getT5().stream().toList());
+                        courseDto.setViews(tuple.getT6().stream().toList());
 
                         return courseDto;
                     });

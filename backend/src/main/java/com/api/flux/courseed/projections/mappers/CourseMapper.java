@@ -18,5 +18,6 @@ public interface CourseMapper {
     @Mapping(target = "institution", ignore = true)
     @Mapping(target = "reviews", ignore = true)
     @Mapping(target = "reactions", ignore = true)
+    @Mapping(target = "views", ignore = true)
     CourseDto toCourseDto(Course course);
 }

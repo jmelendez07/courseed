@@ -12,6 +12,7 @@ import com.api.flux.courseed.projections.dtos.UserDto;
 public interface UserMapper {
     @Mapping(target = "reactions", ignore = true)
     @Mapping(target = "reviews", ignore = true)
+    @Mapping(target = "views", ignore = true)
     UserDto toUserDto(User user);
 
     @Mapping(target = "id", ignore = true)

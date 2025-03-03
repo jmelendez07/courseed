@@ -32,6 +32,7 @@ import com.api.flux.courseed.persistence.repositories.InstitutionRepository;
 import com.api.flux.courseed.persistence.repositories.ReactionRepository;
 import com.api.flux.courseed.persistence.repositories.ReviewRepository;
 import com.api.flux.courseed.persistence.repositories.UserRepository;
+import com.api.flux.courseed.projections.dtos.CourseAverageRating;
 import com.api.flux.courseed.projections.dtos.CourseDto;
 import com.api.flux.courseed.projections.dtos.CreateReviewDto;
 import com.api.flux.courseed.projections.dtos.ReviewCountByMonth;
@@ -97,6 +98,12 @@ public class ReviewService implements InterfaceReviewService {
         this.institutionMapper = institutionMapper;
         this.reactionMapper = reactionMapper;
         this.contentMapper = contentMapper;
+    }
+
+    @Override
+    public Mono<List<CourseAverageRating>> getTotalNegativeReviews() {
+        return reviewRepository.findLowRatedCourses()
+            .collectList();
     }
 
     @Override

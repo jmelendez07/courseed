@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.springframework.data.domain.Page;
 
+import com.api.flux.courseed.projections.dtos.CourseAverageRating;
 import com.api.flux.courseed.projections.dtos.CreateReviewDto;
 import com.api.flux.courseed.projections.dtos.ReviewCountByMonth;
 import com.api.flux.courseed.projections.dtos.ReviewDto;
@@ -14,6 +15,7 @@ import reactor.core.publisher.Mono;
 
 public interface InterfaceReviewService {
     Mono<TotalReviewsDto> getTotalReviews();
+    Mono<List<CourseAverageRating>> getTotalNegativeReviews();
     Mono<Page<ReviewDto>> getAllReviews(int page, int size, String search, String userId);
     Mono<Page<ReviewDto>> getReviewsByCourseId(String courseId, int page, int size);
     Mono<Page<ReviewDto>> getReviewsByAuthUser(Principal principal, int page, int size, String search);

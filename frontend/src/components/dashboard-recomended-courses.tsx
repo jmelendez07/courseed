@@ -17,7 +17,7 @@ function DashboardRecomendedCourses() {
             >
                 <CarouselContent>
                     {coursesHook.courses.map(course => (
-                        <CarouselItem key={course.id} className="md:basis-1/2 lg:basis-1/3">
+                        <CarouselItem key={course.id} className="md:basis-1/2 lg:basis-1/3 2xl:basis-1/4">
                             <FadeItem className="h-full">
                                 <div className="p-1 h-full">
                                     <Course

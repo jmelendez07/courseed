@@ -1,5 +1,5 @@
 import { AppSidebar } from "@/components/app-sidebar";
-import DashboardContentLikesAuth from "@/components/dashboard-content-likes-auth";
+import DashboardContentReactionsAuth from "@/components/dashboard-content-reactions-auth";
 import {
     Breadcrumb,
     BreadcrumbItem,
@@ -35,7 +35,7 @@ function Likes() {
                                 </BreadcrumbItem>
                                 <BreadcrumbSeparator className="hidden md:block" />
                                 <BreadcrumbItem>
-                                    <BreadcrumbPage>Likes</BreadcrumbPage>
+                                    <BreadcrumbPage>Reacciones</BreadcrumbPage>
                                 </BreadcrumbItem>
                             </BreadcrumbList>
                         </Breadcrumb>
@@ -46,7 +46,7 @@ function Likes() {
                     </div>
                 </header>
                 <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
-                    <DashboardContentLikesAuth />
+                    <DashboardContentReactionsAuth />
                 </div>
             </SidebarInset>
         </SidebarProvider>

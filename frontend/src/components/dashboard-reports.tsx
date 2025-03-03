@@ -1,8 +1,27 @@
 import { Star, TrendingDown } from "lucide-react";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "./ui/card";
 import { Button } from "./ui/button";
+import React from "react";
+import axios, { AxiosResponse } from "axios";
+import APIS from "@/enums/apis";
+
+interface CourseAverageRating {
+    courseId: number;
+    total: number;
+}
 
 function DashboardReports() {
+
+    const [coursesNegativeRating, setCoursesNegativeRating] = React.useState<CourseAverageRating[]>([]);
+
+    React.useEffect(() => {
+        axios.get(APIS.REVIEWS_TOTAL_NEGATIVE)
+            .then((response: AxiosResponse<CourseAverageRating[]>) => {
+                setCoursesNegativeRating(response.data);
+            })
+            .catch(() => setCoursesNegativeRating([]))
+    }, []);
+
     return (
         <>
             <div className="flex items-center">
@@ -18,7 +37,7 @@ function DashboardReports() {
                     },
                     {
                         title: "Reseñas Negativas",
-                        description: "2 cursos con aumento de reseñas negativas",
+                        description: coursesNegativeRating.length + " cursos con aumento de reseñas negativas",
                         icon: Star,
                         color: "text-orange-500",
                     },

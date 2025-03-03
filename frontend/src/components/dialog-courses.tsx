@@ -3,6 +3,7 @@ import { CommandDialog, CommandEmpty, CommandInput, CommandItem, CommandList, Co
 import { Search } from "lucide-react";
 import { Button } from "./ui/button";
 import useCourses from "@/hooks/useCourses";
+import { Link } from "react-router-dom";
 
 function DialogCourses() {
     const [open, setOpen] = React.useState<boolean>(false);
@@ -36,13 +37,15 @@ function DialogCourses() {
                 <CommandList>
                     <CommandEmpty>No hay resultados.</CommandEmpty>
                     {courseHook.courses.map(course => (
-                        <CommandItem key={course.id}>
-                            <img 
-                                src={course.image} 
-                                alt={course.title}
-                                className="size-10 object-cover rounded-sm" 
-                            />
-                            <span>{course.title}</span>
+                        <CommandItem asChild key={course.id} className="cursor-pointer">
+                            <Link to={`/educacion/${course.id}`}>
+                                <img 
+                                    src={course.image} 
+                                    alt={course.title}
+                                    className="size-10 object-cover rounded-sm" 
+                                />
+                                <span>{course.title}</span>
+                            </Link>
                         </CommandItem>
                     ))}
                     <CommandSeparator />

@@ -4,8 +4,8 @@ interface UserInterface {
     roles?: string[];
     createdAt?: string;
     updatedAt?: string;
-    likes?: number;
     reviews?: number;
+    views?: number;
 }
 
 export default UserInterface;

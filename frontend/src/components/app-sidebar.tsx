@@ -116,9 +116,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 				url: "/usuario/reseñas"
 			},
 			{
-				title: "Likes",
+				title: "Reacciones",
 				icon: ThumbsUp,
-				url: "/usuario/likes"
+				url: "/usuario/reacciones"
 			},
 		]
 	}

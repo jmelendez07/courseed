@@ -64,6 +64,7 @@ public class SecurityConfig {
                     .pathMatchers(HttpMethod.PUT, "/users/*", "/users/email/*", "/users/password/*", "/users/roles/*").hasRole(Roles.ADMIN)
                     .pathMatchers(HttpMethod.DELETE, "/users/*").hasRole(Roles.ADMIN)
                     .pathMatchers(HttpMethod.GET, "/roles", "/roles/users/count").hasRole(Roles.ADMIN)
+                    .pathMatchers(HttpMethod.GET, "/views/course/*").permitAll()
                     .anyExchange().authenticated())
                 .addFilterAt(authenticationWebFilter, SecurityWebFiltersOrder.AUTHENTICATION);
 

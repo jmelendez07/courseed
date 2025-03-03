@@ -1,4 +1,4 @@
-import { ArrowUpRight, BookMarked, CalendarClock, Check, DollarSign, Landmark, MessageSquareText, SquareStack, Star } from "lucide-react";
+import { ArrowUpRight, BookMarked, CalendarClock, Check, DollarSign, Eye, Landmark, MessageSquareText, SquareStack, Star } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -10,6 +10,9 @@ import FadeItem from "./fadeItem";
 import REACTION from "@/enums/reaction";
 import ReactionInterface from "@/interfaces/reaction";
 import useReaction from "@/hooks/useReaction";
+import useView from "@/hooks/useView";
+import ViewInterface from "@/interfaces/view";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./tooltip";
 
 interface HeroCourseProps {
     course: CourseInterface;
@@ -17,6 +20,7 @@ interface HeroCourseProps {
     handleCreatedReaction: (reaction: ReactionInterface) => void;
     handleUpdatedReaction: (reaction: ReactionInterface) => void;
     handleDeletedReaction: (id: string) => void;
+    handleCreatedView: (view: ViewInterface) => void;
 }
 
 const HeroCourse = ({
@@ -24,11 +28,13 @@ const HeroCourse = ({
     handlePrimaryButton,
     handleCreatedReaction,
     handleUpdatedReaction,
-    handleDeletedReaction
+    handleDeletedReaction,
+    handleCreatedView
 }: HeroCourseProps) => {
 
     const authHook = useAuth();
     const reactionHook = useReaction();
+    const viewHook = useView({ cId: course.id });
     const [isExploding, setIsExploding] = React.useState<boolean>(false);
 
     function getAverageRating(): number {
@@ -81,24 +87,24 @@ const HeroCourse = ({
 
     const handleReaction = React.useCallback(async (type: keyof typeof REACTION) => {
         if (!authHook?.user) return;
-        
+
         setIsExploding(false);
         const currentReaction = course.reactions.find(reaction => reaction.user.id === authHook?.user?.id);
 
         if (currentReaction?.type === type) {
             if (await reactionHook.handleDelete(currentReaction.id)) handleDeletedReaction(currentReaction.id);
         } else if (currentReaction) {
-            const updatedReaction = await reactionHook.handleUpdate(course.id, type);  
+            const updatedReaction = await reactionHook.handleUpdate(course.id, type);
             if (updatedReaction) handleUpdatedReaction(updatedReaction);
         } else {
-            const createdReaction = await reactionHook.handleCreate(course.id, type); 
+            const createdReaction = await reactionHook.handleCreate(course.id, type);
             if (createdReaction) {
                 if (REACTION[createdReaction.type as keyof typeof REACTION] === REACTION.GOOD) setIsExploding(true);
                 handleCreatedReaction(createdReaction);
             }
         }
     }, [reactionHook, authHook, course.reactions]);
-    
+
     const getReactionCount = React.useCallback(() => {
         return Object.keys(REACTION)
             .map(type => ({
@@ -106,6 +112,12 @@ const HeroCourse = ({
                 total: course.reactions.filter(reaction => reaction.type === type).length
             }))
     }, [course.reactions, authHook?.user]);
+
+    const handleCreateView = React.useCallback(async () => {
+        if (!authHook?.user || course.views.some(view => view.user.id === authHook.user?.id)) return;
+        const createdView = await viewHook.handleCreate();
+        if (createdView) handleCreatedView(createdView);
+    }, [authHook?.user]);
 
     return (
         <section className="py-12 flex justify-center">
@@ -159,8 +171,8 @@ const HeroCourse = ({
                         </div>
                         <span className="inline-flex items-center -space-x-4">
                             {getReactionCount().map((reaction, index) => (
-                                <FadeItem 
-                                    key={index} 
+                                <FadeItem
+                                    key={index}
                                     className={`
                                         text-4xl rounded-full bg-white dark:bg-zinc-800 drop-shadow-lg py-1 flex items-center justify-center
                                         ${reaction.total > 0 ? 'group' : 'grayscale'}
@@ -177,7 +189,7 @@ const HeroCourse = ({
                             {isExploding && <ConfettiExplosion />}
                         </span>
                     </div>
-                    <div className="flex w-full flex-col justify-center gap-2 sm:flex-row lg:justify-start">
+                    <div className="flex w-full flex-col justify-center gap-2 sm:flex-row lg:justify-start sm:items-center">
                         <FadeItem>
                             <Button onClick={() => {
                                 if (handlePrimaryButton) handlePrimaryButton()
@@ -187,7 +199,12 @@ const HeroCourse = ({
                             </Button>
                         </FadeItem>
                         <FadeItem>
-                            <Button asChild variant="outline" className="w-full sm:w-auto">
+                            <Button
+                                asChild
+                                variant="outline"
+                                className="w-full sm:w-auto"
+                                onClick={handleCreateView}
+                            >
                                 <a
                                     href={course.url}
                                     target="_blank"
@@ -197,6 +214,23 @@ const HeroCourse = ({
                                 </a>
                             </Button>
                         </FadeItem>
+                        {course.views.length > 0 && (
+                            <TooltipProvider>
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <Button variant="ghost" className="cursor-default px-1">
+                                            <FadeItem className="inline-flex items-center gap-2 text-gray-500 dark:text-white justify-center text-sm">
+                                                <Eye />
+                                                {course.views.length}
+                                            </FadeItem>
+                                        </Button>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                        <p>Usuarios que han visto este programa</p>
+                                    </TooltipContent>
+                                </Tooltip>
+                            </TooltipProvider>
+                        )}
                     </div>
                 </div>
                 <div className="flex flex-col gap-12 md:gap-20">

@@ -1,0 +1,32 @@
+package com.api.flux.courseed.persistence.repositories;
+
+import java.time.LocalDateTime;
+
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.mongodb.repository.Aggregation;
+import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
+import com.api.flux.courseed.persistence.documents.View;
+import com.api.flux.courseed.projections.dtos.CourseViewsStatsDto;
+
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+
+public interface ViewRepository extends ReactiveMongoRepository<View, String> {
+    Mono<Long> countByCourseId(String courseId);
+    Flux<View> findByCourseId(String courseId);
+    Mono<Long> countByCreatedAtBetween(LocalDateTime start, LocalDateTime end);
+    Flux<View> findByCourseId(String courseId, Pageable pageable);
+    Mono<View> findByCourseIdAndUserId(String courseId, String userId);
+    Flux<View> findByUserId(String userId);
+    Flux<View> findByUserId(String userId, Pageable pageable);
+
+    @Aggregation(pipeline = {
+        "{ $match: { createdAt: { $gte: ?0 } } }",
+        "{ $project: { courseId: 1, month: { $dateToString: { format: '%Y-%m', date: '$createdAt' } } } }",
+        "{ $group: { _id: { courseId: '$courseId', month: '$month' }, views: { $sum: 1 } } }",
+        "{ $group: { _id: '$_id.courseId', views: { $push: { month: '$_id.month', count: '$views' } } } }",
+        "{ $project: { courseId: '$_id', lastMonthViews: { $arrayElemAt: ['$views.count', 0] }, currentMonthViews: { $arrayElemAt: ['$views.count', 1] } } }",
+        "{ $match: { $expr: { $lt: ['$currentMonthViews', '$lastMonthViews'] } } }"
+    })
+    Flux<CourseViewsStatsDto> findCoursesWithDecreasingViews(String lastMonthStart);
+}

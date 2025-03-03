@@ -17,14 +17,32 @@ public class ReactionController {
     @Autowired
     private ValidationService validationService;
 
+    public Mono<ServerResponse> getTotalReactions(ServerRequest serverRequest) {
+        return reactionService.getTotalReactions()
+            .flatMap(user -> ServerResponse.ok().bodyValue(user))
+            .switchIfEmpty(ServerResponse.notFound().build());
+    } 
+
     public Mono<ServerResponse> findReactionsByCourseId(ServerRequest serverRequest) {
         return reactionService.findReactionsByCourseId(
             serverRequest.pathVariable("courseId"),
             Integer.parseInt(serverRequest.queryParam("page").orElse("0")), 
             Integer.parseInt(serverRequest.queryParam("size").orElse("10"))
         )
-            .flatMap(user -> ServerResponse.ok().bodyValue(user))
+            .flatMap(reactions -> ServerResponse.ok().bodyValue(reactions))
             .switchIfEmpty(ServerResponse.notFound().build());
+    } 
+
+    public Mono<ServerResponse> findReactionsByAuthUser(ServerRequest serverRequest) {
+        return serverRequest.principal()
+            .flatMap(principal -> reactionService.findReactionsByAuthUser(
+                principal, 
+                serverRequest.queryParam("type").orElse(""),
+                Integer.parseInt(serverRequest.queryParam("page").orElse("0")), 
+                Integer.parseInt(serverRequest.queryParam("size").orElse("10"))   
+            ))
+                .flatMap(reactions -> ServerResponse.ok().bodyValue(reactions))
+                .switchIfEmpty(ServerResponse.notFound().build());
     } 
 
     public Mono<ServerResponse> createReaction(ServerRequest serverRequest) {

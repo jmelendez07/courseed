@@ -102,7 +102,7 @@ const Hero = ({
     button = {
         text: "Explorar Educación",
         icon: GraduationCap,
-        url: "/cursos",
+        url: "/educacion",
     },
 }: HeroProps) => {
 

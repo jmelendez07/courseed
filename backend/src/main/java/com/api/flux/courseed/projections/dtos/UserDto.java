@@ -12,6 +12,7 @@ public class UserDto implements Serializable {
     private LocalDateTime updatedAt;
     private int reactions;
     private int reviews;
+    private int views;
 
     public UserDto() {}
 
@@ -81,7 +82,16 @@ public class UserDto implements Serializable {
 
     public void setReactions(int reactions) {
         this.reactions = reactions;
+    }
+
+    public int getViews() {
+        return views;
+    }
+
+    public void setViews(int views) {
+        this.views = views;
     }    
 
+    
     
 }

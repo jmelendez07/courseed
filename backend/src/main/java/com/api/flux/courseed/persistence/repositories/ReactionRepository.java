@@ -1,5 +1,7 @@
 package com.api.flux.courseed.persistence.repositories;
 
+import java.time.LocalDateTime;
+
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
 
@@ -12,7 +14,10 @@ public interface ReactionRepository extends ReactiveMongoRepository<Reaction, St
     Mono<Long> countByCourseId(String courseId);
     Flux<Reaction> findByCourseId(String courseId);
     Flux<Reaction> findByCourseId(String courseId, Pageable pageable);
+    Flux<Reaction> findByTypeContaining(String type, Pageable pageable);
+    Flux<Reaction> findByUserIdAndTypeContaining(String userId, String type, Pageable pageable);
     Mono<Reaction> findByCourseIdAndUserId(String courseId, String userId);
     Flux<Reaction> findByUserId(String userId);
     Flux<Reaction> findByType(String type);
+    Mono<Long> countByCreatedAtBetween(LocalDateTime start, LocalDateTime end);
 }

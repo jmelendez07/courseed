@@ -12,7 +12,7 @@ import Users from "@/pages/auth/admin/users/Users";
 import CoursesAdmin from "@/pages/auth/admin/courses/Courses";
 import ReviewsAdmin from "@/pages/auth/admin/reviews/Reviews";
 import DashboardUser from "@/pages/auth/user/Dashboard";
-import Likes from "@/pages/auth/user/Likes";
+import Reactions from "@/pages/auth/user/Reactions";
 import ReviewsUser from "@/pages/auth/user/Reviews";
 import ProtectedAuthRoute from "./ProtectedAuthRoute";
 import ProtectedAdminRoute from "./ProtectedAdminRoute";
@@ -99,8 +99,8 @@ function Routes() {
                     element: <DashboardUser />
                 },
                 {
-                    path: 'likes',
-                    element: <Likes />
+                    path: 'reacciones',
+                    element: <Reactions />
                 },
                 {
                     path: 'reseñas',

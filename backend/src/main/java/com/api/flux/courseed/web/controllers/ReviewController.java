@@ -25,6 +25,12 @@ public class ReviewController {
             .switchIfEmpty(ServerResponse.notFound().build());
     } 
 
+    public Mono<ServerResponse> getTotalNegativeReviews(ServerRequest serverRequest) {
+        return reviewService.getTotalNegativeReviews()
+            .flatMap(user -> ServerResponse.ok().bodyValue(user))
+            .switchIfEmpty(ServerResponse.notFound().build());
+    } 
+
     public Mono<ServerResponse> getAllReviews(ServerRequest serverRequest) {
         return reviewService
             .getAllReviews(

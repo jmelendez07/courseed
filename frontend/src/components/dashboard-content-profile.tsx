@@ -41,8 +41,8 @@ function DashboardContentProfile() {
                 </div>
                 <div className="flex justify-center gap-4 md:justify-start">
                     <div>
-                        <span className="text-2xl font-bold">{authHook?.user?.likes}</span>
-                        <span className="ml-1 text-muted-foreground">likes</span>
+                        <span className="text-2xl font-bold">{authHook?.user?.views}</span>
+                        <span className="ml-1 text-muted-foreground">Programas visitados</span>
                     </div>
                     <div>
                         <span className="text-2xl font-bold">{authHook?.user?.reviews}</span>

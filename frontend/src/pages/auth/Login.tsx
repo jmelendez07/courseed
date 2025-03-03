@@ -1,5 +1,5 @@
 import { LoginForm } from "@/components/login-form";
-import LoginDraw from "@/components/ui/LoginDraw";
+import LoginDraw from "@/components/draws/LoginDraw";
 import HeadProvider from "@/providers/HeadProvider";
 import { Link } from "react-router-dom";
 

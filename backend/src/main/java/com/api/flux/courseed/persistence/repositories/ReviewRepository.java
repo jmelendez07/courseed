@@ -8,6 +8,7 @@ import org.springframework.data.mongodb.repository.Aggregation;
 import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
 import org.springframework.stereotype.Repository;
 import com.api.flux.courseed.persistence.documents.Review;
+import com.api.flux.courseed.projections.dtos.CourseAverageRating;
 import com.api.flux.courseed.projections.dtos.ReviewAvg;
 import com.api.flux.courseed.projections.dtos.ReviewCountByMonth;
 
@@ -42,4 +43,11 @@ public interface ReviewRepository extends ReactiveMongoRepository<Review, String
     })
     Flux<ReviewCountByMonth> countReviewsLastSixMonths(LocalDate fromDate);
     Mono<Long> countByCreatedAtBetween(LocalDateTime start, LocalDateTime end);
+
+    @Aggregation(pipeline = {
+        "{ $group: { _id: '$courseId', avgRating: { $avg: '$rating' } } }",
+        "{ $match: { avgRating: { $lt: 3 } } }",
+        "{ $project: { _id: 0, courseId: '$_id', avgRating: 1 } }"
+    })
+    Flux<CourseAverageRating> findLowRatedCourses();
 }

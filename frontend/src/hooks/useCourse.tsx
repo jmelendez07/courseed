@@ -2,6 +2,7 @@ import APIS from "@/enums/apis";
 import CourseInterface from "@/interfaces/course";
 import ReactionInterface from "@/interfaces/reaction";
 import ReviewInterface from "@/interfaces/review";
+import ViewInterface from "@/interfaces/view";
 import axios, { AxiosError, AxiosResponse } from "axios";
 import React from "react";
 
@@ -74,6 +75,14 @@ function useCourse({ id }: useCourseProps) {
         });
     } 
 
+    const newView = (newView: ViewInterface) => {
+        if (!course) return;
+        setCourse({
+            ...course,
+            views: [ newView, ...course.views ]
+        });
+    }
+
     return {
         course,
         loading,
@@ -84,7 +93,8 @@ function useCourse({ id }: useCourseProps) {
         handleDeletedReaction,
         newReview,
         updateReview,
-        deleteReview
+        deleteReview,
+        newView
     };
 }
 

@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import CourseInterface from "@/interfaces/course";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./dropdown-menu";
+import { Link } from "react-router-dom";
 
 interface CourseComponentProps {
 	className?: string;
@@ -109,13 +110,12 @@ function Course({ className, course, optionsEnable, handleEdit, handleDelete }: 
 			</CardContent>
 			<CardFooter>
 				<Button asChild className="w-full group">
-					<a
-						href={`/educacion/${course.id}`} 
-						target="_blank"
+					<Link
+						to={`/educacion/${course.id}`} 
 					>
 						Ver Información
 						<ArrowUpRight className="transition-transform group-hover:translate-x-1" />
-					</a>
+					</Link>
 				</Button>
 			</CardFooter>
 		</Card>

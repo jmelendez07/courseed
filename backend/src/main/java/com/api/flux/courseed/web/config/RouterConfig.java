@@ -14,6 +14,7 @@ import com.api.flux.courseed.web.controllers.ReactionController;
 import com.api.flux.courseed.web.controllers.ReviewController;
 import com.api.flux.courseed.web.controllers.RoleController;
 import com.api.flux.courseed.web.controllers.UserController;
+import com.api.flux.courseed.web.controllers.ViewController;
 
 @Configuration
 public class RouterConfig {
@@ -22,7 +23,7 @@ public class RouterConfig {
     RouterFunction<ServerResponse> routes(
         AuthController authController, CategoryController categoryController,
         ContentController contentController, CourseController courseController,
-        InstitutionController institutionController,
+        InstitutionController institutionController, ViewController viewController,
         ReviewController reviewController, UserController userController,
         RoleController roleController, ReactionController reactionController
     ) {
@@ -36,6 +37,7 @@ public class RouterConfig {
             .path("/users", () -> userRoutes(userController))
             .path("/roles", () -> roleRoutes(roleController))
             .path("/reactions", () -> reactionRoutes(reactionController))
+            .path("/views", () -> viewRoutes(viewController))
             .build();
     }
 
@@ -105,6 +107,8 @@ public class RouterConfig {
         return RouterFunctions
             .route()
             .GET("/course/{courseId}", reactionController::findReactionsByCourseId)
+            .GET("/auth", reactionController::findReactionsByAuthUser)
+            .GET("/total/this-month", reactionController::getTotalReactions)
             .POST(reactionController::createReaction)
             .PUT(reactionController::updateReaction)
             .DELETE("/{id}", reactionController::deleteReaction)
@@ -117,6 +121,7 @@ public class RouterConfig {
             .GET("", reviewController::getAllReviews)
             .GET("/months/count", reviewController::getReviewCountsForLastSixMonths)
             .GET("/total/this-month", reviewController::getTotalReviews)
+            .GET("/total/negative", reviewController::getTotalNegativeReviews)
             .GET("/course/{courseId}", reviewController::getReviewsByCourseId)
             .GET("/auth", reviewController::getReviewsByAuthUser)
             .POST(reviewController::createReview)
@@ -146,6 +151,16 @@ public class RouterConfig {
             .route()
             .GET("", roleController::getAllRoles)
             .GET("/users/count", roleController::getRolesWithUserCount)
+            .build();
+    }
+
+    private RouterFunction<ServerResponse> viewRoutes(ViewController viewController) {
+        return RouterFunctions
+            .route()
+            .GET("/course/{courseId}", viewController::findViewsByCourseId)
+            .GET("/auth", viewController::findViewsByAuthUser)
+            .GET("/total/this-month", viewController::getTotalViews)
+            .POST("/create", viewController::createView)
             .build();
     }
 
@@ -192,5 +207,10 @@ public class RouterConfig {
     @Bean
     RoleController roleController() {
         return new RoleController();
+    }
+
+    @Bean
+    ViewController viewController() {
+        return new ViewController();
     }
 }

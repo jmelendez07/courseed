@@ -3,7 +3,7 @@ import { Button } from "./ui/button";
 import { ArrowUpRight, ChevronDown, ChevronUp, LoaderCircle, Search } from "lucide-react";
 import ReviewLarge from "./ui/review-large";
 import useReviewsAuth from "@/hooks/useReviewsAuth";
-import ReviewsDraw from "./ui/ReviewsDraw";
+import ReviewsDraw from "./draws/ReviewsDraw";
 
 interface DashboardContentReviewsAuthProps {
     className?: string;
@@ -22,13 +22,17 @@ function DashboardContentReviewsAuth({ className }: DashboardContentReviewsAuthP
                 {
                     reviewsHook.reviews.length > 0 ? (
                         <>
-                            <div className="grid grid-cols-1 items-center md:grid-cols-[1fr,auto] gap-x-4">
+                            <div className="flex items-center pb-4 flex-col gap-2 sm:flex-row sm:justify-between">
+                                <div>
+                                    <h1 className="text-3xl font-bold tracking-tight">Reseñas de Programas</h1>
+                                    <p className="text-muted-foreground">Visualiza tus valoraciones y comentarios.</p>
+                                </div>
                                 <form
                                     onSubmit={e => {
                                         e.preventDefault();
                                         reviewsHook.handleSearch();
                                     }}
-                                    className="flex items-center py-4 gap-2"
+                                    className="flex items-center gap-2"
                                 >
                                     <Input
                                         type="text"
@@ -41,7 +45,7 @@ function DashboardContentReviewsAuth({ className }: DashboardContentReviewsAuthP
                                                 searchText: e.target.value
                                             });
                                         }}
-                                        className="max-w-sm"
+                                        className="w-96 max-w-sm"
                                     />
                                     <Button
                                         type="submit"

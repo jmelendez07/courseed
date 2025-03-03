@@ -34,6 +34,7 @@ function Course() {
                         handleCreatedReaction={(reaction) => courseHook.handleCreatedReaction(reaction)}
                         handleUpdatedReaction={(reaction) => courseHook.handleUpdatedReaction(reaction)}
                         handleDeletedReaction={(id) => courseHook.handleDeletedReaction(id)}
+                        handleCreatedView={(view) => courseHook.newView(view)}
                     />
                     <BlogReviews
                         ref={BlogReviewsRef}

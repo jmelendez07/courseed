@@ -4,6 +4,7 @@ import InstitutionInterface from "./institution";
 import LikeInterface from "./like";
 import ReactionInterface from "./reaction";
 import ReviewInterface from "./review";
+import ViewInterface from "./view";
 
 interface CourseInterface {
     id: string;
@@ -21,6 +22,7 @@ interface CourseInterface {
     likes: LikeInterface[];
     reactions: ReactionInterface[];
     reviews: ReviewInterface[];
+    views: ViewInterface[];
 }
 
 export default CourseInterface;

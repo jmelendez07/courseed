@@ -62,7 +62,7 @@ function ReviewLarge({ review, handleEdit, handleDelete, className }: ReviewComp
 					<img
 						src={review.course.image}
 						alt={review.course.title}
-						className="w-full object-cover rounded-lg h-32 max-h-32"
+						className="w-full object-cover rounded-lg h-32 max-h-32 bg-zinc-100 dark:bg-zinc-900"
 					/>
 				</div>
 				<p className="text-sm text-gray-600 mb-2 line-clamp-3">{review.content}</p>
