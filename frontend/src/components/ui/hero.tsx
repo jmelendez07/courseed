@@ -111,7 +111,7 @@ const Hero = ({
 
     return (
         <motion.section
-            className="py-12 md:py-12 flex justify-center"
+            className="py-12 flex justify-center"
             initial="initial"
             animate="animate"
         >

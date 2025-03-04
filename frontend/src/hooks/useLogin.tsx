@@ -89,11 +89,13 @@ function useLogin() {
         })
             .then((response: AxiosResponse<AuthCredentialsProps>) => {
                 if (response.data && Array.isArray(response.data.roles)) {
-                    navigate(response.data.roles.some(role => role === ROLES.ADMIN)
-                            ? "/administrador"
-                            : "/usuario",
-                        { replace: true }
-                    );
+                    if (response.data.roles.some(role => role === ROLES.ADMIN)) {
+                        navigate("/administrador", { replace: true });
+                    } else if (response.data.roles.some(role => role === ROLES.PUBLISHER)) {
+                        navigate("/publicador", { replace: true });
+                    } else {
+                        navigate("/usuario", { replace: true });
+                    }
                 } else {
                     setCredentialsErrors({
                         ...credentialsErrors,

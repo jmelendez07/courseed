@@ -40,6 +40,9 @@ enum APIS {
     VIEWS_CREATE = 'api/views/create',
     VIEWS_BY_AUTH_USER = 'api/views/auth',
     VIEWS_TOTAL = 'api/views/total/this-month',
+    VIEWS_COURSES_DECREASING = 'api/views/courses/this-month/decreasing',
+    SEARCH_HISTORIES_BY_AUTH_USER = 'api/search-histories/auth',
+    SEARCH_HISTORY_CREATE = 'api/search-histories/create'
 }
 
 export default APIS;

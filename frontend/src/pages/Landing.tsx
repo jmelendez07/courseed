@@ -8,6 +8,7 @@ import Logos from "@/components/ui/logos";
 import WorkShopsGallery from "@/components/workshops-gallery";
 import DiplomasGallery from "@/components/diplomas-gallery";
 import CoursesGallery from "@/components/courses-gallery";
+import Pricing from "@/components/pricing";
 
 function Landing() {
     const location = useLocation();
@@ -23,6 +24,7 @@ function Landing() {
             <CoursesGallery />
             <DiplomasGallery />
             <WorkShopsGallery />
+            <Pricing />
             <Logos heading="Con la confianza de estas instituciones" />
             <Footer />
         </>

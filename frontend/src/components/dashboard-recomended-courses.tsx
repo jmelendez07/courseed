@@ -1,7 +1,6 @@
 import useCourses from "@/hooks/useCourses";
 import { Carousel, CarouselContent, CarouselItem } from "./ui/carousel";
 import Course from "./ui/course";
-import FadeItem from "./ui/fadeItem";
 
 function DashboardRecomendedCourses() {
 
@@ -18,15 +17,13 @@ function DashboardRecomendedCourses() {
                 <CarouselContent>
                     {coursesHook.courses.map(course => (
                         <CarouselItem key={course.id} className="md:basis-1/2 lg:basis-1/3 2xl:basis-1/4">
-                            <FadeItem className="h-full">
-                                <div className="p-1 h-full">
-                                    <Course
-                                        course={course}
-                                        optionsEnable={false}
-                                        className="h-full"
-                                    />
-                                </div>
-                            </FadeItem>
+                            <div className="p-1 h-full">
+                                <Course
+                                    course={course}
+                                    optionsEnable={false}
+                                    className="h-full"
+                                />
+                            </div>
                         </CarouselItem>
                     ))}
                 </CarouselContent>

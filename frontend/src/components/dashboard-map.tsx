@@ -6,6 +6,7 @@ import axios, { AxiosResponse } from "axios";
 import APIS from "@/enums/apis";
 import { Link } from "react-router-dom";
 import { ArrowUpRight } from "lucide-react";
+import MapView, { capitals } from "./ui/map-view";
 
 function DashboardMap() {
     const mapRef = React.useRef<HTMLDivElement | null>(null);
@@ -47,25 +48,21 @@ function DashboardMap() {
                 <Card ref={mapRef} className="xl:col-span-3 hover:shadow-lg transition-shadow duration-300">
                     <CardContent className="p-0">
                         <div className="relative aspect-[16/9] w-full overflow-hidden rounded-lg">
-                            <div className="absolute inset-0 " />
+                            <div className="absolute inset-0">
+                                <MapView />
+                            </div>
                             <div className="hidden md:block absolute bottom-4 left-4 right-4">
-                                <div className="grid grid-cols-5 gap-2">
-                                    {[
-                                        { region: "América", users: "4,256", color: "bg-blue-500" },
-                                        { region: "Europa", users: "2,187", color: "bg-green-500" },
-                                        { region: "Asia", users: "1,543", color: "bg-yellow-500" },
-                                        { region: "África", users: "876", color: "bg-red-500" },
-                                        { region: "Oceanía", users: "387", color: "bg-purple-500" },
-                                    ].map((region, i) => (
-                                        <Card key={i} className="bg-background/80 backdrop-blur-sm">
+                                <div className="grid grid-cols-8 gap-2">
+                                    {capitals.map((capital, index) => (
+                                        <Card key={index} className="bg-background/80 backdrop-blur-sm">
                                             <CardHeader className="p-3">
                                                 <div className="flex items-center gap-2">
-                                                    <div className={`h-3 w-3 rounded-full ${region.color}`} />
-                                                    <CardTitle className="text-sm">{region.region}</CardTitle>
+                                                    <div className={`h-3 w-3 rounded-full`} style={{ backgroundColor: capital.color }} />
+                                                    <CardTitle className="text-sm">{capital.dept}</CardTitle>
                                                 </div>
                                             </CardHeader>
                                             <CardContent className="p-3 pt-0">
-                                                <p className="text-lg font-bold">{region.users}</p>
+                                                <p className="text-lg font-bold">{capital.name}</p>
                                             </CardContent>
                                         </Card>
                                     ))}

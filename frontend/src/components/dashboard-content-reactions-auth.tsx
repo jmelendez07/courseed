@@ -5,6 +5,7 @@ import Course from "./ui/course";
 import LikeDraw from "./draws/LikeDraw";
 import useReactions from "@/hooks/useReactions";
 import REACTION, { getReactionText } from "@/enums/reaction";
+import { Link } from "react-router-dom";
 
 interface DashboardContentLikesAuthProps {
     className?: string;
@@ -96,10 +97,10 @@ function DashboardContentLikesAuth({ className }: DashboardContentLikesAuthProps
                             Parece que aún no has dado ningúna reacción.
                         </p>
                         <Button asChild className="group">
-                            <a href="/educacion" target="_blank">
+                            <Link to="/educacion">
                                 Reacciona a un programa aqui
                                 <ArrowUpRight className="transition-transform group-hover:translate-x-1" />
-                            </a>
+                            </Link>
                         </Button>
                     </div>
                 )}

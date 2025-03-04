@@ -33,6 +33,20 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 		return authHook?.user?.roles?.some(r => r === ROLES.ADMIN);
 	}
 
+	const isPublisher = (): boolean | undefined => {
+		return authHook?.user?.roles?.some(r => r === ROLES.PUBLISHER);
+	}
+
+	const getNavMain = () => {
+		if (isAdmin()) {
+			return dataAdmin.navMain;
+		} else if (isPublisher()) {
+			return dataPublisher.navMain;
+		} else {
+			return dataUser.navMain;
+		}
+	}
+
 	const userForm = {
 		title: "Registrar Nuevo Usuario",
 		description: "Añade un nuevo usuario a la plataforma con su correo y una contraseña segura.",
@@ -123,6 +137,17 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 		]
 	}
 
+	const dataPublisher = {
+		actions: [],
+		navMain: [
+			{
+				title: "Panel",
+				icon: LayoutPanelLeft,
+				url: "/publicador"
+			}
+		]
+	}
+
 	return (
 		<Sidebar collapsible="icon" {...props}>
 			<SidebarHeader>
@@ -132,7 +157,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 				/>
 			</SidebarHeader>
 			<SidebarContent>
-				<NavMain items={isAdmin() ? dataAdmin.navMain : dataUser.navMain} />
+				<NavMain items={getNavMain()} />
 			</SidebarContent>
 			<SidebarFooter>
 				<NavUser />

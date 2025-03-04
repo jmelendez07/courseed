@@ -24,6 +24,12 @@ public class ViewController {
             .switchIfEmpty(ServerResponse.notFound().build());
     } 
 
+    public Mono<ServerResponse> findCoursesWithDecreasingViews(ServerRequest serverRequest) {
+        return viewService.findCoursesWithDecreasingViews()
+            .flatMap(user -> ServerResponse.ok().bodyValue(user))
+            .switchIfEmpty(ServerResponse.notFound().build());
+    }
+
     public Mono<ServerResponse> findViewsByCourseId(ServerRequest serverRequest) {
         return viewService.findViewsByCourseId(
             serverRequest.pathVariable("courseId"),

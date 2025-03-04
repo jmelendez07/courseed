@@ -10,6 +10,7 @@ interface CredentialsProps {
     email: string;
     password: string;
     confirmPassword: string;
+    birthdate: Date | undefined;
 }
 
 interface CredentialsErrorsProps {
@@ -32,7 +33,8 @@ function useRegister() {
     const [credentials, setCredentials] = React.useState<CredentialsProps>({
         email: '',
         password: '',
-        confirmPassword: ''
+        confirmPassword: '',
+        birthdate: undefined
     });
     const [credentialsErrors, setCredentialsErrors] = React.useState<CredentialsErrorsProps>({
         email: null,

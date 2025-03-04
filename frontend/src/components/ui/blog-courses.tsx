@@ -24,7 +24,8 @@ const BlogCourses = ({
     const [searchParams] = useSearchParams();
     const courseHook = useCourses({
         institutionParam: { id: searchParams.get('institucion'), name: undefined },
-        facultyParam: { id: searchParams.get('facultad'), name: undefined }
+        facultyParam: { id: searchParams.get('facultad'), name: undefined },
+        searchParam: searchParams.get("busqueda") || undefined
     });
     const institutionHook = useInstitution({ size: 7 });
     const facultyHook = useFaculty({ size: 7 });

@@ -127,13 +127,15 @@ const Navbar = ({
         },
     ];
 
-    const getName = React.useCallback(() => {
-        const name = authHook?.user?.email.split('@')[0];
-        if (name) {
-            return name.charAt(0).toUpperCase() + name.slice(1);
+    const getPrincipalRoute = (): string => {
+        if (authHook?.user?.roles?.some(r => r === ROLES.ADMIN)) {
+            return "/administrador";
+        } else if (authHook?.user?.roles?.some(r => r === ROLES.PUBLISHER)) {
+            return "/publicador";
+        } else {
+            return "/usuario";
         }
-        return '';
-    }, [authHook?.user?.email]);
+    }
 
     return (
         <motion.section initial="initial" animate="animate" className="py-4 flex justify-center">
@@ -170,7 +172,7 @@ const Navbar = ({
                                                 <AvatarFallback className="rounded-lg">{authHook?.user?.email.slice(0, 2).toUpperCase()}</AvatarFallback>
                                             </Avatar>
                                             <div className="grid flex-1 text-left text-sm leading-tight">
-                                                <span className="truncate font-semibold">{getName()}</span>
+                                                <span className="truncate font-semibold">{authHook.getName()}</span>
                                                 <span className="truncate text-xs">{authHook?.user?.email}</span>
                                             </div>
                                             <ChevronsUpDown className="ml-auto size-4" />
@@ -188,14 +190,14 @@ const Navbar = ({
                                                     <AvatarFallback className="rounded-lg">{authHook?.user?.email.slice(0, 2).toUpperCase()}</AvatarFallback>
                                                 </Avatar>
                                                 <div className="grid flex-1 text-left text-sm leading-tight">
-                                                    <span className="truncate font-semibold">{getName()}</span>
+                                                    <span className="truncate font-semibold">{authHook.getName()}</span>
                                                     <span className="truncate text-xs">{authHook?.user?.email}</span>
                                                 </div>
                                             </div>
                                         </DropdownMenuLabel>
                                         <DropdownMenuSeparator />
                                         <DropdownMenuGroup>
-                                            <Link to={authHook.user.roles?.some(r => r === ROLES.ADMIN) ? '/administrador' : '/usuario'}>
+                                            <Link to={getPrincipalRoute()}>
                                                 <DropdownMenuItem>
                                                     <LayoutPanelLeft />
                                                     Panel
@@ -298,7 +300,7 @@ const Navbar = ({
                                                                 <AvatarFallback className="rounded-lg">{authHook?.user?.email.slice(0, 2).toUpperCase()}</AvatarFallback>
                                                             </Avatar>
                                                             <div className="grid flex-1 text-left text-sm leading-tight">
-                                                                <span className="truncate font-semibold">{getName()}</span>
+                                                                <span className="truncate font-semibold">{authHook.getName()}</span>
                                                                 <span className="truncate text-xs">{authHook?.user?.email}</span>
                                                             </div>
                                                             <ChevronsUpDown className="ml-auto size-4" />
@@ -316,14 +318,14 @@ const Navbar = ({
                                                                     <AvatarFallback className="rounded-lg">{authHook?.user?.email.slice(0, 2).toUpperCase()}</AvatarFallback>
                                                                 </Avatar>
                                                                 <div className="grid flex-1 text-left text-sm leading-tight">
-                                                                    <span className="truncate font-semibold">{getName()}</span>
+                                                                    <span className="truncate font-semibold">{authHook.getName()}</span>
                                                                     <span className="truncate text-xs">{authHook?.user?.email}</span>
                                                                 </div>
                                                             </div>
                                                         </DropdownMenuLabel>
                                                         <DropdownMenuSeparator />
                                                         <DropdownMenuGroup>
-                                                            <Link to={authHook.user.roles?.some(r => r === ROLES.ADMIN) ? '/administrador' : '/usuario'}>
+                                                            <Link to={getPrincipalRoute()}>
                                                                 <DropdownMenuItem>
                                                                     <LayoutPanelLeft />
                                                                     Panel

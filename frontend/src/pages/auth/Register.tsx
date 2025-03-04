@@ -19,7 +19,7 @@ function Register() {
 				</div>
 			</div>
 			<div className="relative hidden lg:block">
-				<div className="absolute inset-0 h-full w-full object-cover dark:brightness-[0.2] dark:grayscale overflow-hidden flex items-center">
+				<div className="absolute inset-0 h-full w-full object-cover overflow-hidden flex items-center">
 					<RegisterDraw />
 				</div>
 			</div>

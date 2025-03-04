@@ -17,6 +17,7 @@ interface AuthContextProps {
     handleUser: () => Promise<any>;
     setUser: React.Dispatch<React.SetStateAction<UserInterface | null>>;
     setLoading: React.Dispatch<React.SetStateAction<boolean>>;
+    getName: () => string
 }
 
 const AuthContext = React.createContext<AuthContextProps | null>(null);
@@ -38,9 +39,16 @@ function AuthProvider({ children }: ChildrenProps) {
         } catch (error) {
             delete axios.defaults.headers.common['Authorization'];
             localStorage.removeItem('token');
-            console.error(error);
         }
     }
+
+    const getName = React.useCallback(() => {
+        const name = user?.email.split('@')[0].replace(".", " ");
+        if (name) {
+            return name.charAt(0).toUpperCase() + name.slice(1);
+        }
+        return '';
+    }, [user?.email]);
 
     React.useEffect(() => {
         if (token) {
@@ -62,7 +70,8 @@ function AuthProvider({ children }: ChildrenProps) {
           handleToken,
           handleUser,
           setUser,
-          setLoading
+          setLoading,
+          getName
         }),
         [token, user, loading]
     );
@@ -153,5 +162,32 @@ function useIsUser() {
     return isUser;
 }
 
+function useIsPublisher() {
+    const [isPublisher, setIsPublisher] = React.useState<boolean | null>(null);
+    const auth = useAuth();
+
+    React.useEffect(() => {
+        if (auth?.user && Array.isArray(auth.user.roles)) {
+            setIsPublisher(auth.user.roles.some(role => role === ROLES.PUBLISHER));
+        } else {
+            axios.get(APIS.USER_AUTHENTICATED, {
+                headers: {
+                    Authorization: `${TOKEN.PREFIX} ${localStorage.getItem('token')}`
+                }
+            })
+                .then((response: AxiosResponse<UserInterface | null>) => {
+                    setIsPublisher(
+                        typeof response.data === "object" && 
+                        Array.isArray(response.data?.roles) &&
+                        response.data.roles.some(role => role === ROLES.PUBLISHER)
+                    )
+                })
+                .catch(() => setIsPublisher(false));
+        }
+    }, [auth?.user]);
+
+    return isPublisher;
+}
+
 export default AuthProvider;
-export { useAuth, useIsAuth, useIsAdmin, useIsUser }
+export { useAuth, useIsAuth, useIsAdmin, useIsUser, useIsPublisher }

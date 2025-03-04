@@ -2,7 +2,9 @@ package com.api.flux.courseed.services.implementations;
 
 import java.security.Principal;
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.time.temporal.TemporalAdjusters;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -20,6 +22,7 @@ import com.api.flux.courseed.persistence.repositories.InstitutionRepository;
 import com.api.flux.courseed.persistence.repositories.UserRepository;
 import com.api.flux.courseed.persistence.repositories.ViewRepository;
 import com.api.flux.courseed.projections.dtos.CourseDto;
+import com.api.flux.courseed.projections.dtos.CourseViewsStatsDto;
 import com.api.flux.courseed.projections.dtos.SaveViewDto;
 import com.api.flux.courseed.projections.dtos.TotalViewsDto;
 import com.api.flux.courseed.projections.dtos.UserDto;
@@ -168,6 +171,19 @@ public class ViewService implements InterfaceViewService {
                 .zipWith(viewRepository.count())
                 .map(p -> new PageImpl<>(p.getT1(), pageable, p.getT2()))
             );
+    }
+
+    @Override
+    public Mono<List<CourseViewsStatsDto>> findCoursesWithDecreasingViews() {
+        LocalDateTime startOfLastMonth = LocalDateTime.now()
+            .withDayOfMonth(1)
+            .minusMonths(1)
+            .withHour(0).withMinute(0).withSecond(0).withNano(0);
+
+        long lastMonthEpoch = startOfLastMonth.toEpochSecond(ZoneOffset.UTC);
+
+        return viewRepository.findCoursesWithDecreasingViews(lastMonthEpoch)
+            .collectList();
     }
 
 }

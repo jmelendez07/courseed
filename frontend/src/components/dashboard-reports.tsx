@@ -13,6 +13,7 @@ interface CourseAverageRating {
 function DashboardReports() {
 
     const [coursesNegativeRating, setCoursesNegativeRating] = React.useState<CourseAverageRating[]>([]);
+    const [coursesDecreasingViews, setCoursesDecreasingViews] = React.useState<[]>([]);
 
     React.useEffect(() => {
         axios.get(APIS.REVIEWS_TOTAL_NEGATIVE)
@@ -20,6 +21,14 @@ function DashboardReports() {
                 setCoursesNegativeRating(response.data);
             })
             .catch(() => setCoursesNegativeRating([]))
+    }, []);
+
+    React.useEffect(() => {
+        axios.get(APIS.VIEWS_COURSES_DECREASING)
+            .then((response: AxiosResponse) => {
+                setCoursesDecreasingViews(response.data);
+            })
+            .catch(() => setCoursesDecreasingViews([]));
     }, []);
 
     return (
@@ -31,7 +40,7 @@ function DashboardReports() {
                 {[
                     {
                         title: "Baja Interacción",
-                        description: "5 cursos con baja interacción en los últimos 30 días",
+                        description: coursesDecreasingViews.length + " cursos con baja interacción en los últimos 30 días",
                         icon: TrendingDown,
                         color: "text-yellow-500",
                     },

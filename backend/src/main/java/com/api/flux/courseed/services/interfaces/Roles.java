@@ -4,4 +4,5 @@ public interface Roles {
     String PREFIX = "ROLE_";
     String ADMIN = "ADMIN";
     String USER = "USER";
+    String PUBLISHER = "PUBLISHER";
 }

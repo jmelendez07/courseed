@@ -4,6 +4,7 @@ import { ArrowUpRight, ChevronDown, ChevronUp, LoaderCircle, Search } from "luci
 import ReviewLarge from "./ui/review-large";
 import useReviewsAuth from "@/hooks/useReviewsAuth";
 import ReviewsDraw from "./draws/ReviewsDraw";
+import { Link } from "react-router-dom";
 
 interface DashboardContentReviewsAuthProps {
     className?: string;
@@ -104,10 +105,10 @@ function DashboardContentReviewsAuth({ className }: DashboardContentReviewsAuthP
                                 Parece que aún no has creado ninguna reseña.
                             </p>
                             <Button asChild className="group">
-                                <a href="/educacion" target="_blank">
+                                <Link to="/educacion">
                                     Reseñar una educación continua
                                     <ArrowUpRight className="transition-transform group-hover:translate-x-1" />
-                                </a>
+                                </Link>
                             </Button>
                         </div>
                     )

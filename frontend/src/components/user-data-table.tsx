@@ -80,6 +80,7 @@ function UserDataTable() {
 				return roles.map(role => {
 					if (role === ROLES.ADMIN) return 'Administrador';
 					if (role === ROLES.USER) return 'Usuario';
+					if (role === ROLES.PUBLISHER) return 'Publicador';
 					return role;
 				}).join(', ');
 			}

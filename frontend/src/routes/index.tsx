@@ -17,6 +17,8 @@ import ReviewsUser from "@/pages/auth/user/Reviews";
 import ProtectedAuthRoute from "./ProtectedAuthRoute";
 import ProtectedAdminRoute from "./ProtectedAdminRoute";
 import ProtectedUserRoute from "./ProtectedUserRoute";
+import ProtectedPublisherRoute from "./ProtectedPublisherRoute";
+import DashboardPublisher from "@/pages/auth/publisher/Dashboard";
 
 function Routes() {
 
@@ -110,6 +112,19 @@ function Routes() {
         }
     ]
 
+    const routesForPublisher = [
+        {
+            path: '/publicador',
+            element: <ProtectedPublisherRoute />,
+            children: [
+                {
+                    path: '',
+                    element: <DashboardPublisher />
+                }
+            ]
+        }
+    ]
+
     const router = createBrowserRouter([
         {
             path: '/',
@@ -118,7 +133,8 @@ function Routes() {
                 ...routesForNotAuthenticated,
                 ...routesForAuthenticated,
                 ...routesForAdmin,
-                ...routesForUser
+                ...routesForUser,
+                ...routesForPublisher
             ]
         }
     ]);

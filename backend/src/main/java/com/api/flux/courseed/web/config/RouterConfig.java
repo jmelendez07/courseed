@@ -13,6 +13,7 @@ import com.api.flux.courseed.web.controllers.InstitutionController;
 import com.api.flux.courseed.web.controllers.ReactionController;
 import com.api.flux.courseed.web.controllers.ReviewController;
 import com.api.flux.courseed.web.controllers.RoleController;
+import com.api.flux.courseed.web.controllers.SearchHistoryController;
 import com.api.flux.courseed.web.controllers.UserController;
 import com.api.flux.courseed.web.controllers.ViewController;
 
@@ -25,7 +26,8 @@ public class RouterConfig {
         ContentController contentController, CourseController courseController,
         InstitutionController institutionController, ViewController viewController,
         ReviewController reviewController, UserController userController,
-        RoleController roleController, ReactionController reactionController
+        RoleController roleController, ReactionController reactionController,
+        SearchHistoryController searchHistoryController
     ) {
         return RouterFunctions.route()
             .path("/auth", () -> authRoutes(authController))
@@ -38,6 +40,7 @@ public class RouterConfig {
             .path("/roles", () -> roleRoutes(roleController))
             .path("/reactions", () -> reactionRoutes(reactionController))
             .path("/views", () -> viewRoutes(viewController))
+            .path("/search-histories", () -> searchHistoryRoutes(searchHistoryController))
             .build();
     }
 
@@ -160,7 +163,16 @@ public class RouterConfig {
             .GET("/course/{courseId}", viewController::findViewsByCourseId)
             .GET("/auth", viewController::findViewsByAuthUser)
             .GET("/total/this-month", viewController::getTotalViews)
+            .GET("/courses/this-month/decreasing", viewController::findCoursesWithDecreasingViews)
             .POST("/create", viewController::createView)
+            .build();
+    }
+
+    private RouterFunction<ServerResponse> searchHistoryRoutes(SearchHistoryController searchHistoryController) {
+        return RouterFunctions
+            .route()
+            .GET("/auth", searchHistoryController::findByAuthUser)
+            .POST("/create", searchHistoryController::createSearchHistory)
             .build();
     }
 
@@ -212,5 +224,10 @@ public class RouterConfig {
     @Bean
     ViewController viewController() {
         return new ViewController();
+    }
+
+    @Bean
+    SearchHistoryController searchHistoryController() {
+        return new SearchHistoryController();
     }
 }

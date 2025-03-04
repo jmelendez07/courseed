@@ -1,6 +1,7 @@
 import { AppSidebar } from "@/components/app-sidebar";
 import DashboardCourseOferts from "@/components/dashboard-courses-oferts";
 import DashboardRecomendedCourses from "@/components/dashboard-recomended-courses";
+import DashboardSearchHistories from "@/components/dashboard-search-histories";
 import {
     Breadcrumb,
     BreadcrumbItem,
@@ -16,6 +17,7 @@ import {
     SidebarProvider,
     SidebarTrigger,
 } from "@/components/ui/sidebar";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Theme from "@/components/ui/theme";
 import { useAuth } from "@/providers/AuthProvider";
 import React from "react";
@@ -64,7 +66,18 @@ function Dashboard() {
                         <h1 className="text-3xl font-bold tracking-tight">Bienvenid@, {getName()}</h1>
                         <p className="text-muted-foreground">Continúa aprendiendo donde lo dejaste</p>
                     </div>
-                    <DashboardRecomendedCourses />
+                    <Tabs defaultValue="recomendados" className="flex-1 flex flex-col items-start">
+                        <TabsList className="mb-4">
+                            <TabsTrigger value="recomendados">Recomendados</TabsTrigger>
+                            <TabsTrigger value="historial">Historial</TabsTrigger>
+                        </TabsList>
+                        <TabsContent value="recomendados" className="space-y-4 h-full">
+                            <DashboardRecomendedCourses />
+                        </TabsContent>
+                        <TabsContent value="historial" className="space-y-4 w-full h-full overflow-hidden">
+                            <DashboardSearchHistories />
+                        </TabsContent>
+                    </Tabs>
                     <DashboardCourseOferts />
                 </div>
             </SidebarInset>

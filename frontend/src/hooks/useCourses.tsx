@@ -23,9 +23,10 @@ interface UseCoursesProps {
     size?: number;
     institutionParam?: InstitutionInterface;
     facultyParam?: CategoryInterface;
+    searchParam?: string
 }
 
-function useCourses({ size, institutionParam, facultyParam }: UseCoursesProps) {
+function useCourses({ size, institutionParam, facultyParam, searchParam }: UseCoursesProps) {
     const [courses, setCourses] = React.useState<CourseInterface[]>([]);
     const [loading, setLoading] = React.useState(false);
     const [totalCourses, setTotalCourses] = React.useState<number | null>(null);
@@ -34,7 +35,7 @@ function useCourses({ size, institutionParam, facultyParam }: UseCoursesProps) {
 
     const [params, setParams] = React.useState<ParamsProps>({
         pageNumber: 0,
-        searchText: "",
+        searchText: searchParam || "",
         institution: institutionParam?.id ? institutionParam : null,
         faculty: facultyParam?.id ? facultyParam : null
     });
@@ -96,10 +97,13 @@ function useCourses({ size, institutionParam, facultyParam }: UseCoursesProps) {
             })
             .catch(() => setIsLastPage(true))
             .finally(() => setLoading(false));
+        
+        if (params.searchText.trim().length > 0) {
+            axios.post(APIS.SEARCH_HISTORY_CREATE, { search: params.searchText })
+        }
     }
 
     const handleCreatedCourse = (course: CourseInterface) => {
-        alert(1);
         setCourses(currentCourses => [
             course,
             ...currentCourses
