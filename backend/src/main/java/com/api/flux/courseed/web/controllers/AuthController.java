@@ -7,6 +7,7 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 import com.api.flux.courseed.projections.dtos.LoginUserDto;
 import com.api.flux.courseed.projections.dtos.RegisterUserDto;
 import com.api.flux.courseed.projections.dtos.UpdateAuthPasswordDto;
+import com.api.flux.courseed.projections.dtos.UpdateProfileDto;
 import com.api.flux.courseed.services.implementations.AuthService;
 import com.api.flux.courseed.services.implementations.ValidationService;
 
@@ -51,10 +52,21 @@ public class AuthController {
             .doOnNext(validationService::validate)
             .flatMap(updateAuthPasswordDto -> serverRequest.principal()
                 .flatMap(principal -> authService.updatePassword(principal, updateAuthPasswordDto)
-                    .flatMap(userDto -> ServerResponse.ok().bodyValue(userDto))
+                    .flatMap(tokenDto -> ServerResponse.ok().bodyValue(tokenDto))
                     .switchIfEmpty(ServerResponse.notFound().build())
                 )
             );
     }
+
+    public Mono<ServerResponse> updateProfile(ServerRequest serverRequest) {
+        return serverRequest.bodyToMono(UpdateProfileDto.class)
+            .doOnNext(validationService::validate)
+            .flatMap(updateProfileDto -> serverRequest.principal()
+                .flatMap(principal -> authService.updateProfile(principal, updateProfileDto)
+                    .flatMap(userDto -> ServerResponse.ok().bodyValue(userDto))
+                    .switchIfEmpty(ServerResponse.notFound().build())
+                )
+            );
+    } 
     
 }

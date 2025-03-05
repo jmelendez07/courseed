@@ -7,6 +7,9 @@ import java.util.List;
 public class UserDto implements Serializable {
     private String id;
     private String email;
+    private String academicLevel;
+    private String sex; 
+    private LocalDateTime birthdate;
     private List<String> roles;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
@@ -90,8 +93,29 @@ public class UserDto implements Serializable {
 
     public void setViews(int views) {
         this.views = views;
-    }    
+    }
 
-    
-    
+    public String getAcademicLevel() {
+        return academicLevel;
+    }
+
+    public void setAcademicLevel(String academicLevel) {
+        this.academicLevel = academicLevel;
+    }
+
+    public String getSex() {
+        return sex;
+    }
+
+    public void setSex(String sex) {
+        this.sex = sex;
+    }
+
+    public LocalDateTime getBirthdate() {
+        return birthdate;
+    }
+
+    public void setBirthdate(LocalDateTime birthdate) {
+        this.birthdate = birthdate;
+    }        
 }

@@ -6,6 +6,7 @@ import com.api.flux.courseed.projections.dtos.LoginUserDto;
 import com.api.flux.courseed.projections.dtos.RegisterUserDto;
 import com.api.flux.courseed.projections.dtos.TokenDto;
 import com.api.flux.courseed.projections.dtos.UpdateAuthPasswordDto;
+import com.api.flux.courseed.projections.dtos.UpdateProfileDto;
 import com.api.flux.courseed.projections.dtos.UserDto;
 
 import reactor.core.publisher.Mono;
@@ -14,5 +15,6 @@ public interface InterfaceAuthService {
     Mono<UserDto> getAuthUser(Principal principal);
     Mono<TokenDto> login(LoginUserDto loginUserDto);
     Mono<Object> register(RegisterUserDto registerUserDto);
-    Mono<UserDto> updatePassword(Principal principal, UpdateAuthPasswordDto updateAuthPasswordDto);
+    Mono<TokenDto> updatePassword(Principal principal, UpdateAuthPasswordDto updateAuthPasswordDto);
+    Mono<UserDto> updateProfile(Principal principal, UpdateProfileDto updateProfiledto);
 }

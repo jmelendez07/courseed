@@ -10,6 +10,8 @@ interface CredentialsProps {
     email: string;
     password: string;
     confirmPassword: string;
+    academicLevel: string | undefined;
+    sex: string | undefined;
     birthdate: Date | undefined;
 }
 
@@ -17,6 +19,9 @@ interface CredentialsErrorsProps {
     email: string | null;
     password: string | null;
     confirmPassword: string | null;
+    academicLevel: string | null;
+    sex: string | null;
+    birthdate: string | null;
 }
 
 interface CredentialLoginErrorsProps {
@@ -34,12 +39,17 @@ function useRegister() {
         email: '',
         password: '',
         confirmPassword: '',
+        academicLevel: undefined,
+        sex: undefined,
         birthdate: undefined
     });
     const [credentialsErrors, setCredentialsErrors] = React.useState<CredentialsErrorsProps>({
         email: null,
         password: null,
-        confirmPassword: null
+        confirmPassword: null,
+        academicLevel: null,
+        sex: null,
+        birthdate: null
     });
     const [loading, setLoading] = React.useState<boolean>(false);
     
@@ -61,13 +71,17 @@ function useRegister() {
                     setCredentialsErrors({
                         email: null,
                         password: null,
-                        confirmPassword: null
+                        confirmPassword: null,
+                        academicLevel: null,
+                        sex: null,
+                        birthdate: null
                     });
 
                     handleLogin();
                 }
             })
             .catch((error: AxiosError<CredentialsErrorsProps>) => {
+                console.log(error);
                 if (!error.response?.data) return;
 
                 if (error.response.data.confirmPassword) {
@@ -80,7 +94,10 @@ function useRegister() {
                 setCredentialsErrors({
                     email: error.response.data.email,
                     password: error.response.data.password,
-                    confirmPassword: error.response.data.confirmPassword
+                    confirmPassword: error.response.data.confirmPassword,
+                    academicLevel: error.response.data.academicLevel,
+                    sex: error.response.data.sex,
+                    birthdate: error.response.data.birthdate
                 });
             })
             .finally(() => setLoading(false));
@@ -101,7 +118,10 @@ function useRegister() {
                 setCredentialsErrors({
                     email: error.response.data.email,
                     password: error.response.data.password,
-                    confirmPassword: error.response.data.auth
+                    confirmPassword: error.response.data.auth,
+                    academicLevel: null,
+                    sex: null,
+                    birthdate: null,
                 });
             });
     }

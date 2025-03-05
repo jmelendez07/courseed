@@ -8,9 +8,10 @@ import useRegister from "@/hooks/useRegister";
 import React from "react";
 import { motion } from "motion/react";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
-import { Calendar } from "./ui/calendar";
 import dayjs from "dayjs";
-import { es } from "react-day-picker/locale";
+import { Calendar } from "./ui/calendar";
+import { es } from "date-fns/locale";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 
 enum STEPS {
 	ONE = 1,
@@ -24,6 +25,49 @@ export function RegisterForm({
 
 	const register = useRegister();
 	const [currentStep, setCurrentStep] = React.useState<STEPS>(STEPS.ONE);
+	const [month, setMonth] = React.useState<Date>(new Date());
+	const [yearInput, setYearInput] = React.useState<string>(`${month.getFullYear()}`);
+
+	const handleYearChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		const value = e.target.value;
+		if (/^\d*$/.test(value)) {
+			setYearInput(value);
+			const year = parseInt(value);
+			if (year > 1800 && year <= new Date().getFullYear()) {
+				setMonth(new Date(year, month.getMonth()));
+			}
+		}
+	};
+
+	const nextStep = () => {
+		if (register.credentials.email.trim().length === 0) {
+			register.setCredentialsErrors({
+				...register.credentialsErrors,
+				email: "Debes completar el campo correspondiente al correo electrónico."
+			});
+		} else if (register.credentials.password.trim().length === 0) {
+			register.setCredentialsErrors({
+				...register.credentialsErrors,
+				email: null,
+				password: "Debes completar el campo correspondiente a la contraseña."
+			});
+		} else if (register.credentials.confirmPassword.trim().length === 0) {
+			register.setCredentialsErrors({
+				...register.credentialsErrors,
+				email: null,
+				password: null,
+				confirmPassword: "Debes completar el campo correspondiente a la contraseña."
+			});
+		} else {
+			setCurrentStep(STEPS.TWO);
+			register.setCredentialsErrors({
+				...register.credentialsErrors,
+				email: null,
+				password: null,
+				confirmPassword: null
+			});
+		}
+	}
 
 	return (
 		<form
@@ -40,7 +84,7 @@ export function RegisterForm({
 					Únete y descubre cursos para potenciar tus habilidades.
 				</p>
 			</div>
-			{currentStep === STEPS.ONE && (
+			{(currentStep === STEPS.ONE || register.credentialsErrors.email || register.credentialsErrors.password || register.credentialsErrors.confirmPassword) ? (
 				<motion.div className="grid gap-6">
 					<div className="grid gap-2">
 						<Label htmlFor="email">Correo Electronico</Label>
@@ -104,51 +148,76 @@ export function RegisterForm({
 						type="button"
 						className="w-full"
 						disabled={register.loading}
-						onClick={() => setCurrentStep(STEPS.TWO)}
+						onClick={(e) => {
+							e.preventDefault();
+							nextStep();
+						}}
 					>
 						Siguiente Paso
 					</Button>
 				</motion.div>
-			)}
-
-			{currentStep === STEPS.TWO && (
+			) : (
 				<motion.div className="grid gap-6">
 					<div className="grid gap-2">
 						<Label htmlFor="academicLevel">Nivel Academico</Label>
-						<Input
-							id="academicLevel"
-							type=""
-							autoComplete="email"
-							placeholder="nombre@organizacion.tipo"
-							onChange={register.setCredential}
-							value={register.credentials.email}
-							disabled={register.loading}
-						/>
-						{register.credentialsErrors.email && (
+						<Select
+							onValueChange={value => register.setCredentials({
+								...register.credentials,
+								academicLevel: value
+							})}
+							value={register.credentials.academicLevel}
+						>
+							<SelectTrigger>
+								<SelectValue
+									placeholder="Selecciona un nivel academico"
+								/>
+							</SelectTrigger>
+							<SelectContent>
+								<SelectItem value="primaria">Primaria</SelectItem>
+								<SelectItem value="bachiller">Bachiller</SelectItem>
+								<SelectItem value="tecnologico">Técnico / Tecnológico</SelectItem>
+								<SelectItem value="pregrado">Pregrado / Universitario</SelectItem>
+								<SelectItem value="especialización">Especialización</SelectItem>
+								<SelectItem value="maestria">Maestría</SelectItem>
+								<SelectItem value="doctorado">Doctorado</SelectItem>
+								<SelectItem value="certificación profesional">Certificación Profesional</SelectItem>
+								<SelectItem value="diplomado">Diplomado</SelectItem>
+								<SelectItem value="otro">Otro</SelectItem>
+							</SelectContent>
+						</Select>
+						{register.credentialsErrors.academicLevel && (
 							<p className="flex items-start gap-1 text-xs text-red-600 line-clamp-2">
 								<Info className="w-3 h-3 min-h-3 min-w-3" />
 								<span>
-									{register.credentialsErrors.email}
+									{register.credentialsErrors.academicLevel}
 								</span>
 							</p>
 						)}
 					</div>
 					<div className="grid gap-2">
 						<Label htmlFor="sex">Sexo</Label>
-						<Input
-							id="sex"
-							type=""
-							autoComplete="email"
-							placeholder="nombre@organizacion.tipo"
-							onChange={register.setCredential}
-							value={register.credentials.email}
-							disabled={register.loading}
-						/>
-						{register.credentialsErrors.email && (
+						<Select
+							onValueChange={value => register.setCredentials({
+								...register.credentials,
+								sex: value
+							})}
+							value={register.credentials.sex}
+						>
+							<SelectTrigger>
+								<SelectValue
+									placeholder="Selecciona un sexo"
+								/>
+							</SelectTrigger>
+							<SelectContent>
+								<SelectItem value="masculino">Masculino</SelectItem>
+								<SelectItem value="femenino">Femenino</SelectItem>
+							</SelectContent>
+						</Select>
+						{register.credentialsErrors.sex && (
 							<p className="flex items-start gap-1 text-xs text-red-600 line-clamp-2">
 								<Info className="w-3 h-3 min-h-3 min-w-3" />
 								<span>
-									{register.credentialsErrors.email}
+									{register.credentialsErrors.sex}
 								</span>
 							</p>
 						)}
@@ -159,10 +228,7 @@ export function RegisterForm({
 							<PopoverTrigger asChild>
 								<Button
 									variant={"outline"}
-									className={cn(
-										"w-full pl-3 text-left font-normal",
-										!register.credentials.birthdate && "text-muted-foreground"
-									)}
+									className="bg-transparent dark:bg-transparent font-normal"
 								>
 									{register.credentials.birthdate ? (
 										dayjs(register.credentials.birthdate.toISOString()).format("LL")
@@ -173,26 +239,37 @@ export function RegisterForm({
 								</Button>
 							</PopoverTrigger>
 							<PopoverContent className="w-auto p-0" align="start">
+								<div className="flex items-center text-sm gap-2 px-4 py-2">
+									<span>Año:</span>
+									<Input
+										className="w-20 text-center"
+										value={yearInput}
+										onChange={handleYearChange}
+										maxLength={4}
+									/>
+								</div>
 								<Calendar
+									locale={es}
 									mode="single"
-									locale=""
 									selected={register.credentials.birthdate}
 									onSelect={(value) => register.setCredentials({
 										...register.credentials,
 										birthdate: value
 									})}
-									disabled={(date) =>
+									disabled={(date: Date) =>
 										date > new Date() || date < new Date("1900-01-01")
 									}
-									initialFocus
+									month={month}
+									onMonthChange={setMonth}
+									required={true}
 								/>
 							</PopoverContent>
 						</Popover>
-						{register.credentialsErrors.email && (
+						{register.credentialsErrors.birthdate && (
 							<p className="flex items-start gap-1 text-xs text-red-600 line-clamp-2">
 								<Info className="w-3 h-3 min-h-3 min-w-3" />
 								<span>
-									{register.credentialsErrors.email}
+									{register.credentialsErrors.birthdate}
 								</span>
 							</p>
 						)}

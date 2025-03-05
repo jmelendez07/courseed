@@ -10,6 +10,7 @@ import {
     BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import Color from "@/components/ui/Color";
+import ProfileCards from "@/components/ui/profile-cards";
 import { Separator } from "@/components/ui/separator";
 import {
     SidebarInset,
@@ -50,6 +51,8 @@ function Profile() {
                     </header>
                     <div className="flex flex-col gap-8 p-8">
                         <DashboardContentProfile />
+                        <Separator className="my-4" />
+                        <ProfileCards />
                         <Separator className="my-4" />
                         <DashboardStatsProfile />
                     </div>

@@ -20,19 +20,9 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Theme from "@/components/ui/theme";
 import { useAuth } from "@/providers/AuthProvider";
-import React from "react";
 
 function Dashboard() {
-
     const authHook = useAuth();
-
-    const getName = React.useCallback(() => {
-        const name = authHook?.user?.email.split('@')[0].replace(".", " ");
-        if (name) {
-            return name.charAt(0).toUpperCase() + name.slice(1);
-        }
-        return '';
-    }, [authHook?.user?.email]);
 
     return (
         <SidebarProvider>
@@ -63,7 +53,7 @@ function Dashboard() {
                 </header>
                 <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
                     <div>
-                        <h1 className="text-3xl font-bold tracking-tight">Bienvenid@, {getName()}</h1>
+                        <h1 className="text-3xl font-bold tracking-tight">Bienvenid@, {authHook?.getName()}</h1>
                         <p className="text-muted-foreground">Continúa aprendiendo donde lo dejaste</p>
                     </div>
                     <Tabs defaultValue="recomendados" className="flex-1 flex flex-col items-start">

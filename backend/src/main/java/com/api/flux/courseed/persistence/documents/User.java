@@ -10,11 +10,14 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document(collection = "users")
 public class User {
-    
+
     @Id
     private String id;
     private String email;
     private String password;
+    private String academicLevel;
+    private String sex;
+    private LocalDateTime birthdate;
     private List<String> roles;
 
     @CreatedDate
@@ -22,6 +25,25 @@ public class User {
 
     @LastModifiedDate
     private LocalDateTime updatedAt;
+
+    public User() {
+    }
+
+    public User(String email, String password, List<String> roles) {
+        this.email = email;
+        this.password = password;
+        this.roles = roles;
+    }
+
+    public User(String email, String password, String academicLevel, String sex, LocalDateTime birthdate,
+            List<String> roles) {
+        this.email = email;
+        this.password = password;
+        this.academicLevel = academicLevel;
+        this.sex = sex;
+        this.birthdate = birthdate;
+        this.roles = roles;
+    }
 
     public String getId() {
         return id;
@@ -71,11 +93,28 @@ public class User {
         this.updatedAt = updatedAt;
     }
 
-    public User() {}
-
-    public User(String email, String password, List<String> roles) {
-        this.email = email;
-        this.password = password;
-        this.roles = roles;
+    public String getAcademicLevel() {
+        return academicLevel;
     }
+
+    public void setAcademicLevel(String academicLevel) {
+        this.academicLevel = academicLevel;
+    }
+
+    public String getSex() {
+        return sex;
+    }
+
+    public void setSex(String sex) {
+        this.sex = sex;
+    }
+
+    public LocalDateTime getBirthdate() {
+        return birthdate;
+    }
+
+    public void setBirthdate(LocalDateTime birthdate) {
+        this.birthdate = birthdate;
+    }
+
 }

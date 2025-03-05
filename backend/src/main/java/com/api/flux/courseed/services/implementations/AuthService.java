@@ -22,6 +22,7 @@ import com.api.flux.courseed.projections.dtos.LoginUserDto;
 import com.api.flux.courseed.projections.dtos.RegisterUserDto;
 import com.api.flux.courseed.projections.dtos.TokenDto;
 import com.api.flux.courseed.projections.dtos.UpdateAuthPasswordDto;
+import com.api.flux.courseed.projections.dtos.UpdateProfileDto;
 import com.api.flux.courseed.projections.dtos.UserDto;
 import com.api.flux.courseed.projections.mappers.UserMapper;
 import com.api.flux.courseed.services.interfaces.InterfaceAuthService;
@@ -139,21 +140,29 @@ public class AuthService implements InterfaceAuthService {
     }
 
     @Override
-    public Mono<UserDto> updatePassword(Principal principal, UpdateAuthPasswordDto updateAuthPasswordDto) {
+    public Mono<TokenDto> updatePassword(Principal principal, UpdateAuthPasswordDto updateAuthPasswordDto) {
         return userRepository.findByEmail(principal.getName())
             .filter(user -> passwordEncoder.matches(updateAuthPasswordDto.getCurrentPassword(), user.getPassword()))
             .flatMap(user -> {
                 if (!updateAuthPasswordDto.getNewPassword().equals(updateAuthPasswordDto.getConfirmNewPassword())) {
                     return Mono.error(new CustomWebExchangeBindException(
                         updateAuthPasswordDto.getConfirmNewPassword(), 
-                        "confirmPassword", 
+                        "confirmNewPassword", 
                         "La confirmación de la contraseña no coincide con la contraseña nueva. Por favor, revísalo e inténtalo de nuevo."
                     ).getWebExchangeBindException());   
                 }
 
                 user.setPassword(passwordEncoder.encode(updateAuthPasswordDto.getNewPassword()));
                 return userRepository.save(user)
-                    .map(userMapper::toUserDto);
+                    .flatMap(savedUser -> {
+                        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
+                            savedUser.getEmail(), 
+                            savedUser.getPassword(), 
+                            savedUser.getRoles().stream().map(SimpleGrantedAuthority::new).toList()
+                        );
+                        return reactiveAuthenticationManager.authenticate(authenticationToken)
+                        .map(auth -> new TokenDto(jwtUtil.create(auth)));
+                    });
             })
             .switchIfEmpty(Mono.error(
                 new CustomWebExchangeBindException(
@@ -161,6 +170,25 @@ public class AuthService implements InterfaceAuthService {
                     "auth", 
                     "El correo electrónico o la contraseña proporcionados son incorrectos. Por favor, verifica tus credenciales e intenta nuevamente."
                 ).getWebExchangeBindException())
-            ); 
+            );
+    }
+
+    public Mono<UserDto> updateProfile(Principal principal, UpdateProfileDto updateProfileDto) {
+        return userRepository.findByEmail(principal.getName())
+            .flatMap(user -> {
+                user.setAcademicLevel(updateProfileDto.getAcademicLevel());
+                user.setSex(updateProfileDto.getSex());
+                user.setBirthdate(updateProfileDto.getBirthdate());
+
+                return userRepository.save(user)
+                    .map(userMapper::toUserDto);
+            })
+            .switchIfEmpty(Mono.error(
+                new CustomWebExchangeBindException(
+                    updateProfileDto,
+                    "auth", 
+                    "El correo electrónico o la contraseña proporcionados son incorrectos. Por favor, verifica tus credenciales e intenta nuevamente."
+                ).getWebExchangeBindException())
+            );
     }
 }

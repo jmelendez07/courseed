@@ -2,6 +2,8 @@ enum APIS {
     USERS = 'api/users',
     USERS_TOTAL = 'api/users/total/this-month',
     USER_AUTHENTICATED = 'api/auth',
+    UPDATE_AUTH_PASSWORD = 'api/auth/password',
+    UPDATE_PROFILE = 'api/auth/profile',
     USERS_COUNT_BY_MONTH = 'api/users/months/count',
     USER_CREATE = 'api/users/create',
     USER_UPDATE_EMAIL = 'api/users/email/',

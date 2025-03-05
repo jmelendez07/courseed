@@ -51,6 +51,7 @@ public class RouterConfig {
             .POST("/login", authController::login)
             .POST("/register", authController::register)
             .PUT("/password", authController::updatePassword)
+            .PUT("/profile", authController::updateProfile)
             .build();
     }
 
