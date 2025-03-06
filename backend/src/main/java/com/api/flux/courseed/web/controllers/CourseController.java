@@ -34,6 +34,17 @@ public class CourseController {
             .switchIfEmpty(ServerResponse.notFound().build());
     }
 
+    public Mono<ServerResponse> getCoursesByAuthUser(ServerRequest serverRequest) {
+        return serverRequest.principal()
+            .flatMap(principal -> courseService.getCoursesByAuthUser(
+                principal,
+                Integer.parseInt(serverRequest.queryParam("page").orElse("0")), 
+                Integer.parseInt(serverRequest.queryParam("size").orElse("10"))
+            ))
+            .flatMap(courses -> ServerResponse.ok().bodyValue(courses))
+            .switchIfEmpty(ServerResponse.notFound().build());
+    }
+
     public Mono<ServerResponse> searchCoursesByText(ServerRequest serverRequest) {
         return courseService
             .searchCoursesByText(
@@ -87,9 +98,10 @@ public class CourseController {
     public Mono<ServerResponse> createCourse(ServerRequest serverRequest) {
         return serverRequest.bodyToMono(SaveCourseDto.class)
             .doOnNext(validationService::validate)
-            .flatMap(saveCourseDto -> courseService.createCourse(saveCourseDto)
-                .flatMap(courseDto -> ServerResponse.ok().bodyValue(courseDto))
-                .switchIfEmpty(ServerResponse.notFound().build())
+            .flatMap(saveCourseDto -> serverRequest.principal()
+                .flatMap(principal -> courseService.createCourse(principal, saveCourseDto))
+                    .flatMap(courseDto -> ServerResponse.ok().bodyValue(courseDto))
+                    .switchIfEmpty(ServerResponse.notFound().build())
             );
     }
     

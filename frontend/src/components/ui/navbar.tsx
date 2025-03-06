@@ -130,8 +130,8 @@ const Navbar = ({
     const getPrincipalRoute = (): string => {
         if (authHook?.user?.roles?.some(r => r === ROLES.ADMIN)) {
             return "/administrador";
-        } else if (authHook?.user?.roles?.some(r => r === ROLES.PUBLISHER)) {
-            return "/publicador";
+        } else if (authHook?.user?.roles?.some(r => r === ROLES.SUBSCRIBER)) {
+            return "/suscriptor";
         } else {
             return "/usuario";
         }

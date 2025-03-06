@@ -14,6 +14,7 @@ public class CourseDto implements Serializable {
     private String modality;
     private CategoryDto category;
     private InstitutionDto institution;
+    private UserDto user;
     private List<ContentDto> contents;
     private List<ReviewDto> reviews;
     private List<ReactionDto> reactions;
@@ -131,4 +132,11 @@ public class CourseDto implements Serializable {
         this.views = views;
     }
 
+    public UserDto getUser() {
+        return user;
+    }
+
+    public void setUser(UserDto user) {
+        this.user = user;
+    }
 }

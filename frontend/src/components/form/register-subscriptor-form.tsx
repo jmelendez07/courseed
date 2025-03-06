@@ -1,0 +1,187 @@
+import { cn } from "@/lib/utils"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Link, useNavigate } from "react-router-dom"
+import React from "react"
+import axios, { AxiosError, AxiosResponse } from "axios"
+import APIS from "@/enums/apis"
+import { useAuth } from "@/providers/AuthProvider"
+import { Info, LoaderCircle } from "lucide-react"
+import { useToast } from "@/hooks/use-toast"
+import dayjs from "dayjs"
+
+interface FormProps {
+    email: string;
+    password: string;
+    confirmPassword: string;
+}
+
+interface ErrorsProps {
+    email: string | null;
+    password: string | null;
+    confirmPassword: string | null;
+}
+
+function RegisterSubscriptorForm({
+    className,
+    ...props
+}: React.ComponentPropsWithoutRef<"div">) {
+
+    const [form, setForm] = React.useState<FormProps>({
+        email: "",
+        password: "",
+        confirmPassword: "",
+    });
+
+    const [errors, setErrors] = React.useState<ErrorsProps>({
+        email: null,
+        password: null,
+        confirmPassword: null,
+    });
+
+    const [loading, setLoading] = React.useState<boolean>(false);
+    const authHook = useAuth();
+    const { toast } = useToast();
+    const navigate = useNavigate();
+
+    const handleRegister = (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        setLoading(true);
+        axios.post(APIS.REGISTER_SUSCRIPTOR, form)
+            .then((response: AxiosResponse) => {
+                authHook?.handleToken(response.data.token);
+                setErrors({
+                    email: null,
+                    password: null,
+                    confirmPassword: null,
+                });
+                toast({
+                    title: `Bienvenido a coursed, tu suscripción se ha compleado exitosamente!`,
+                    description: dayjs().format("LLL"),
+                });
+                console.log(response);
+                navigate("/suscriptor", { replace: true });
+            })
+            .catch((error: AxiosError<ErrorsProps>) => {
+                setErrors({
+                    email: error.response?.data.email ?? null,
+                    password: error.response?.data.password ?? null,
+                    confirmPassword: error.response?.data.confirmPassword ?? null,
+                });
+            })
+            .finally(() => setLoading(false));
+    }
+
+    const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setForm({
+            ...form,
+            [e.target.id]: e.target.value
+        });
+    }
+
+    return (
+        <div className={cn("flex flex-col gap-6", className)} {...props}>
+            <form onSubmit={handleRegister}>
+                <div className="flex flex-col gap-6">
+                    <div className="flex flex-col items-center gap-2">
+                        <Link
+                            to="/"
+                            className="flex flex-col items-center gap-2 font-medium"
+                        >
+                            <img 
+                                src="/logo.png" 
+                                className="w-10" 
+                                alt="Courseed"
+                            />
+                            <span className="sr-only">Courseed</span>
+                        </Link>
+                        <h1 className="text-xl font-bold">Te damos la bienvenida a courseed</h1>
+                        <div className="text-center text-sm text-zinc-500 dark:text-zinc-400">
+                            ¿Ya tienes una cuenta?{" "}
+                            <Link to="/acceso" className="underline underline-offset-4 text-zinc-900 dark:text-white">
+                                Inicia Sesión Aqui
+                            </Link>
+                        </div>
+                    </div>
+                    <div className="flex flex-col gap-6">
+                        <div className="grid gap-2">
+                            <Label htmlFor="email">Correo Electronico</Label>
+                            <Input
+                                id="email"
+                                type="email"
+                                autoComplete="email"
+                                placeholder="m@example.com"
+                                value={form.email}
+                                onChange={handleOnChange}
+                                disabled={loading}
+                            />
+                            {errors.email && (
+                                <p className="flex items-start gap-1 text-xs text-red-600 line-clamp-2">
+                                    <Info className="w-3 h-3 min-h-3 min-w-3" />
+                                    <span>
+                                        {errors.email}
+                                    </span>
+                                </p>
+                            )}
+                        </div>
+                        <div className="grid gap-2">
+                            <Label htmlFor="password">Contraseña</Label>
+                            <Input
+                                id="password"
+                                type="password"
+                                autoComplete="new-password"
+                                value={form.password}
+                                onChange={handleOnChange}
+                                disabled={loading}
+                            />
+                            {errors.password && (
+                                <p className="flex items-start gap-1 text-xs text-red-600 line-clamp-2">
+                                    <Info className="w-3 h-3 min-h-3 min-w-3" />
+                                    <span>
+                                        {errors.password}
+                                    </span>
+                                </p>
+                            )}
+                        </div>
+                        <div className="grid gap-2">
+                            <Label htmlFor="email">Confirmar Contraseña</Label>
+                            <Input
+                                id="confirmPassword"
+                                type="password"
+                                autoComplete="new-password"
+                                value={form.confirmPassword}
+                                onChange={handleOnChange}
+                                disabled={loading}
+                            />
+                            {errors.confirmPassword && (
+                                <p className="flex items-start gap-1 text-xs text-red-600 line-clamp-2">
+                                    <Info className="w-3 h-3 min-h-3 min-w-3" />
+                                    <span>
+                                        {errors.confirmPassword}
+                                    </span>
+                                </p>
+                            )}
+                        </div>
+                        <Button 
+                            type="submit" 
+                            className="w-full"
+                            disabled={loading}
+                        >
+                            Registrarse
+                            {loading && (
+                                <LoaderCircle className="animate-spin" />
+                            )}
+                        </Button>
+                    </div>
+                </div>
+            </form>
+            <div className="text-balance text-center text-xs text-muted-foreground [&_a]:underline [&_a]:underline-offset-4 hover:[&_a]:text-primary">
+                Al hacer click en registrarse, estas aceptando los <a href="#">Terminos del servicio</a>{" "}
+                y la <a href="#">Politica de Privacidad</a>.
+            </div>
+        </div>
+    );
+}
+
+export default RegisterSubscriptorForm;

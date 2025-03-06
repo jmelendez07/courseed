@@ -1,23 +1,25 @@
 import APIS from "@/enums/apis";
-import axios, { AxiosError } from "axios";
-import React from "react";
-import { Button } from "./ui/button";
-import { LoaderCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import dayjs from "dayjs";
+import ReviewCourseUserInterface from "@/interfaces/review-course-user";
 import { DialogContext } from "@/providers/DialogProvider";
-import UserInterface from "@/interfaces/user";
+import axios, { AxiosError } from "axios";
+import dayjs from "dayjs";
+import React from "react";
+import { Button } from "@/components/ui/button";
+import { LoaderCircle } from "lucide-react";
+import ReviewInterface from "@/interfaces/review";
 
-interface DeleteUserProps {
-    user: UserInterface;
-    onDeleted?: (user: UserInterface) => void
+interface DeleteReviewForm {
+    review: ReviewCourseUserInterface | ReviewInterface,
+    onDeleted?: (review: ReviewCourseUserInterface | ReviewInterface) => void
 }
 
 interface ErrorProps {
-    userId: string | null;
+    auth: string | null;
+    reviewId: string | null;
 }
 
-function DeleteUserForm({ user, onDeleted }: DeleteUserProps) {
+function DeleteReviewForm({ review, onDeleted }: DeleteReviewForm) {
     const dialogContext = React.useContext(DialogContext);
     const [loading, setLoading] = React.useState<boolean>(false);
     const { toast } = useToast();
@@ -26,17 +28,17 @@ function DeleteUserForm({ user, onDeleted }: DeleteUserProps) {
         setLoading(true);
         e.preventDefault();
         
-        axios.delete(`${APIS.USER_DELETE}${user.id}`)
+        axios.delete(`${APIS.REVIEWS_DELETE}${review.id}`)
             .then(() => {
                 dialogContext?.setContext({
                     ...dialogContext.context,
                     open: false
                 });
                 toast({
-                    title: `${user.email} Eliminado!`,
+                    title: `Reseña de ${review.user.email} Eliminada!`,
                     description: dayjs().format("LLL"),
                 });
-                if (onDeleted) onDeleted(user);
+                if (onDeleted) onDeleted(review);
             })
             .catch((error: AxiosError<ErrorProps>) => {
                 dialogContext?.setContext({
@@ -44,8 +46,8 @@ function DeleteUserForm({ user, onDeleted }: DeleteUserProps) {
                     open: false
                 });
                 toast({
-                    title: `Error al eliminar a ${user.email}. Algo salió mal!`,
-                    description: error.response?.data.userId || error.message,
+                    title: `Reseña de ${review.user.email} salió mal!`,
+                    description: error.response?.data.auth || error.response?.data.reviewId || error.message,
                     variant: "destructive",
                 });
             })
@@ -69,4 +71,4 @@ function DeleteUserForm({ user, onDeleted }: DeleteUserProps) {
     );
 }
 
-export default DeleteUserForm;
+export default DeleteReviewForm;

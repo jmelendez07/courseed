@@ -1,23 +1,23 @@
 import APIS from "@/enums/apis";
-import CourseInterface from "@/interfaces/course";
 import axios, { AxiosError } from "axios";
 import React from "react";
-import { Button } from "./ui/button";
+import { Button } from "@/components/ui/button";
 import { LoaderCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import dayjs from "dayjs";
 import { DialogContext } from "@/providers/DialogProvider";
+import UserInterface from "@/interfaces/user";
 
-interface DeleteCourseProps {
-    course: CourseInterface;
-    onDeleted?: (course: CourseInterface) => void
+interface DeleteUserProps {
+    user: UserInterface;
+    onDeleted?: (user: UserInterface) => void
 }
 
 interface ErrorProps {
-    courseId: string | null;
+    userId: string | null;
 }
 
-function DeleteCourseForm({ course, onDeleted }: DeleteCourseProps) {
+function DeleteUserForm({ user, onDeleted }: DeleteUserProps) {
     const dialogContext = React.useContext(DialogContext);
     const [loading, setLoading] = React.useState<boolean>(false);
     const { toast } = useToast();
@@ -26,17 +26,17 @@ function DeleteCourseForm({ course, onDeleted }: DeleteCourseProps) {
         setLoading(true);
         e.preventDefault();
         
-        axios.delete(`${APIS.COURSES_DELETE}${course.id}`)
+        axios.delete(`${APIS.USER_DELETE}${user.id}`)
             .then(() => {
                 dialogContext?.setContext({
                     ...dialogContext.context,
                     open: false
                 });
                 toast({
-                    title: `${course.title} Eliminado!`,
+                    title: `${user.email} Eliminado!`,
                     description: dayjs().format("LLL"),
                 });
-                if (onDeleted) onDeleted(course);
+                if (onDeleted) onDeleted(user);
             })
             .catch((error: AxiosError<ErrorProps>) => {
                 dialogContext?.setContext({
@@ -44,8 +44,8 @@ function DeleteCourseForm({ course, onDeleted }: DeleteCourseProps) {
                     open: false
                 });
                 toast({
-                    title: `${course.title}. Algo salió mal!`,
-                    description: error.response?.data.courseId,
+                    title: `Error al eliminar a ${user.email}. Algo salió mal!`,
+                    description: error.response?.data.userId || error.message,
                     variant: "destructive",
                 });
             })
@@ -69,4 +69,4 @@ function DeleteCourseForm({ course, onDeleted }: DeleteCourseProps) {
     );
 }
 
-export default DeleteCourseForm;
+export default DeleteUserForm;

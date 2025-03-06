@@ -1,7 +1,7 @@
-import { Button } from "./ui/button";
-import { Label } from "./ui/label";
-import { Textarea } from "./ui/textarea";
-import RatingInput from "./ui/rating-input";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import RatingInput from "@/components/ui/rating-input";
 import React from "react";
 import ReviewCourseUserInterface from "@/interfaces/review-course-user";
 import axios, { AxiosError, AxiosResponse } from "axios";

@@ -37,7 +37,7 @@ public class SecurityConfig {
                 .formLogin(ServerHttpSecurity.FormLoginSpec::disable)
                 .cors(cors -> cors.configurationSource(configurationSource))
                 .authorizeExchange(exchange -> exchange
-                    .pathMatchers("/auth/login", "/auth/register").permitAll()
+                    .pathMatchers("/auth/login", "/auth/register", "/auth/register/subscriptor").permitAll()
                     .pathMatchers(HttpMethod.GET, "/categories", "/categories/*", "/categories/name/*").permitAll()
                     .pathMatchers(HttpMethod.POST, "/categories").hasRole(Roles.ADMIN)
                     .pathMatchers(HttpMethod.PUT, "/categories/*").hasRole(Roles.ADMIN)
@@ -48,7 +48,7 @@ public class SecurityConfig {
                     .pathMatchers(HttpMethod.DELETE, "/contents/*").hasRole(Roles.ADMIN)
                     .pathMatchers(HttpMethod.GET, "/courses", "/courses/*", "/courses/search", "/courses/category/*", "/courses/institution/*").permitAll()
                     .pathMatchers(HttpMethod.GET, "/courses/reviews-reactions/count", "/courses/reviews/avg").hasRole(Roles.ADMIN)
-                    .pathMatchers(HttpMethod.POST, "/courses").hasRole(Roles.ADMIN)
+                    .pathMatchers(HttpMethod.POST, "/courses").hasAnyRole(Roles.ADMIN, Roles.SUBSCRIBER)
                     .pathMatchers(HttpMethod.PUT, "/courses/*").hasRole(Roles.ADMIN)
                     .pathMatchers(HttpMethod.DELETE, "/courses/*").hasRole(Roles.ADMIN)
                     .pathMatchers(HttpMethod.DELETE, "/courses/*").hasRole(Roles.ADMIN)

@@ -248,7 +248,7 @@ public class UserService implements InterfaceUserService {
         return userRepository.findById(id)
             .flatMap(user -> {
                 List<String> newRoles = updateUserRolesDto.getRoles().stream()
-                    .filter(role -> role.equals(Roles.PREFIX + Roles.ADMIN) || role.equals(Roles.PREFIX + Roles.USER) || role.equals(Roles.PREFIX + Roles.PUBLISHER))
+                    .filter(role -> role.equals(Roles.PREFIX + Roles.ADMIN) || role.equals(Roles.PREFIX + Roles.USER) || role.equals(Roles.PREFIX + Roles.SUBSCRIBER))
                     .toList();
 
                 if (!newRoles.isEmpty()) {

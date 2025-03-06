@@ -5,6 +5,7 @@ import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 
 import com.api.flux.courseed.projections.dtos.LoginUserDto;
+import com.api.flux.courseed.projections.dtos.RegisterSubscriptorDto;
 import com.api.flux.courseed.projections.dtos.RegisterUserDto;
 import com.api.flux.courseed.projections.dtos.UpdateAuthPasswordDto;
 import com.api.flux.courseed.projections.dtos.UpdateProfileDto;
@@ -47,6 +48,15 @@ public class AuthController {
             );
     }
 
+    public Mono<ServerResponse> registerSubscriptor(ServerRequest serverRequest) {
+        return serverRequest.bodyToMono(RegisterSubscriptorDto.class)
+            .doOnNext(validationService::validate)
+            .flatMap(registerSubscriptorDto -> authService.registerSubscriptor(registerSubscriptorDto)
+                .flatMap(tokenDto -> ServerResponse.ok().bodyValue(tokenDto))
+                .switchIfEmpty(ServerResponse.notFound().build())
+            );
+    }
+
     public Mono<ServerResponse> updatePassword(ServerRequest serverRequest) {
         return serverRequest.bodyToMono(UpdateAuthPasswordDto.class)
             .doOnNext(validationService::validate)
@@ -68,5 +78,13 @@ public class AuthController {
                 )
             );
     } 
+
+    public Mono<ServerResponse> subscribe(ServerRequest serverRequest) {
+        return serverRequest.principal()
+            .flatMap(principal -> authService.subscribe(principal)
+                .flatMap(tokenDto -> ServerResponse.ok().bodyValue(tokenDto))
+                .switchIfEmpty(ServerResponse.notFound().build())
+            );
+    }
     
 }

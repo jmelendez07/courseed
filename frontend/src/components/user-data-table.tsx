@@ -36,9 +36,9 @@ import UserInterface from "@/interfaces/user";
 import ROLES from "@/enums/roles";
 import useUsers from "@/hooks/useUsers";
 import { useAuth } from "@/providers/AuthProvider";
-import UpdateUserForm from "./update-user-form";
+import UpdateUserForm from "@/components/form/update-user-form";
 import { DialogContext } from "@/providers/DialogProvider";
-import DeleteUserForm from "./delete-user-form";
+import DeleteUserForm from "@/components/form/delete-user-form";
 import { Avatar, AvatarFallback } from "./ui/avatar";
 
 function UserDataTable() {
@@ -80,7 +80,7 @@ function UserDataTable() {
 				return roles.map(role => {
 					if (role === ROLES.ADMIN) return 'Administrador';
 					if (role === ROLES.USER) return 'Usuario';
-					if (role === ROLES.PUBLISHER) return 'Publicador';
+					if (role === ROLES.SUBSCRIBER) return 'Suscriptor';
 					return role;
 				}).join(', ');
 			}
@@ -108,23 +108,23 @@ function UserDataTable() {
 			},
 		},
 		{
-			accessorKey: "likes",
+			accessorKey: "reactions",
 			header: ({ column }) => {
 				return (
 					<Button
 						variant="ghost"
 						onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
 					>
-						Likes
+						Reacciones
 						<ArrowUpDown className="ml-2 h-4 w-4" />
 					</Button>
 				)
 			},
 			cell: ({ row }) => {
-				const likes = parseFloat(row.getValue("likes"));
+				const reactions = parseFloat(row.getValue("reactions"));
 	
 				return <div className="flex items-center pl-3.5">
-					{likes}
+					{reactions}
 					<Heart className="ml-2 h-4 w-4" />
 				</div>
 			},
@@ -219,6 +219,8 @@ function UserDataTable() {
 			columnFilters,
 		},
 	});
+
+	console.log(userHook.users);
 
 	return (
 		<div className="w-full">

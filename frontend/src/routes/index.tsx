@@ -17,8 +17,10 @@ import ReviewsUser from "@/pages/auth/user/Reviews";
 import ProtectedAuthRoute from "./ProtectedAuthRoute";
 import ProtectedAdminRoute from "./ProtectedAdminRoute";
 import ProtectedUserRoute from "./ProtectedUserRoute";
-import ProtectedPublisherRoute from "./ProtectedPublisherRoute";
-import DashboardPublisher from "@/pages/auth/publisher/Dashboard";
+import DashboardSubscriber from "@/pages/auth/subscriptor/Dashboard";
+import CoursesSubscriber from "@/pages/auth/subscriptor/Courses";
+import ProtectedSubscriberRoute from "./ProtectedSubscriberRoute";
+import RegisterSubscribe from "@/pages/auth/RegisterSubscribe";
 
 function Routes() {
 
@@ -30,6 +32,10 @@ function Routes() {
         {
             path: '/acceso',
             element: <Login/>
+        },
+        {
+            path: '/registro/suscriptor',
+            element: <RegisterSubscribe />
         },
         {
             path: '/registro',
@@ -112,14 +118,18 @@ function Routes() {
         }
     ]
 
-    const routesForPublisher = [
+    const routesForSubscriptor = [
         {
-            path: '/publicador',
-            element: <ProtectedPublisherRoute />,
+            path: '/suscriptor',
+            element: <ProtectedSubscriberRoute />,
             children: [
                 {
                     path: '',
-                    element: <DashboardPublisher />
+                    element: <DashboardSubscriber />
+                },
+                {
+                    path: 'programas',
+                    element: <CoursesSubscriber />
                 }
             ]
         }
@@ -134,7 +144,7 @@ function Routes() {
                 ...routesForAuthenticated,
                 ...routesForAdmin,
                 ...routesForUser,
-                ...routesForPublisher
+                ...routesForSubscriptor
             ]
         }
     ]);

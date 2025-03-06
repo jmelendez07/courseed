@@ -7,11 +7,11 @@ import { CalendarIcon, Info, LoaderCircle } from "lucide-react";
 import useRegister from "@/hooks/useRegister";
 import React from "react";
 import { motion } from "motion/react";
-import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import dayjs from "dayjs";
-import { Calendar } from "./ui/calendar";
+import { Calendar } from "@/components/ui/calendar";
 import { es } from "date-fns/locale";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 enum STEPS {
 	ONE = 1,
@@ -80,9 +80,12 @@ export function RegisterForm({
 		>
 			<div className="flex flex-col items-center gap-2 text-center">
 				<h1 className="text-2xl font-bold">Regístrate y comienza ya</h1>
-				<p className="text-balance text-sm text-zinc-500 dark:text-zinc-400">
-					Únete y descubre cursos para potenciar tus habilidades.
-				</p>
+				<div className="text-center text-sm text-zinc-500 dark:text-zinc-400">
+					¿Quieres suscribirte?{" "}
+					<Link to="/registro/suscriptor" className="underline underline-offset-4 text-zinc-900 dark:text-white">
+						Registrate Aqui
+					</Link>
+				</div>
 			</div>
 			{(currentStep === STEPS.ONE || register.credentialsErrors.email || register.credentialsErrors.password || register.credentialsErrors.confirmPassword) ? (
 				<motion.div className="grid gap-6">
@@ -284,7 +287,7 @@ export function RegisterForm({
 			)}
 
 			<div className="text-center text-sm">
-				¿Ya tienes cuenta?{" "}
+				¿Ya tienes una cuenta?{" "}
 				<Link to="/acceso" className="underline underline-offset-4">
 					Inicia Sesión Aqui
 				</Link>

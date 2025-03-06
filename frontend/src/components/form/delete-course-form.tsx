@@ -1,25 +1,23 @@
 import APIS from "@/enums/apis";
-import { useToast } from "@/hooks/use-toast";
-import ReviewCourseUserInterface from "@/interfaces/review-course-user";
-import { DialogContext } from "@/providers/DialogProvider";
+import CourseInterface from "@/interfaces/course";
 import axios, { AxiosError } from "axios";
-import dayjs from "dayjs";
 import React from "react";
-import { Button } from "./ui/button";
+import { Button } from "@/components/ui/button";
 import { LoaderCircle } from "lucide-react";
-import ReviewInterface from "@/interfaces/review";
+import { useToast } from "@/hooks/use-toast";
+import dayjs from "dayjs";
+import { DialogContext } from "@/providers/DialogProvider";
 
-interface DeleteReviewForm {
-    review: ReviewCourseUserInterface | ReviewInterface,
-    onDeleted?: (review: ReviewCourseUserInterface | ReviewInterface) => void
+interface DeleteCourseProps {
+    course: CourseInterface;
+    onDeleted?: (course: CourseInterface) => void
 }
 
 interface ErrorProps {
-    auth: string | null;
-    reviewId: string | null;
+    courseId: string | null;
 }
 
-function DeleteReviewForm({ review, onDeleted }: DeleteReviewForm) {
+function DeleteCourseForm({ course, onDeleted }: DeleteCourseProps) {
     const dialogContext = React.useContext(DialogContext);
     const [loading, setLoading] = React.useState<boolean>(false);
     const { toast } = useToast();
@@ -28,17 +26,17 @@ function DeleteReviewForm({ review, onDeleted }: DeleteReviewForm) {
         setLoading(true);
         e.preventDefault();
         
-        axios.delete(`${APIS.REVIEWS_DELETE}${review.id}`)
+        axios.delete(`${APIS.COURSES_DELETE}${course.id}`)
             .then(() => {
                 dialogContext?.setContext({
                     ...dialogContext.context,
                     open: false
                 });
                 toast({
-                    title: `Reseña de ${review.user.email} Eliminada!`,
+                    title: `${course.title} Eliminado!`,
                     description: dayjs().format("LLL"),
                 });
-                if (onDeleted) onDeleted(review);
+                if (onDeleted) onDeleted(course);
             })
             .catch((error: AxiosError<ErrorProps>) => {
                 dialogContext?.setContext({
@@ -46,8 +44,8 @@ function DeleteReviewForm({ review, onDeleted }: DeleteReviewForm) {
                     open: false
                 });
                 toast({
-                    title: `Reseña de ${review.user.email} salió mal!`,
-                    description: error.response?.data.auth || error.response?.data.reviewId || error.message,
+                    title: `${course.title}. Algo salió mal!`,
+                    description: error.response?.data.courseId,
                     variant: "destructive",
                 });
             })
@@ -71,4 +69,4 @@ function DeleteReviewForm({ review, onDeleted }: DeleteReviewForm) {
     );
 }
 
-export default DeleteReviewForm;
+export default DeleteCourseForm;

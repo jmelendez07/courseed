@@ -19,8 +19,8 @@ import {
 } from "@/components/ui/sidebar";
 import React from "react";
 import { DialogContext } from "@/providers/DialogProvider";
-import CreateUserForm from "./create-user-form";
-import CourseForm from "./course-form";
+import CreateUserForm from "@/components/form/create-user-form";
+import CourseForm from "@/components/form/course-form";
 import { useAuth } from "@/providers/AuthProvider";
 import ROLES from "@/enums/roles";
 
@@ -33,15 +33,15 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 		return authHook?.user?.roles?.some(r => r === ROLES.ADMIN);
 	}
 
-	const isPublisher = (): boolean | undefined => {
-		return authHook?.user?.roles?.some(r => r === ROLES.PUBLISHER);
+	const isSubscriber = (): boolean | undefined => {
+		return authHook?.user?.roles?.some(r => r === ROLES.SUBSCRIBER);
 	}
 
 	const getNavMain = () => {
 		if (isAdmin()) {
 			return dataAdmin.navMain;
-		} else if (isPublisher()) {
-			return dataPublisher.navMain;
+		} else if (isSubscriber()) {
+			return dataSubscriber.navMain;
 		} else {
 			return dataUser.navMain;
 		}
@@ -137,13 +137,18 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 		]
 	}
 
-	const dataPublisher = {
+	const dataSubscriber = {
 		actions: [],
 		navMain: [
 			{
 				title: "Panel",
 				icon: LayoutPanelLeft,
-				url: "/publicador"
+				url: "/suscriptor"
+			},
+			{
+				title: "Programas",
+				icon: GraduationCap,
+				url: "/suscriptor/programas"
 			}
 		]
 	}

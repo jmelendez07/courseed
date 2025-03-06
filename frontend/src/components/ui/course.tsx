@@ -35,7 +35,7 @@ function Course({ className, course, optionsEnable, handleEdit, handleDelete }: 
 				currency: 'COP',
 				minimumFractionDigits: 2,
 				maximumFractionDigits: 2
-			}) + " COP"
+			})
 			: "Sin información";
 	}
 

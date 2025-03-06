@@ -11,9 +11,11 @@ import com.api.flux.courseed.projections.dtos.SaveCourseDto;
 public interface CourseMapper {
 
     @Mapping(target = "id", ignore = true)
+    @Mapping(target = "userId", ignore = true)
     Course toCourse(SaveCourseDto saveCourseDto);
     
     @Mapping(target = "category", ignore = true)
+    @Mapping(target = "user", ignore = true)
     @Mapping(target = "contents", ignore = true)
     @Mapping(target = "institution", ignore = true)
     @Mapping(target = "reviews", ignore = true)

@@ -81,7 +81,6 @@ function useRegister() {
                 }
             })
             .catch((error: AxiosError<CredentialsErrorsProps>) => {
-                console.log(error);
                 if (!error.response?.data) return;
 
                 if (error.response.data.confirmPassword) {

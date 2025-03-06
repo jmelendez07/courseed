@@ -7,12 +7,12 @@ import FadeItem from "./fadeItem";
 import { useAuth } from "@/providers/AuthProvider";
 import CreateReviewCard from "./createReviewCard";
 import { DialogContext } from "@/providers/DialogProvider";
-import CreateReviewForm from "../create-review-form";
+import CreateReviewForm from "@/components/form/create-review-form";
 import UserInterface from "@/interfaces/user";
 import CourseInterface from "@/interfaces/course";
 import ReviewInterface from "@/interfaces/review";
-import UpdateReviewForm from "../update-review-form";
-import DeleteReviewForm from "../delete-review-form";
+import UpdateReviewForm from "@/components/form/update-review-form";
+import DeleteReviewForm from "@/components/form/delete-review-form";
 
 interface BlogReviewsProps {
     tagline: string;

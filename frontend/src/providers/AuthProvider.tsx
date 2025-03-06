@@ -168,7 +168,7 @@ function useIsPublisher() {
 
     React.useEffect(() => {
         if (auth?.user && Array.isArray(auth.user.roles)) {
-            setIsPublisher(auth.user.roles.some(role => role === ROLES.PUBLISHER));
+            setIsPublisher(auth.user.roles.some(role => role === ROLES.SUBSCRIBER));
         } else {
             axios.get(APIS.USER_AUTHENTICATED, {
                 headers: {
@@ -179,7 +179,7 @@ function useIsPublisher() {
                     setIsPublisher(
                         typeof response.data === "object" && 
                         Array.isArray(response.data?.roles) &&
-                        response.data.roles.some(role => role === ROLES.PUBLISHER)
+                        response.data.roles.some(role => role === ROLES.SUBSCRIBER)
                     )
                 })
                 .catch(() => setIsPublisher(false));

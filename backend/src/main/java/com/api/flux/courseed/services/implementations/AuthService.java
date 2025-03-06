@@ -19,6 +19,7 @@ import com.api.flux.courseed.persistence.repositories.ReviewRepository;
 import com.api.flux.courseed.persistence.repositories.UserRepository;
 import com.api.flux.courseed.persistence.repositories.ViewRepository;
 import com.api.flux.courseed.projections.dtos.LoginUserDto;
+import com.api.flux.courseed.projections.dtos.RegisterSubscriptorDto;
 import com.api.flux.courseed.projections.dtos.RegisterUserDto;
 import com.api.flux.courseed.projections.dtos.TokenDto;
 import com.api.flux.courseed.projections.dtos.UpdateAuthPasswordDto;
@@ -190,5 +191,61 @@ public class AuthService implements InterfaceAuthService {
                     "El correo electrónico o la contraseña proporcionados son incorrectos. Por favor, verifica tus credenciales e intenta nuevamente."
                 ).getWebExchangeBindException())
             );
+    }
+
+    @Override
+    public Mono<TokenDto> subscribe(Principal principal) {
+        return userRepository.findByEmail(principal.getName())
+            .flatMap(user -> {
+                user.setRoles(Arrays.asList(Roles.PREFIX + Roles.SUBSCRIBER));
+
+                return userRepository.save(user)
+                    .flatMap(savedUser -> {
+                        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
+                            savedUser.getEmail(), 
+                            savedUser.getPassword(), 
+                            savedUser.getRoles().stream().map(SimpleGrantedAuthority::new).toList()
+                        );
+                        return reactiveAuthenticationManager.authenticate(authenticationToken)
+                        .map(auth -> new TokenDto(jwtUtil.create(auth)));
+                    });
+            });
+    }
+
+    @Override
+    public Mono<Object> registerSubscriptor(RegisterSubscriptorDto registerSubscriptorDto) {
+        if (!registerSubscriptorDto.getPassword().equals(registerSubscriptorDto.getConfirmPassword())) {
+            return Mono.error(new CustomWebExchangeBindException(
+                registerSubscriptorDto, 
+                "confirmPassword", 
+                "La confirmación de la contraseña no coincide con la contraseña original."
+            ).getWebExchangeBindException());
+        }
+
+        return userRepository.findByEmail(registerSubscriptorDto.getEmail())
+            .flatMap(existingUser -> Mono.error(
+                new CustomWebExchangeBindException(
+                    registerSubscriptorDto.getEmail(), 
+                    "email", 
+                    "El email que intentas registrar ya está asociado a otra cuenta."
+                ).getWebExchangeBindException()
+            ))
+            .switchIfEmpty(Mono.defer(() -> {
+                User user = userMapper.toUser(registerSubscriptorDto);
+                user.setPassword(passwordEncoder.encode(user.getPassword()));
+                user.setRoles(Arrays.asList(Roles.PREFIX + Roles.SUBSCRIBER));
+
+                return userRepository.save(user)
+                    .flatMap(savedUser -> {
+                        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
+                            savedUser.getEmail(), 
+                            savedUser.getPassword(), 
+                            savedUser.getRoles().stream().map(SimpleGrantedAuthority::new).toList()
+                        );
+
+                        return reactiveAuthenticationManager.authenticate(authenticationToken)
+                            .map(auth -> new TokenDto(jwtUtil.create(auth)));
+                    });
+            }));
     }
 }

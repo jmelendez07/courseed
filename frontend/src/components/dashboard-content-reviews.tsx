@@ -7,8 +7,8 @@ import { ChevronDown, ChevronUp, LoaderCircle, Search } from "lucide-react";
 import ComboBoxResponsive from "./ui/combo-box-responsive";
 import ReviewLarge from "./ui/review-large";
 import useUsers from "@/hooks/useUsers";
-import UpdateReviewForm from "./update-review-form";
-import DeleteReviewForm from "./delete-review-form";
+import UpdateReviewForm from "@/components/form/update-review-form";
+import DeleteReviewForm from "@/components/form/delete-review-form";
 
 function DashboardContentReviews({ className }: { className?: string }) {
 

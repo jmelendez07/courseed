@@ -7,8 +7,8 @@ import Course from "@/components/ui/course";
 import { Input } from "@/components/ui/input";
 import React from "react";
 import { DialogContext } from "@/providers/DialogProvider";
-import CourseForm from "./course-form";
-import DeleteCourseForm from "./delete-course-form";
+import CourseForm from "@/components/form/course-form";
+import DeleteCourseForm from "@/components/form/delete-course-form";
 
 function DashboardContentCourses({ className }: { className?: string }) {
 

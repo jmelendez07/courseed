@@ -1,7 +1,7 @@
 import UserInterface from "@/interfaces/user";
-import { Button } from "./ui/button";
-import { Input } from "./ui/input";
-import { Label } from "./ui/label";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import React from "react";
 import { ChevronLeft, ChevronRight, Info, LoaderCircle } from "lucide-react";
 import axios, { AxiosError, AxiosResponse } from "axios";
@@ -9,7 +9,7 @@ import APIS from "@/enums/apis";
 import { useToast } from "@/hooks/use-toast";
 import { DialogContext } from "@/providers/DialogProvider";
 import dayjs from "dayjs";
-import ComboBoxResponsive from "./ui/combo-box-responsive";
+import ComboBoxResponsive from "@/components/ui/combo-box-responsive";
 import ROLES from "@/enums/roles";
 
 interface FormProps {

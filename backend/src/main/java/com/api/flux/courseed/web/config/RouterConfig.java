@@ -50,8 +50,10 @@ public class RouterConfig {
             .GET(authController::getAuthUser)
             .POST("/login", authController::login)
             .POST("/register", authController::register)
+            .POST("/register/subscriptor", authController::registerSubscriptor)
             .PUT("/password", authController::updatePassword)
             .PUT("/profile", authController::updateProfile)
+            .PUT("/subscribe", authController::subscribe)
             .build();
     }
 
@@ -82,6 +84,7 @@ public class RouterConfig {
         return RouterFunctions
             .route()
             .GET("", courseController::getAllCourses)
+            .GET("/auth", courseController::getCoursesByAuthUser)
             .GET("/search", courseController::searchCoursesByText)
             .GET("/reviews/avg", courseController::getTopCoursesWithRatingAvg)
             .GET("/{id}", courseController::getCourseById)

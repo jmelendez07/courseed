@@ -31,6 +31,16 @@ export function TeamSwitcher({
 }) {
 	const { isMobile } = useSidebar();
 
+	const getRoleName = () => {
+		if (roles.some(r => r === ROLES.ADMIN)) {
+			return 'Administrador';
+		} else if (roles.some(r => r === ROLES.SUBSCRIBER)) {
+			return 'Suscriptor';
+		} else {
+			return 'Usuario';
+		}
+	}
+
 	return (
 		<SidebarMenu>
 			<SidebarMenuItem>
@@ -51,10 +61,7 @@ export function TeamSwitcher({
 									Courseed
 								</span>
 								<span className="truncate text-xs">
-									{roles.some(r => r === ROLES.ADMIN) 
-										? 'Administrador'
-										: 'Usuario'
-									}
+									{getRoleName()}
 								</span>
 							</div>
 							<ChevronsUpDown className="ml-auto" />

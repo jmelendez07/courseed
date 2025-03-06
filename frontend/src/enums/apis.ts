@@ -17,6 +17,7 @@ enum APIS {
     COURSES_SEARCH = 'api/courses/search',
     COURSES_BY_INSTITUTION = 'api/courses/institution',
     COURSES_BY_FACULTY = 'api/courses/category',
+    COURSES_BY_AUTH_USER = 'api/courses/auth',
     COURSES_REVIEWS_REACTIONS_COUNT = 'api/courses/reviews-reactions/count',
     COURSES_WITH_RATING_AVG = 'api/courses/reviews/avg',
     COURSES_CREATE = 'api/courses',
@@ -44,7 +45,9 @@ enum APIS {
     VIEWS_TOTAL = 'api/views/total/this-month',
     VIEWS_COURSES_DECREASING = 'api/views/courses/this-month/decreasing',
     SEARCH_HISTORIES_BY_AUTH_USER = 'api/search-histories/auth',
-    SEARCH_HISTORY_CREATE = 'api/search-histories/create'
+    SEARCH_HISTORY_CREATE = 'api/search-histories/create',
+    SUBSCRIBE = 'api/auth/subscribe',
+    REGISTER_SUSCRIPTOR = 'api/auth/register/subscriptor',
 }
 
 export default APIS;

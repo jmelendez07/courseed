@@ -91,8 +91,8 @@ function useLogin() {
                 if (response.data && Array.isArray(response.data.roles)) {
                     if (response.data.roles.some(role => role === ROLES.ADMIN)) {
                         navigate("/administrador", { replace: true });
-                    } else if (response.data.roles.some(role => role === ROLES.PUBLISHER)) {
-                        navigate("/publicador", { replace: true });
+                    } else if (response.data.roles.some(role => role === ROLES.SUBSCRIBER)) {
+                        navigate("/suscriptor", { replace: true });
                     } else {
                         navigate("/usuario", { replace: true });
                     }

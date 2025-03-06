@@ -78,7 +78,7 @@ function DashboardContentLikesAuth({ className }: DashboardContentLikesAuthProps
                                     </>
                                 ) : (
                                     <>
-                                        Mostrar mas reseñas
+                                        Mostrar mas reacciones
                                         {reactionsHook.loading ? (
                                             <LoaderCircle className="animate-spin" />
                                         ) : (

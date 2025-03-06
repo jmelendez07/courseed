@@ -35,6 +35,7 @@ interface ComboBoxResponsiveProps {
     pagination?: boolean;
     onPaginate?: () => void;
     labelAll?: string | null;
+    disabled?: boolean;
 }
 
 function ComboBoxResponsive({ 
@@ -44,15 +45,19 @@ function ComboBoxResponsive({
     selectedStatus,
     pagination,
     onPaginate,
-    labelAll
+    labelAll,
+    disabled = false
 }: ComboBoxResponsiveProps) {
     const [isOpen, setIsOpen] = React.useState<boolean>(false);
     const isDesktop = useMediaQuery("(min-width: 768px)");
 
     if (isDesktop) {
         return (
-            <Popover open={isOpen} onOpenChange={setIsOpen}>
-                <PopoverTrigger asChild>
+            <Popover 
+                open={isOpen} 
+                onOpenChange={setIsOpen}
+            >
+                <PopoverTrigger disabled={disabled} className="max-w-full overflow-hidden" asChild>
                     <Button variant="outline" className="justify-between items-center">
                         <p className="max-w-full truncate">
                             {(selectedStatus && selectedStatus.name) ? <>{selectedStatus.name}</> : placeholder}

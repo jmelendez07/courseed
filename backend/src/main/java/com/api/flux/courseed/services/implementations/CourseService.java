@@ -1,4 +1,5 @@
 package com.api.flux.courseed.services.implementations;
+import java.security.Principal;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
@@ -13,6 +14,7 @@ import com.api.flux.courseed.persistence.documents.Course;
 import com.api.flux.courseed.persistence.documents.Institution;
 import com.api.flux.courseed.persistence.documents.Reaction;
 import com.api.flux.courseed.persistence.documents.Review;
+import com.api.flux.courseed.persistence.documents.View;
 import com.api.flux.courseed.persistence.repositories.CategoryRepository;
 import com.api.flux.courseed.persistence.repositories.ContentRepository;
 import com.api.flux.courseed.persistence.repositories.CourseRepository;
@@ -35,6 +37,7 @@ import com.api.flux.courseed.projections.mappers.CourseMapper;
 import com.api.flux.courseed.projections.mappers.InstitutionMapper;
 import com.api.flux.courseed.projections.mappers.ReactionMapper;
 import com.api.flux.courseed.projections.mappers.ReviewMapper;
+import com.api.flux.courseed.projections.mappers.UserMapper;
 import com.api.flux.courseed.projections.mappers.ViewMapper;
 import com.api.flux.courseed.services.interfaces.InterfaceCourseService;
 import com.api.flux.courseed.web.exceptions.CustomWebExchangeBindException;
@@ -60,12 +63,13 @@ public class CourseService implements InterfaceCourseService {
     private ReviewMapper reviewMapper;
     private ReactionMapper reactionMapper;
     private ViewMapper viewMapper;
+    private UserMapper userMapper;
 
     public CourseService(
         CourseRepository courseRepository, CategoryRepository categoryRepository, ReactionRepository reactionRepository,
         InstitutionRepository institutionRepository, ContentRepository contentRepository, ViewRepository viewRepository,
         ReviewRepository reviewRepository, UserRepository userRepository, CourseMapper courseMapper, CategoryMapper categoryMapper,
-        InstitutionMapper institutionMapper, ContentMapper contentMapper,
+        InstitutionMapper institutionMapper, ContentMapper contentMapper, UserMapper userMapper,
         ReviewMapper reviewMapper, ReactionMapper reactionMapper, ViewMapper viewMapper
     ) {
         this.courseRepository = courseRepository;
@@ -83,6 +87,7 @@ public class CourseService implements InterfaceCourseService {
         this.reviewMapper = reviewMapper;
         this.reactionMapper = reactionMapper;
         this.viewMapper = viewMapper;
+        this.userMapper = userMapper;
     }
 
     @Override
@@ -331,27 +336,40 @@ public class CourseService implements InterfaceCourseService {
     }
 
     @Override
-    public Mono<CourseDto> createCourse(SaveCourseDto saveCourseDto) {
-        return categoryRepository.findById(saveCourseDto.getCategoryId())
-            .flatMap(category -> institutionRepository.findById(saveCourseDto.getInstitutionId())
-                .flatMap(institution -> courseRepository.save(courseMapper.toCourse(saveCourseDto))
-                    .flatMap(course -> this.getCourseById(course.getId()))
+    public Mono<CourseDto> createCourse(Principal principal, SaveCourseDto saveCourseDto) {
+        return userRepository.findByEmail(principal.getName())
+            .flatMap(user -> categoryRepository.findById(saveCourseDto.getCategoryId())
+                .flatMap(category -> institutionRepository.findById(saveCourseDto.getInstitutionId())
+                    .flatMap(institution -> {
+                        Course course = courseMapper.toCourse(saveCourseDto);
+                        course.setUserId(user.getId());
+
+                        return courseRepository.save(course)
+                            .map(savedCourse -> {
+                                CourseDto savedCourseDto = courseMapper.toCourseDto(savedCourse);
+                                savedCourseDto.setCategory(categoryMapper.toCategoryDto(category));
+                                savedCourseDto.setInstitution(institutionMapper.toInstitutionDto(institution));
+                                savedCourseDto.setUser(userMapper.toUserDto(user));
+
+                                return savedCourseDto;
+                            });
+                    })
+                    .switchIfEmpty(Mono.error(
+                        new CustomWebExchangeBindException(
+                            saveCourseDto.getInstitutionId(), 
+                            "institutionId", 
+                            "No hemos podido encontrar la institución indicada. Te sugerimos que verifiques la información y lo intentes de nuevo."
+                        ).getWebExchangeBindException()
+                    ))
                 )
                 .switchIfEmpty(Mono.error(
                     new CustomWebExchangeBindException(
-                        saveCourseDto.getInstitutionId(), 
-                        "institutionId", 
-                        "No hemos podido encontrar la institución indicada. Te sugerimos que verifiques la información y lo intentes de nuevo."
+                        saveCourseDto.getCategoryId(), 
+                        "categoryId", 
+                        "No hemos podido encontrar la categoría indicada. Te sugerimos que verifiques la información y lo intentes de nuevo."
                     ).getWebExchangeBindException()
                 ))
-            )
-            .switchIfEmpty(Mono.error(
-                new CustomWebExchangeBindException(
-                    saveCourseDto.getCategoryId(), 
-                    "categoryId", 
-                    "No hemos podido encontrar la categoría indicada. Te sugerimos que verifiques la información y lo intentes de nuevo."
-                ).getWebExchangeBindException()
-            ));
+            );
     }
 
     @Override
@@ -405,6 +423,48 @@ public class CourseService implements InterfaceCourseService {
                     "No hemos podido encontrar el curso indicado. Te sugerimos que verifiques la información y lo intentes de nuevo."
                 ).getWebExchangeBindException())
             );
+    }
+
+    @Override
+    public Mono<Page<CourseDto>> getCoursesByAuthUser(Principal principal, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+
+        return userRepository.findByEmail(principal.getName())
+            .flatMapMany(user -> courseRepository.findByUserId(user.getId(), pageable)
+                .flatMap(course -> {
+                    Mono<Category> categoryMono = categoryRepository.findById(course.getCategoryId());
+                    Mono<Institution> institutionMono = institutionRepository.findById(course.getInstitutionId());
+                    Flux<Content> contentFlux = contentRepository.findByCourseId(course.getId());
+                    Flux<Reaction> reactionFlux = reactionRepository.findByCourseId(course.getId());
+                    Flux<Review> reviewFlux = reviewRepository.findByCourseId(course.getId());
+                    Flux<View> viewFlux = viewRepository.findByCourseId(course.getId());
+
+                    return Mono.zip(categoryMono, institutionMono, contentFlux.collectList(), reactionFlux.collectList(), reviewFlux.collectList(), viewFlux.collectList())
+                        .map(tuple -> {
+                            CourseDto courseDto = courseMapper.toCourseDto(course);
+                            courseDto.setCategory(categoryMapper.toCategoryDto(tuple.getT1()));
+                            courseDto.setInstitution(institutionMapper.toInstitutionDto(tuple.getT2()));
+                            courseDto.setContents(tuple.getT3().stream()
+                                .map(contentMapper::toContentDto)
+                                .toList()
+                            );
+                            courseDto.setReactions(tuple.getT4().stream().map(reactionMapper::toReactionDto).toList());
+                            courseDto.setReviews(tuple.getT5().stream()
+                                .map(reviewMapper::toReviewDto)
+                                .toList()
+                            );
+                            courseDto.setViews(tuple.getT6().stream()
+                                .map(viewMapper::toViewDto)
+                                .toList()
+                            );
+
+                            return courseDto;
+                        });
+                    })
+            )
+            .collectList()
+            .zipWith(courseRepository.count())
+            .map(p -> new PageImpl<>(p.getT1(), pageable, p.getT2()));
     }
     
 }
