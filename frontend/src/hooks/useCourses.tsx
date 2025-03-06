@@ -2,7 +2,7 @@ import APIS from "@/enums/apis";
 import CategoryInterface from "@/interfaces/category";
 import CourseInterface from "@/interfaces/course";
 import InstitutionInterface from "@/interfaces/institution";
-import axios, { AxiosError, AxiosResponse } from "axios";
+import axios, { AxiosResponse } from "axios";
 import React from "react";
 
 interface ResponseCourseProps {
@@ -14,7 +14,7 @@ interface ResponseCourseProps {
 
 interface ParamsProps {
     pageNumber: number;
-    searchText: string;
+    search: string;
     institution: InstitutionInterface | null;
     faculty: CategoryInterface | null;
 }
@@ -35,7 +35,7 @@ function useCourses({ size, institutionParam, facultyParam, searchParam }: UseCo
 
     const [params, setParams] = React.useState<ParamsProps>({
         pageNumber: 0,
-        searchText: searchParam || "",
+        search: searchParam || "",
         institution: institutionParam?.id ? institutionParam : null,
         faculty: facultyParam?.id ? facultyParam : null
     });
@@ -43,19 +43,13 @@ function useCourses({ size, institutionParam, facultyParam, searchParam }: UseCo
     const handleFetch = React.useCallback(() => {
         setLoading(true);
 
-        let url: string = APIS.COURSES;
-        if (params.institution) {
-            url = `${APIS.COURSES_BY_INSTITUTION}/${params.institution.id}`;
-        } else if (params.faculty) {
-            url = `${APIS.COURSES_BY_FACULTY}/${params.faculty.id}`;
-        } else if (params.searchText) {
-            url = `${APIS.COURSES_SEARCH}?text=${params.searchText}`;
-        }
-
-        axios.get(url, {
+        axios.get(APIS.COURSES, {
             params: {
                 page: params.pageNumber,
-                size: pageSize
+                size: pageSize,
+                search: params.search,
+                institutionId: params.institution?.id,
+                categoryId: params.faculty?.id,
             },
         })
             .then((response: AxiosResponse<ResponseCourseProps>) => {
@@ -69,39 +63,11 @@ function useCourses({ size, institutionParam, facultyParam, searchParam }: UseCo
                 setIsLastPage(response.data.last || response.data.empty);
                 setTotalCourses(response.data.totalElements);
             })
-            .catch((error: AxiosError) => {
-                console.error(error);
+            .catch(() => {
                 setIsLastPage(true);
             })
             .finally(() => setLoading(false));
-    }, [params.pageNumber, pageSize, params.institution, params.searchText, params.faculty]);
-
-    const handleSearch = () => {
-        setParams({
-            ...params,
-            institution: null,
-            faculty: null,
-            pageNumber: 0
-        });
-        setLoading(true);
-        axios.get(`${APIS.COURSES_SEARCH}?text=${params.searchText}`, {
-            params: {
-                page: 0,
-                size: pageSize
-            },
-        })
-            .then((response: AxiosResponse<ResponseCourseProps>) => {
-                setCourses(response.data.content);
-                setIsLastPage(response.data.last || response.data.empty);
-                setTotalCourses(response.data.totalElements);
-            })
-            .catch(() => setIsLastPage(true))
-            .finally(() => setLoading(false));
-        
-        if (params.searchText.trim().length > 0) {
-            axios.post(APIS.SEARCH_HISTORY_CREATE, { search: params.searchText })
-        }
-    }
+    }, [params.pageNumber, pageSize, params.institution, params.search, params.faculty]);
 
     const handleCreatedCourse = (course: CourseInterface) => {
         setCourses(currentCourses => [
@@ -126,7 +92,7 @@ function useCourses({ size, institutionParam, facultyParam, searchParam }: UseCo
         setCourses(courses.filter(c => c.id !== course.id));
     }
 
-    React.useEffect(() => handleFetch(), [params.pageNumber, pageSize, params.institution?.id, params.faculty?.id]);
+    React.useEffect(() => handleFetch(), [params.pageNumber, params.search, pageSize, params.institution?.id, params.faculty?.id]);
 
     return {
         courses,
@@ -140,7 +106,6 @@ function useCourses({ size, institutionParam, facultyParam, searchParam }: UseCo
         setIsLastPage,
         setTotalCourses,
         setParams,
-        handleSearch,
         handleCreatedCourse,
         handleUpdateCourse,
         handleDeleteCourse

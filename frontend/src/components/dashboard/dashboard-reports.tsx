@@ -1,6 +1,6 @@
 import { Star, TrendingDown } from "lucide-react";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "./ui/card";
-import { Button } from "./ui/button";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import React from "react";
 import axios, { AxiosResponse } from "axios";
 import APIS from "@/enums/apis";

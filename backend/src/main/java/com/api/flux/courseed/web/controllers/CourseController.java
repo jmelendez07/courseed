@@ -21,6 +21,9 @@ public class CourseController {
     public Mono<ServerResponse> getAllCourses(ServerRequest serverRequest) {
         return courseService
             .getAllCourses(
+                serverRequest.queryParam("search").orElse(""),
+                serverRequest.queryParam("categoryId").orElse(""),
+                serverRequest.queryParam("institutionId").orElse(""),
                 Integer.parseInt(serverRequest.queryParam("page").orElse("0")), 
                 Integer.parseInt(serverRequest.queryParam("size").orElse("10"))
             )
@@ -38,6 +41,7 @@ public class CourseController {
         return serverRequest.principal()
             .flatMap(principal -> courseService.getCoursesByAuthUser(
                 principal,
+                serverRequest.queryParam("search").orElse(""),
                 Integer.parseInt(serverRequest.queryParam("page").orElse("0")), 
                 Integer.parseInt(serverRequest.queryParam("size").orElse("10"))
             ))
@@ -108,15 +112,25 @@ public class CourseController {
     public Mono<ServerResponse> updateCourse(ServerRequest serverRequest) {
         return serverRequest.bodyToMono(SaveCourseDto.class)
             .doOnNext(validationService::validate)
-            .flatMap(saveCourseDto -> courseService.updateCourse(serverRequest.pathVariable("id"), saveCourseDto)
+            .flatMap(saveCourseDto -> serverRequest.principal()
+                .flatMap(principal -> courseService.updateCourse(
+                    principal,
+                    serverRequest.pathVariable("id"), 
+                    saveCourseDto
+                )
                 .flatMap(courseDto -> ServerResponse.ok().bodyValue(courseDto))
                 .switchIfEmpty(ServerResponse.notFound().build())
-            );
+            ));
     }
 
     public Mono<ServerResponse> deleteCourse(ServerRequest serverRequest) {
-        return courseService.deleteCourse(serverRequest.pathVariable("id"))
-            .flatMap(c -> ServerResponse.ok().bodyValue(c))
-            .switchIfEmpty(ServerResponse.notFound().build());
+        return serverRequest.principal()
+            .flatMap(principal -> courseService.deleteCourse(
+                principal, 
+                serverRequest.pathVariable("id")
+            )
+                .flatMap(c -> ServerResponse.ok().bodyValue(c))
+                .switchIfEmpty(ServerResponse.notFound().build())
+            );
     }    
 }

@@ -15,13 +15,13 @@ import reactor.core.publisher.Mono;
 public interface InterfaceCourseService {
     Mono<List<CourseWithReviewsCountAndReactionsCount>> getTopCoursesWithReviewsAndReactions(int page, int size);
     Mono<List<CourseWithRatingAvg>> getTopCoursesWithRatingAvg(int size);
-    Mono<Page<CourseDto>> getCoursesByAuthUser(Principal principal, int page, int size);
-    Mono<Page<CourseDto>> getAllCourses(int page, int size);
+    Mono<Page<CourseDto>> getCoursesByAuthUser(Principal principal, String search, int page, int size);
+    Mono<Page<CourseDto>> getAllCourses(String search, String categoryId, String institutionId, int page, int size);
     Mono<Page<CourseDto>> getCoursesByCategoryId(String categoryId, int page, int size);
     Mono<Page<CourseDto>> getCoursesByInstitutionId(String institutionId, int page, int size);
     Mono<Page<CourseDto>> searchCoursesByText(String text, int page, int size);
     Mono<CourseDto> getCourseById(String id);
     Mono<CourseDto> createCourse(Principal principal, SaveCourseDto saveCourseDto);
-    Mono<CourseDto> updateCourse(String id, SaveCourseDto saveCourseDto);
-    Mono<Boolean> deleteCourse(String id);
+    Mono<CourseDto> updateCourse(Principal principal, String id, SaveCourseDto saveCourseDto);
+    Mono<Object> deleteCourse(Principal principal, String id);
 }

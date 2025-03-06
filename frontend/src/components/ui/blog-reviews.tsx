@@ -58,7 +58,7 @@ const BlogReviews = forwardRef<HTMLElement, BlogReviewsProps>(({
                     </FadeItem>
                 </div>
                 {(course.reviews.length > 0 || authHook?.user) && (
-                    <div className="w-full grid gap-6 md:grid-cols-2 lg:grid-cols-3 lg:gap-8 2xl:flex 2xl:flex-wrap">
+                    <div className="w-full grid gap-6 md:grid-cols-2 lg:grid-cols-3 lg:gap-8 2xl:flex 2xl:flex-wrap justify-between">
                         {(authHook?.user && !course.reviews.some(r => r.user.id === authHook.user?.id)) && (
                             <CreateReviewCard 
                                 user={authHook.user} 
@@ -72,11 +72,11 @@ const BlogReviews = forwardRef<HTMLElement, BlogReviewsProps>(({
                                         onCreated={(review) => newReview(review)} 
                                     />
                                 })}
-                                className="w-full md:w-[400px] md:max-w-[400px]"
+                                className="w-full md:max-w-[400px]"
                             />
                         )}
                         {course.reviews.map(review => (
-                            <FadeItem key={review.id} className="md:w-[400px] md:max-w-[400px]">
+                            <FadeItem key={review.id} className="w-full md:max-w-[400px]">
                                 <Review
                                     review={review}
                                     optionsEnabled={authHook?.user?.id === review.user.id}
@@ -98,7 +98,7 @@ const BlogReviews = forwardRef<HTMLElement, BlogReviewsProps>(({
                                             onDeleted={(r) => deleteReview(r)}
                                         />
                                     })}
-                                    className="md:w-[400px] md:max-w-[400px]"
+                                    className="w-full md:max-w-[400px]"
                                 />
                             </FadeItem>
                         ))}

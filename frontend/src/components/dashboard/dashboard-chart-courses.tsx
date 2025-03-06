@@ -1,6 +1,6 @@
 import React from "react";
-import BarChart from "./bar-chart";
-import PieChart from "./pie-chart";
+import BarChart from "@/components/bar-chart";
+import PieChart from "@/components/pie-chart";
 import InstitutionsWithCoursesCount from "@/interfaces/institutions-with-courses-count";
 import axios, { AxiosResponse } from "axios";
 import APIS from "@/enums/apis";
@@ -16,8 +16,11 @@ function DashboardChartCourses() {
 	const coursesSize = 9;
 	const [institutions, setInstitutions] = React.useState<InstitutionsWithCoursesCount[]>([]);
 	const [courses, setCourses] = React.useState<CoursesWithReviewsReactionsCount[]>([]);
+	const [loadingCourses, setLoadingCourses] = React.useState<boolean>(true);
+	const [loadingInstitutions, setLoadingInstitutions] = React.useState<boolean>(true);
 
 	React.useEffect(() => {
+		setLoadingInstitutions(true);
 		axios.get(APIS.INSTITUTIONS_COURSES_COUNT, {
 			params: { page: 0, size: institutionsSize }
 		})
@@ -27,16 +30,19 @@ function DashboardChartCourses() {
 			.catch(() => {
 				setInstitutions([]);
 			})
+			.finally(() => setLoadingInstitutions(false));
 	}, []);
 
 	React.useEffect(() => {
+		setLoadingCourses(true);
 		axios.get(APIS.COURSES_REVIEWS_REACTIONS_COUNT, {
 			params: { page: 0, size: coursesSize }
 		})
 			.then((response: AxiosResponse<CoursesWithReviewsReactionsCount[]>) => {
 				setCourses(response.data);
 			})
-			.catch(() => setCourses([]));
+			.catch(() => setCourses([]))
+			.finally(() => setLoadingCourses(false));
 	}, []);
 
 	const colorHook = React.useContext(ColorContext);
@@ -67,6 +73,7 @@ function DashboardChartCourses() {
 					}))}
 					labelBar1="Reseñas"
 					labelBar2="Reacciones"
+					loading={loadingCourses}
 				/>
 				<PieChart
 					title={`Top ${institutionsSize} Instituciones con Mayor Oferta Académica 🎓`}
@@ -76,6 +83,7 @@ function DashboardChartCourses() {
 						value: institution.totalCourses,
 						fill: getTailwindColor(colorHook ? colorHook.color : "sky", tailwindShades[index] || 100),
 					}))}
+					loading={loadingInstitutions}
 				/>
 			</div>
 		</>

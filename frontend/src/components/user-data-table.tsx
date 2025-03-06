@@ -220,8 +220,6 @@ function UserDataTable() {
 		},
 	});
 
-	console.log(userHook.users);
-
 	return (
 		<div className="w-full">
 			<div className="flex items-center pb-4 flex-col gap-2 sm:flex-row sm:justify-between">

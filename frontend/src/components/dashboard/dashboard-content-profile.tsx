@@ -1,7 +1,7 @@
 import { useAuth } from "@/providers/AuthProvider";
-import { Avatar, AvatarFallback } from "./ui/avatar";
-import { Badge } from "./ui/badge";
-import { Button } from "./ui/button";
+import { Avatar, AvatarFallback } from "@/components//ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { LogOut } from "lucide-react";
 import { Link } from "react-router-dom";
 import ROLES from "@/enums/roles";

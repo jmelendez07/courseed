@@ -1,7 +1,7 @@
 import { AppSidebar } from "@/components/app-sidebar";
-import DashboardCourseOferts from "@/components/dashboard-courses-oferts";
-import DashboardRecomendedCourses from "@/components/dashboard-recomended-courses";
-import DashboardSearchHistories from "@/components/dashboard-search-histories";
+import DashboardCourseOferts from "@/components/dashboard/dashboard-courses-oferts";
+import DashboardRecomendedCourses from "@/components/dashboard/dashboard-recomended-courses";
+import DashboardSearchHistories from "@/components/dashboard/dashboard-search-histories";
 import {
     Breadcrumb,
     BreadcrumbItem,

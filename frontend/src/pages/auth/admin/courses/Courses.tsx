@@ -1,6 +1,6 @@
 import { AppSidebar } from "@/components/app-sidebar";
-import DashboardChartCourses from "@/components/dashboard-chart-courses";
-import DashboardContentCourses from "@/components/dashboard-content-courses";
+import DashboardChartCourses from "@/components/dashboard/dashboard-chart-courses";
+import DashboardContentCourses from "@/components/dashboard/dashboard-content-courses";
 import {
 	Breadcrumb,
 	BreadcrumbItem,

@@ -1,9 +1,9 @@
-import { Input } from "./ui/input";
-import { Button } from "./ui/button";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { ArrowUpRight, ChevronDown, ChevronUp, LoaderCircle, Search } from "lucide-react";
-import ReviewLarge from "./ui/review-large";
+import ReviewLarge from "@/components/ui/review-large";
 import useReviewsAuth from "@/hooks/useReviewsAuth";
-import ReviewsDraw from "./draws/ReviewsDraw";
+import ReviewsDraw from "@/components/draws/ReviewsDraw";
 import { Link } from "react-router-dom";
 
 interface DashboardContentReviewsAuthProps {

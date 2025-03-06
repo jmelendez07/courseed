@@ -1,5 +1,5 @@
 import { AppSidebar } from "@/components/app-sidebar";
-import DashboardContentReactionsAuth from "@/components/dashboard-content-reactions-auth";
+import DashboardContentReactionsAuth from "@/components/dashboard/dashboard-content-reactions-auth";
 import {
     Breadcrumb,
     BreadcrumbItem,

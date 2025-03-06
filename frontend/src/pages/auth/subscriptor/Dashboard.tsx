@@ -1,15 +1,12 @@
 import { AppSidebar } from "@/components/app-sidebar";
+import DashboardCategoriesAnalytics from "@/components/dashboard/dashboard-categories-analytics";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
 import Color from "@/components/ui/Color";
 import { Separator } from "@/components/ui/separator";
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import Theme from "@/components/ui/theme";
-import { useAuth } from "@/providers/AuthProvider";
 
 function Dashboard() {
-
-    const authHook = useAuth();
-
     return (
         <SidebarProvider>
             <AppSidebar />
@@ -37,12 +34,7 @@ function Dashboard() {
                         <Theme />
                     </div>
                 </header>
-                <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
-                    <div>
-                        <h1 className="text-3xl font-bold tracking-tight">Bienvenid@, {authHook?.getName()}</h1>
-                        <p className="text-muted-foreground">Continúa desde donde lo dejaste</p>
-                    </div>
-                </div>
+                <DashboardCategoriesAnalytics />
             </SidebarInset>
         </SidebarProvider>
     );

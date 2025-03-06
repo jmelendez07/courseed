@@ -1,5 +1,5 @@
 import { AppSidebar } from "@/components/app-sidebar";
-import DashboardContentReviewsAuth from "@/components/dashboard-content-reviews-auth";
+import DashboardContentReviewsAuth from "@/components/dashboard/dashboard-content-reviews-auth";
 import {
     Breadcrumb,
     BreadcrumbItem,

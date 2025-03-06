@@ -1,11 +1,11 @@
 import useReviews from "@/hooks/useReviews";
 import { DialogContext } from "@/providers/DialogProvider";
 import React from "react";
-import { Input } from "./ui/input";
-import { Button } from "./ui/button";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { ChevronDown, ChevronUp, LoaderCircle, Search } from "lucide-react";
-import ComboBoxResponsive from "./ui/combo-box-responsive";
-import ReviewLarge from "./ui/review-large";
+import ComboBoxResponsive from "@/components/ui/combo-box-responsive";
+import ReviewLarge from "@/components/ui/review-large";
 import useUsers from "@/hooks/useUsers";
 import UpdateReviewForm from "@/components/form/update-review-form";
 import DeleteReviewForm from "@/components/form/delete-review-form";

@@ -64,29 +64,27 @@ const BlogCourses = ({
                 </div>
                 <div className="w-full max-w-full">
                     <div className="flex flex-col md:flex-row justify-between items-center gap-2">
-                        <form onSubmit={e => {
-                            e.preventDefault();
-                            courseHook.handleSearch();
-                        }} className="relative w-full lg:w-[28rem] lg:max-w-md">
+                        <div className="relative w-full lg:w-[28rem] lg:max-w-md">
                             <FadeItem>
                                 <Input
                                     type="text"
                                     placeholder="Buscar por titulo, descripción, duración..."
-                                    value={courseHook.params.searchText}
+                                    value={courseHook.params.search}
                                     onChange={e => {
                                         courseHook.setParams({
                                             ...courseHook.params,
-                                            searchText: e.target.value
+                                            pageNumber: 0,
+                                            search: e.target.value
                                         });
                                     }}
                                     className="pr-10 w-full"
                                 />
-                                <Button size="icon" variant="ghost" className="absolute right-0 top-0 h-full">
+                                <Button size="icon" variant="ghost" className="absolute right-0 top-0 h-full cursor-default hover:bg-transparent dark:hover:bg-transparent">
                                     <Search className="h-4 w-4" />
                                     <span className="sr-only">Buscar</span>
                                 </Button>
                             </FadeItem>
-                        </form>
+                        </div>
                         <div className="flex items-center flex-wrap sm:flex-nowrap gap-2">
                             <FadeItem className="w-full">
                                 <ComboBoxResponsive
@@ -98,8 +96,7 @@ const BlogCourses = ({
                                         courseHook.setParams({
                                             ...courseHook.params,
                                             institution: i,
-                                            pageNumber: 0,
-                                            faculty: null
+                                            pageNumber: 0
                                         });
                                     }}
                                     pagination={!institutionHook.isLastPage}
@@ -116,7 +113,6 @@ const BlogCourses = ({
                                         courseHook.setParams({
                                             ...courseHook.params,
                                             faculty: f,
-                                            institution: null,
                                             pageNumber: 0,
                                         });
                                     }}
@@ -129,11 +125,11 @@ const BlogCourses = ({
                 </div>
                 <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 lg:gap-8 2xl:flex 2xl:flex-wrap 2xl:justify-between">
                     {courseHook.courses.map((course) => (
-                        <FadeItem key={course.id} className="md:max-w-[400px]">
+                        <FadeItem key={course.id} className="md:w-full md:max-w-[400px]">
                             <Course
                                 course={course}
                                 optionsEnable={false}
-                                className="md:max-w-[400px] h-full"
+                                className="md:w-full md:max-w-[400px] h-full"
                             />
                         </FadeItem>
                     ))}

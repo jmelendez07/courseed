@@ -1,6 +1,6 @@
 import useCourses from "@/hooks/useCourses";
 import useInstitution from "@/hooks/useInstitution";
-import { ChevronDown, ChevronUp, LoaderCircle, Search } from "lucide-react";
+import { ChevronDown, ChevronUp, LoaderCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import ComboBoxResponsive from "@/components/ui/combo-box-responsive";
 import Course from "@/components/ui/course";
@@ -22,30 +22,22 @@ function DashboardContentCourses({ className }: { className?: string }) {
                 <h2 className="text-xl font-semibold">Gestion de Programas</h2>
             </div>
             <div className="grid grid-cols-1 items-center md:grid-cols-[1fr,auto] gap-x-4">
-                <form onSubmit={e => {
-                    e.preventDefault();
-                    courseHook.handleSearch();
-                }} className="flex items-center gap-2">
+                <div className="flex items-center gap-2">
                     <Input
                         type="text"
                         disabled={courseHook.loading}
-                        value={courseHook.params.searchText}
+                        value={courseHook.params.search}
                         placeholder="Buscar por titulo, descripción, duracion..."
                         onChange={e => {
                             courseHook.setParams({
                                 ...courseHook.params,
-                                searchText: e.target.value
+                                pageNumber: 0,
+                                search: e.target.value
                             });
                         }}
                         className="max-w-sm"
                     />
-                    <Button
-                        type="submit"
-                        disabled={courseHook.loading}
-                    >
-                        {courseHook.loading ? <LoaderCircle className="animate-spin" /> : <Search />}
-                    </Button>
-                </form>
+                </div>
                 <ComboBoxResponsive
                     placeholder="Filtrar por Institución..."
                     labelAll="Todas las instituciones"
@@ -58,6 +50,7 @@ function DashboardContentCourses({ className }: { className?: string }) {
                             pageNumber: 0
                         });
                     }}
+                    disabled={courseHook.loading}
                     pagination={!institutionHook.isLastPage}
                     onPaginate={() => institutionHook.setPageNumber(institutionHook.pageNumber + 1)}
                 />
@@ -112,7 +105,7 @@ function DashboardContentCourses({ className }: { className?: string }) {
                         </>
                     ) : (
                         <>
-                            Mostrar mas educación continuada
+                            Mostrar mas programas
                             {courseHook.loading ? (
                                 <LoaderCircle className="animate-spin" />
                             ) : (

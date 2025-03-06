@@ -1,7 +1,7 @@
 import { AppSidebar } from "@/components/app-sidebar";
-import DashboardMap from "@/components/dashboard-map";
-import DashboardReports from "@/components/dashboard-reports";
-import DashboardStats from "@/components/dashboard-stats";
+import DashboardMap from "@/components/dashboard/dashboard-map";
+import DashboardReports from "@/components/dashboard/dashboard-reports";
+import DashboardStats from "@/components/dashboard/dashboard-stats";
 import {
     Breadcrumb,
     BreadcrumbItem,

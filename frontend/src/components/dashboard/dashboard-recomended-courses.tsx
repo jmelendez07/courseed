@@ -1,6 +1,6 @@
 import useCourses from "@/hooks/useCourses";
-import { Carousel, CarouselContent, CarouselItem } from "./ui/carousel";
-import Course from "./ui/course";
+import { Carousel, CarouselContent, CarouselItem } from "@/components/ui/carousel";
+import Course from "@/components/ui/course";
 
 function DashboardRecomendedCourses() {
 

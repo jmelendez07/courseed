@@ -9,6 +9,7 @@ import APIS from "@/enums/apis";
 import CourseInterface from "@/interfaces/course";
 import LearningDraw from "../draws/LearninDraw";
 import Course from "../ui/course";
+import DeleteCourseForm from "../form/delete-course-form";
 
 interface ResponseProps {
     content: CourseInterface[];
@@ -24,12 +25,17 @@ function DashboardCoursesSuscriptor() {
     const [courses, setCourses] = React.useState<CourseInterface[]>([]);
     const [pageNumber, setPageNumber] = React.useState<number>(0);
 
-    const courseForm = {
-        title: "Crea un Nuevo Programa",
-        description: "Añade un nuevo programa a la plataforma con su titulo, precio, duración...",
-        open: true,
-        dialogChildren: <CourseForm />
-    }
+    const handleCreated = React.useCallback((course: CourseInterface) => {
+        setCourses(current => [course, ...current]);
+    }, [courses]);
+
+    const handleUpdated = React.useCallback((course: CourseInterface) => {
+        setCourses(current => current.map(c => c.id === course.id ? course : c));
+    }, [courses]);
+
+    const handleDeleted = React.useCallback((course: CourseInterface) => {
+        setCourses(current => current.filter(c => c.id !== course.id))
+    }, [courses]);
 
     React.useEffect(() => {
         setLoading(true);
@@ -37,7 +43,8 @@ function DashboardCoursesSuscriptor() {
         axios.get(APIS.COURSES_BY_AUTH_USER, {
             params: {
                 page: pageNumber,
-                size: 12
+                size: 12,
+                search
             }
         })
             .then((response: AxiosResponse<ResponseProps>) => {
@@ -52,7 +59,7 @@ function DashboardCoursesSuscriptor() {
                 setIsLastPage(true);
             })
             .finally(() => setLoading(false));
-    }, [pageNumber]);
+    }, [pageNumber, search]);
 
     return (
         <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
@@ -73,7 +80,14 @@ function DashboardCoursesSuscriptor() {
                         />
                     </div>
                     <Button
-                        onClick={() => dialogContext?.setContext(courseForm)}
+                        onClick={() => dialogContext?.setContext({
+                            title: "Crea un Nuevo Programa",
+                            description: "Añade un nuevo programa a la plataforma con su titulo, precio, duración...",
+                            open: true,
+                            dialogChildren: <CourseForm 
+                                onCreated={handleCreated}
+                            />
+                        })}
                     >
                         <Plus className="h-4 w-4" />
                         Crear Programa
@@ -94,6 +108,24 @@ function DashboardCoursesSuscriptor() {
                                         key={course.id} 
                                         course={course} 
                                         optionsEnable={true}
+                                        handleEdit={() => dialogContext?.setContext({
+                                            title: `Renueva ${course.title}`,
+                                            description: "Actualiza el contenido con los últimos enfoques de titulo, precio, duración...",
+                                            open: true,
+                                            dialogChildren: <CourseForm 
+                                                course={course}
+                                                onUpdated={handleUpdated} 
+                                            />
+                                        })}
+                                        handleDelete={() => dialogContext?.setContext({
+                                            title: `Eliminar ${course.title}`,
+                                            description: "¿Estas seguro de querer eliminar esta educación? No podras recuperarla",
+                                            open: true,
+                                            dialogChildren: <DeleteCourseForm
+                                                course={course} 
+                                                onDeleted={handleDeleted} 
+                                            />
+                                        })}
                                     />
                                 ))}
                             </div>
@@ -132,7 +164,7 @@ function DashboardCoursesSuscriptor() {
                         <div className="flex flex-1 flex-col items-center justify-center p-4 text-center gap-4">
                             <LearningDraw />
                             <p className="mb-8 text-base">
-                                Parece que aún no has creado ningún programa.
+                                {search ? 'No hay resultados para esta busqueda.' : 'Parece que aún no has creado ningún programa.'} 
                             </p>
                         </div>
                     )

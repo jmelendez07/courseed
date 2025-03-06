@@ -40,6 +40,7 @@ import com.api.flux.courseed.projections.mappers.ReviewMapper;
 import com.api.flux.courseed.projections.mappers.UserMapper;
 import com.api.flux.courseed.projections.mappers.ViewMapper;
 import com.api.flux.courseed.services.interfaces.InterfaceCourseService;
+import com.api.flux.courseed.services.interfaces.Roles;
 import com.api.flux.courseed.web.exceptions.CustomWebExchangeBindException;
 
 import reactor.core.publisher.Flux;
@@ -91,11 +92,48 @@ public class CourseService implements InterfaceCourseService {
     }
 
     @Override
-    public Mono<Page<CourseDto>> getAllCourses(int page, int size) {
+    public Mono<Page<CourseDto>> getAllCourses(String search, String categoryId, String institutionId, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
+        String searchRegex = (search != null && !search.isEmpty()) ? ".*" + search + ".*" : ".*";
+        Flux<Course> courseFlux = Flux.empty();
 
-        return courseRepository.findAllBy(pageable)
-            .flatMap(course -> {
+        if ((institutionId == null || institutionId.isEmpty()) && (categoryId == null || categoryId.isEmpty())) {
+            courseFlux = courseRepository.findByTitleRegexIgnoreCaseOrUrlRegexIgnoreCaseOrDurationRegexIgnoreCaseOrModalityRegexIgnoreCase(
+                searchRegex, searchRegex, searchRegex, searchRegex, pageable
+            );
+        }
+
+        if (institutionId != null && !institutionId.isEmpty() && (categoryId == null || categoryId.isEmpty())) {
+            courseFlux = courseRepository.findByInstitutionIdAndTitleRegexIgnoreCaseOrInstitutionIdAndUrlRegexIgnoreCaseOrInstitutionIdAndDurationRegexIgnoreCaseOrInstitutionIdAndModalityRegexIgnoreCase(
+                institutionId, searchRegex,
+                institutionId, searchRegex,
+                institutionId, searchRegex,
+                institutionId, searchRegex,
+                pageable
+            );
+        }
+
+        if (categoryId != null && !categoryId.isEmpty() && (institutionId == null || institutionId.isEmpty())) {
+            courseFlux = courseRepository.findByCategoryIdAndTitleRegexIgnoreCaseOrCategoryIdAndUrlRegexIgnoreCaseOrCategoryIdAndDurationRegexIgnoreCaseOrCategoryIdAndModalityRegexIgnoreCase(
+                categoryId, searchRegex,
+                categoryId, searchRegex,
+                categoryId, searchRegex,
+                categoryId, searchRegex,
+                pageable
+            );
+        }
+
+        if ((categoryId != null && !categoryId.isEmpty()) && (institutionId != null && !institutionId.isEmpty())) {
+            courseFlux = courseRepository.findByCategoryIdAndInstitutionIdAndTitleRegexIgnoreCaseOrCategoryIdAndInstitutionIdAndUrlRegexIgnoreCaseOrCategoryIdAndInstitutionIdAndDurationRegexIgnoreCaseOrCategoryIdAndInstitutionIdAndModalityRegexIgnoreCase(
+                categoryId, institutionId, searchRegex,
+                categoryId, institutionId, searchRegex,
+                categoryId, institutionId, searchRegex,
+                categoryId, institutionId, searchRegex,
+                pageable
+            );
+        }
+
+        return courseFlux.flatMap(course -> {
                 Mono<Category> categoryMono = categoryRepository.findById(course.getCategoryId());
                 Mono<Institution> institutionMono = institutionRepository.findById(course.getInstitutionId());
                 Flux<Content> contentFlux = contentRepository.findByCourseId(course.getId());
@@ -373,64 +411,84 @@ public class CourseService implements InterfaceCourseService {
     }
 
     @Override
-    public Mono<CourseDto> updateCourse(String id, SaveCourseDto saveCourseDto) {
-        return courseRepository.findById(id)
-            .flatMap(course -> categoryRepository.findById(saveCourseDto.getCategoryId())
-                .flatMap(category -> institutionRepository.findById(saveCourseDto.getInstitutionId())
-                    .flatMap(institution -> {
-                        Course courseToUpdate = courseMapper.toCourse(saveCourseDto);
-                        courseToUpdate.setId(course.getId());
-
-                        return courseRepository.save(courseToUpdate)
-                            .flatMap(updatedCourse -> this.getCourseById(updatedCourse.getId()));
-                    })
+    public Mono<CourseDto> updateCourse(Principal principal, String id, SaveCourseDto saveCourseDto) {
+        return userRepository.findByEmail(principal.getName())
+            .flatMap(user -> courseRepository.findById(id)
+                .flatMap(course -> categoryRepository.findById(saveCourseDto.getCategoryId())
+                    .flatMap(category -> institutionRepository.findById(saveCourseDto.getInstitutionId())
+                        .flatMap(institution -> {
+                            if (user.getRoles().contains(Roles.PREFIX + Roles.ADMIN) || user.getId().equals(course.getUserId())) {
+                                Course courseToUpdate = courseMapper.toCourse(saveCourseDto);
+                                courseToUpdate.setId(course.getId());
+                                courseToUpdate.setUserId(course.getUserId());
+    
+                                return courseRepository.save(courseToUpdate)
+                                    .flatMap(updatedCourse -> this.getCourseById(updatedCourse.getId()));
+                            } else {
+                                return Mono.error(new CustomWebExchangeBindException(
+                                    principal.getName(), 
+                                    "auth", 
+                                    "No tienes la autorización necesaria para actualizar este programa."
+                                ).getWebExchangeBindException());
+                            }
+                        })
+                        .switchIfEmpty(Mono.error(
+                            new CustomWebExchangeBindException(
+                                saveCourseDto.getInstitutionId(), 
+                                "institutionId", 
+                                "No hemos podido encontrar la institución indicada. Te sugerimos que verifiques la información y lo intentes de nuevo."
+                            ).getWebExchangeBindException()
+                        ))    
+                    )
                     .switchIfEmpty(Mono.error(
                         new CustomWebExchangeBindException(
-                            saveCourseDto.getInstitutionId(), 
-                            "institutionId", 
-                            "No hemos podido encontrar la institución indicada. Te sugerimos que verifiques la información y lo intentes de nuevo."
+                            saveCourseDto.getCategoryId(), 
+                            "categoryId", 
+                            "No hemos podido encontrar la categoría indicada. Te sugerimos que verifiques la información y lo intentes de nuevo."
                         ).getWebExchangeBindException()
-                    ))    
+                    ))
                 )
                 .switchIfEmpty(Mono.error(
                     new CustomWebExchangeBindException(
-                        saveCourseDto.getCategoryId(), 
-                        "categoryId", 
-                        "No hemos podido encontrar la categoría indicada. Te sugerimos que verifiques la información y lo intentes de nuevo."
-                    ).getWebExchangeBindException()
-                ))
-            )
-            .switchIfEmpty(Mono.error(
-                new CustomWebExchangeBindException(
-                    id, 
-                    "courseId", 
-                    "No hemos podido encontrar el curso indicado. Te sugerimos que verifiques la información y lo intentes de nuevo."
-                ).getWebExchangeBindException())
+                        id, 
+                        "courseId", 
+                        "No hemos podido encontrar el curso indicado. Te sugerimos que verifiques la información y lo intentes de nuevo."
+                    ).getWebExchangeBindException())
+                ));
+    }
+
+    @Override
+    public Mono<Object> deleteCourse(Principal principal, String id) {
+        return userRepository.findByEmail(principal.getName())
+            .flatMap(user -> courseRepository.findById(id)
+                .flatMap(course -> {
+                    if (user.getRoles().contains(Roles.PREFIX + Roles.ADMIN) || user.getId().equals(course.getUserId())) {
+                        return courseRepository.deleteById(id)
+                            .then(Mono.just(true));
+                    } else {
+                        return Mono.error(new CustomWebExchangeBindException(
+                            principal.getName(), 
+                            "auth", 
+                            "No tienes la autorización necesaria para eliminar este programa."
+                        ).getWebExchangeBindException());
+                    }
+                })
+                .switchIfEmpty(Mono.error(
+                    new CustomWebExchangeBindException(
+                        id, 
+                        "courseId", 
+                        "No hemos podido encontrar el curso indicado. Te sugerimos que verifiques la información y lo intentes de nuevo."
+                    ).getWebExchangeBindException())
+                )
             );
     }
 
     @Override
-    public Mono<Boolean> deleteCourse(String id) {
-        return courseRepository.findById(id)
-            .flatMap(course -> 
-                courseRepository.deleteById(id)
-                    .then(Mono.just(true))
-            )
-            .switchIfEmpty(Mono.error(
-                new CustomWebExchangeBindException(
-                    id, 
-                    "courseId", 
-                    "No hemos podido encontrar el curso indicado. Te sugerimos que verifiques la información y lo intentes de nuevo."
-                ).getWebExchangeBindException())
-            );
-    }
-
-    @Override
-    public Mono<Page<CourseDto>> getCoursesByAuthUser(Principal principal, int page, int size) {
+    public Mono<Page<CourseDto>> getCoursesByAuthUser(Principal principal, String search, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
 
         return userRepository.findByEmail(principal.getName())
-            .flatMapMany(user -> courseRepository.findByUserId(user.getId(), pageable)
+            .flatMapMany(user -> courseRepository.findByUserIdAndTitleContainingOrderByCreatedAtDesc(user.getId(), search, pageable)
                 .flatMap(course -> {
                     Mono<Category> categoryMono = categoryRepository.findById(course.getCategoryId());
                     Mono<Institution> institutionMono = institutionRepository.findById(course.getInstitutionId());

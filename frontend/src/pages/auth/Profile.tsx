@@ -1,6 +1,6 @@
 import { AppSidebar } from "@/components/app-sidebar";
-import DashboardContentProfile from "@/components/dashboard-content-profile";
-import DashboardStatsProfile from "@/components/dashboard-stats-profile";
+import DashboardContentProfile from "@/components/dashboard/dashboard-content-profile";
+import DashboardStatsProfile from "@/components/dashboard/dashboard-stats-profile";
 import {
     Breadcrumb,
     BreadcrumbItem,

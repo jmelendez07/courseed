@@ -17,12 +17,14 @@ import tailwindConfig from "tailwindcss/defaultConfig";
 import React from "react";
 import { ColorContext } from "@/providers/ColorProvider";
 import resolveConfig from "tailwindcss/resolveConfig";
+import { LoaderCircle } from "lucide-react";
 
 interface LineChartProps {
     title?: string;
     description?: string;
     chartData: ChartItem[];
     labelValueToolTip?: String;
+    loading?: boolean;
     className?: String;
 }
 
@@ -36,6 +38,7 @@ function LineChart({
     description="January - June 2024",
     labelValueToolTip="count",
     chartData,
+    loading,
     className
 }: LineChartProps) {
     const isDesktop = useMediaQuery("(min-width: 768px)");
@@ -65,15 +68,20 @@ function LineChart({
                 <CardTitle>{title}</CardTitle>
                 <CardDescription>{description}</CardDescription>
             </CardHeader>
-            <CardContent className="max-h-full overflow-hidden">
-                <ChartContainer config={chartConfig} className="w-full max-h-[220px] overflow-hidden">
+            <CardContent className="max-h-full">
+                {loading ? (
+                    <div className="flex items-center justify-center w-full h-[220px]">
+                        <LoaderCircle className="animate-spin text-zinc-400 dark:text-white" />
+                    </div>
+                ) : (
+                    <ChartContainer config={chartConfig} className="w-full max-h-[220px] overflow-visible">
                     <LineChartRechart
                         accessibilityLayer
                         data={chartData}
                         margin={{
                             top: 20,
-                            left: 12,
-                            right: 12,
+                            left: 30,
+                            right: 30,
                         }}
                     >
                         <CartesianGrid vertical={false} />
@@ -88,8 +96,7 @@ function LineChart({
                             cursor={false}
                             content={
                                 <ChartTooltipContent 
-                                    indicator="line" 
-                                    label="hola"
+                                    indicator="line"
                                 />
                             }
                         />
@@ -114,6 +121,7 @@ function LineChart({
                         </Line>
                     </LineChartRechart>
                 </ChartContainer>
+                )}
             </CardContent>
         </Card>
     );

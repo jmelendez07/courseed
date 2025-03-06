@@ -12,6 +12,8 @@ public interface CourseMapper {
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "userId", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "updatedAt", ignore = true)
     Course toCourse(SaveCourseDto saveCourseDto);
     
     @Mapping(target = "category", ignore = true)

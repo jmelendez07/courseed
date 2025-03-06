@@ -48,6 +48,7 @@ function useReviews({ size }: UseReviewsProps) {
             }
         })
 			.then((response: AxiosResponse<ResponseReviewProps>) => {
+                console.log(response);
 				setReviews(currentReviews => params.pageNumber === 0 
                     ? response.data.content 
                     : [

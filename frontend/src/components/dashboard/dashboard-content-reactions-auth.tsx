@@ -1,8 +1,8 @@
 
-import { Button } from "./ui/button";
+import { Button } from "@/components/ui/button";
 import { ArrowUpRight, ChevronDown, ChevronUp, LoaderCircle } from "lucide-react";
-import Course from "./ui/course";
-import LikeDraw from "./draws/LikeDraw";
+import Course from "@/components/ui/course";
+import LikeDraw from "@/components/draws/LikeDraw";
 import useReactions from "@/hooks/useReactions";
 import REACTION, { getReactionText } from "@/enums/reaction";
 import { Link } from "react-router-dom";

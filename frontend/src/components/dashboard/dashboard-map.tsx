@@ -1,12 +1,12 @@
 import React from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
-import { ScrollArea } from "./ui/scroll-area";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import InstitutionsWithCoursesCount from "@/interfaces/institutions-with-courses-count";
 import axios, { AxiosResponse } from "axios";
 import APIS from "@/enums/apis";
 import { Link } from "react-router-dom";
 import { ArrowUpRight } from "lucide-react";
-import MapView, { capitals } from "./ui/map-view";
+import MapView, { capitals } from "@/components/ui/map-view";
 
 function DashboardMap() {
     const mapRef = React.useRef<HTMLDivElement | null>(null);

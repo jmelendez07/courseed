@@ -17,12 +17,14 @@ import React from "react";
 import { ColorContext } from "@/providers/ColorProvider";
 import resolveConfig from "tailwindcss/resolveConfig";
 import tailwindConfig from "tailwindcss/defaultConfig";
+import { LoaderCircle } from "lucide-react";
 
 interface BarChartHorizontalProps {
     title?: String;
     description?: String;
     chartData: ChartItem[];
     labelValueToolTip?: String;
+    loading?: boolean;
     className?: String;
 } 
 
@@ -36,6 +38,7 @@ function BarChartHorizontal({
     description = "January - June 2024",
     labelValueToolTip = "value",
     chartData,
+    loading,
     className 
 }: BarChartHorizontalProps) {
     const isDesktop = useMediaQuery("(min-width: 768px)");
@@ -67,7 +70,12 @@ function BarChartHorizontal({
                 <CardDescription>{description}</CardDescription>
             </CardHeader>
             <CardContent className="max-h-full overflow-hidden">
-                <ChartContainer config={chartConfig} className="w-full max-h-[220px] overflow-hidden">
+                {loading ? (
+                    <div className="flex items-center justify-center w-full h-[220px]">
+                        <LoaderCircle className="animate-spin text-zinc-400 dark:text-white" />
+                    </div>
+                ) : (
+                    <ChartContainer config={chartConfig} className="w-full max-h-[220px] overflow-hidden">
                     <BarChart
                         accessibilityLayer
                         data={chartData}
@@ -86,7 +94,12 @@ function BarChartHorizontal({
                             tickFormatter={(value) => value.slice(0, 3)}
                             hide
                         />
-                        <XAxis dataKey="value" type="number" hide />
+                        <XAxis 
+                            dataKey="value" 
+                            type="number" 
+                            domain={[0, 8]}
+                            hide
+                        />
                         <ChartTooltip
                             cursor={false}
                             content={<ChartTooltipContent indicator="line" />}
@@ -111,11 +124,12 @@ function BarChartHorizontal({
                                 offset={8}
                                 className="fill-foreground"
                                 fontSize={12}
-                                formatter={(value: string) => value + "⭐"}
+                                formatter={(value: number) => Number(value.toFixed(2)) + "⭐"}
                             />
                         </Bar>
                     </BarChart>
                 </ChartContainer>
+                )}
             </CardContent>
         </Card>
     );

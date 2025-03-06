@@ -1,6 +1,6 @@
 import { AppSidebar } from "@/components/app-sidebar";
-import DashboardChartReviews from "@/components/dashboard-chart-reviews";
-import DashboardContentReviews from "@/components/dashboard-content-reviews";
+import DashboardChartReviews from "@/components/dashboard/dashboard-chart-reviews";
+import DashboardContentReviews from "@/components/dashboard/dashboard-content-reviews";
 import {
 	Breadcrumb,
 	BreadcrumbItem,

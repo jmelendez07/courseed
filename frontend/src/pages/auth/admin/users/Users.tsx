@@ -16,7 +16,7 @@ import UserDataTable from "@/components/user-data-table";
 import HeadProvider from "@/providers/HeadProvider";
 import DialogProvider from "@/providers/DialogProvider";
 import { Link } from "react-router-dom";
-import DashboardChartUsers from "@/components/dashboard-chart-users";
+import DashboardChartUsers from "@/components/dashboard/dashboard-chart-users";
 import Theme from "@/components/ui/theme";
 import Color from "@/components/ui/Color";
 

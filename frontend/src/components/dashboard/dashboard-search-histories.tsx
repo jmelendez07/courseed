@@ -1,8 +1,8 @@
 import { ArrowUpRight, ChevronDown, ChevronUp, Clock, LoaderCircle, Search } from "lucide-react";
-import { Button } from "./ui/button";
+import { Button } from "@/components/ui/button";
 
 import useSearchHistories from "@/hooks/useSearchHistories";
-import SearchDraw from "./draws/SearchDraw";
+import SearchDraw from "@/components/draws/SearchDraw";
 import { Link } from "react-router-dom";
 import dayjs from "dayjs";
 

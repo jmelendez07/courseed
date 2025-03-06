@@ -138,7 +138,7 @@ const HeroCourse = ({
                     </FadeItem>
                     <div className="mb-12 flex w-fit flex-col items-center gap-4 sm:flex-row">
                         <span className="inline-flex items-center -space-x-4">
-                            {course.reviews && course.reviews.map((review, index) => (
+                            {course.reviews && course.reviews.slice(0, 3).map((review, index) => (
                                 <FadeItem key={index} >
                                     <Avatar className="size-12 border dark:border-0">
                                         <AvatarFallback className="rounded-lg">{review.user.email.slice(0, 2).toUpperCase()}</AvatarFallback>

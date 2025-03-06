@@ -1,10 +1,10 @@
 import { ArrowUpRight, CalendarDays } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import React from "react";
 import axios, { AxiosResponse } from "axios";
 import APIS from "@/enums/apis";
 import ReviewCourseUserInterface from "@/interfaces/review-course-user";
-import { Button } from "./ui/button";
+import { Button } from "@/components/ui/button";
 import ViewInterface from "@/interfaces/view";
 import { Link } from "react-router-dom";
 

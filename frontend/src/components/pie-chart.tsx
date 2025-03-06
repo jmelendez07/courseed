@@ -14,11 +14,13 @@ import {
     ChartTooltip,
     ChartTooltipContent,
 } from "@/components/ui/chart";
+import { LoaderCircle } from "lucide-react";
 
 interface PieChartProps {
     title?: string;
     description?: string;
     chartData: ChartItem[];
+    loading?: boolean;
     className?: string;
 }
 
@@ -40,6 +42,7 @@ function PieChart({
     title = "Pie Chart - Label List",
     description = "January - June 2024",
     chartData,
+    loading,
     className
 }: PieChartProps) {
     const chartConfig = {
@@ -57,23 +60,29 @@ function PieChart({
                 <CardDescription>{description}</CardDescription>
             </CardHeader>
             <CardContent className="overflow-hidden">
-                <ChartContainer config={chartConfig} className="mx-auto aspect-square max-h-[250px] overflow-hidden">
-                    <PieChartRechart>
-                        <ChartTooltip
-                            content={<ChartTooltipContent nameKey="value" hideLabel />}
-                        />
-                        <Pie data={chartData} dataKey="value" nameKey="label" label>
-                            <LabelList
-                                dataKey="label"
-                                offset={8}
-                                fontWeight={2}
-                                fontSize={12}
-                                className="fill-foreground"
-                                formatter={renderLabel}
+                {loading ? (
+                    <div className="flex items-center justify-center w-full h-[250px]">
+                        <LoaderCircle className="animate-spin text-zinc-400 dark:text-white" />
+                    </div>
+                ) : (
+                    <ChartContainer config={chartConfig} className="mx-auto aspect-square max-h-[250px] overflow-hidden">
+                        <PieChartRechart>
+                            <ChartTooltip
+                                content={<ChartTooltipContent nameKey="value" hideLabel />}
                             />
-                        </Pie>
-                    </PieChartRechart>
-                </ChartContainer>
+                            <Pie data={chartData} dataKey="value" nameKey="label" label>
+                                <LabelList
+                                    dataKey="label"
+                                    offset={8}
+                                    fontWeight={2}
+                                    fontSize={12}
+                                    className="fill-foreground"
+                                    formatter={renderLabel}
+                                />
+                            </Pie>
+                        </PieChartRechart>
+                    </ChartContainer>
+                )}
             </CardContent>
         </Card>
     );
