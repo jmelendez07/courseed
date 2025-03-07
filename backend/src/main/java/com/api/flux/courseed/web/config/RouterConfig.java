@@ -10,6 +10,7 @@ import com.api.flux.courseed.web.controllers.CategoryController;
 import com.api.flux.courseed.web.controllers.ContentController;
 import com.api.flux.courseed.web.controllers.CourseController;
 import com.api.flux.courseed.web.controllers.InstitutionController;
+import com.api.flux.courseed.web.controllers.PaymentController;
 import com.api.flux.courseed.web.controllers.ReactionController;
 import com.api.flux.courseed.web.controllers.ReviewController;
 import com.api.flux.courseed.web.controllers.RoleController;
@@ -27,7 +28,7 @@ public class RouterConfig {
         InstitutionController institutionController, ViewController viewController,
         ReviewController reviewController, UserController userController,
         RoleController roleController, ReactionController reactionController,
-        SearchHistoryController searchHistoryController
+        SearchHistoryController searchHistoryController, PaymentController paymentController
     ) {
         return RouterFunctions.route()
             .path("/auth", () -> authRoutes(authController))
@@ -41,6 +42,7 @@ public class RouterConfig {
             .path("/reactions", () -> reactionRoutes(reactionController))
             .path("/views", () -> viewRoutes(viewController))
             .path("/search-histories", () -> searchHistoryRoutes(searchHistoryController))
+            .path("/payu", () -> payURoutes(paymentController))
             .build();
     }
 
@@ -180,6 +182,13 @@ public class RouterConfig {
             .build();
     }
 
+    private RouterFunction<ServerResponse> payURoutes(PaymentController paymentController) {
+        return RouterFunctions
+            .route()
+            .POST("/confirm", paymentController::confirmPayment)
+            .build();
+    }
+
     @Bean
     AuthController authController() {
         return new AuthController();
@@ -233,5 +242,10 @@ public class RouterConfig {
     @Bean
     SearchHistoryController searchHistoryController() {
         return new SearchHistoryController();
+    }
+
+    @Bean
+    PaymentController paymentController() {
+        return new PaymentController();
     }
 }

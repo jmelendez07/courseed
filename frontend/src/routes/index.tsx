@@ -21,6 +21,7 @@ import DashboardSubscriber from "@/pages/auth/subscriptor/Dashboard";
 import CoursesSubscriber from "@/pages/auth/subscriptor/Courses";
 import ProtectedSubscriberRoute from "./ProtectedSubscriberRoute";
 import RegisterSubscribe from "@/pages/auth/RegisterSubscribe";
+import PaymentResponse from "@/pages/payment-response";
 
 function Routes() {
 
@@ -48,6 +49,10 @@ function Routes() {
         {
             path: '/educacion/:id',
             element: <Course />
+        },
+        {
+            path: '/payment-response',
+            element: <PaymentResponse />
         },
         {
             path: '/404',
