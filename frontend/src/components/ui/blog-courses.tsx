@@ -10,6 +10,8 @@ import ComboBoxResponsive from "./combo-box-responsive";
 import { useSearchParams } from "react-router-dom";
 import React from "react";
 import FadeItem from "./fadeItem";
+import CourseSkeleton from "../skeleton/course-skeleton";
+import SearchDraw from "../draws/SearchDraw";
 
 interface BlogCoursesProps {
     heading: string;
@@ -25,10 +27,29 @@ const BlogCourses = ({
     const courseHook = useCourses({
         institutionParam: { id: searchParams.get('institucion'), name: undefined },
         facultyParam: { id: searchParams.get('facultad'), name: undefined },
-        searchParam: searchParams.get("busqueda") || undefined
+        searchParam: searchParams.get("busqueda") || undefined,
+        isVisibleParam: false
     });
     const institutionHook = useInstitution({ size: 7 });
     const facultyHook = useFaculty({ size: 7 });
+    const ref = React.useRef<HTMLDivElement>(null);
+
+    React.useEffect(() => {
+        const observer = new IntersectionObserver(
+            (entries) => {
+                if (entries[0].isIntersecting) {
+                    courseHook.setIsVisible(true);
+                    observer.disconnect();
+                }
+            },
+        );
+
+        if (ref.current) {
+            observer.observe(ref.current);
+        }
+
+        return () => observer.disconnect();
+    }, [ref.current]);
 
     React.useEffect(() => {
         const institutionParamId = searchParams.get('institucion');
@@ -123,51 +144,81 @@ const BlogCourses = ({
                         </div>
                     </div>
                 </div>
-                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 lg:gap-8 2xl:flex 2xl:flex-wrap 2xl:justify-between">
-                    {courseHook.courses.map((course) => (
-                        <FadeItem key={course.id} className="md:w-full md:max-w-[400px]">
-                            <Course
-                                course={course}
-                                optionsEnable={false}
-                                className="md:w-full md:max-w-[400px] h-full"
-                            />
-                        </FadeItem>
-                    ))}
-                </div>
-                <div className="flex items-center justify-center space-x-2 py-4">
-                    <FadeItem>
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => {
-                                if (courseHook.isLastPage) {
-                                    window.scrollTo({ top: 0, behavior: "smooth" });
-                                } else {
-                                    courseHook.setParams({
-                                        ...courseHook.params,
-                                        pageNumber: courseHook.params.pageNumber + 1
-                                    });
-                                }
-                            }}
-                            disabled={courseHook.loading}
-                        >
-                            {courseHook.isLastPage ? (
-                                <>
-                                    ¡Lo has visto todo! Vuelve arriba.
-                                    <ChevronUp />
-                                </>
+                <div className="w-full" ref={ref}>
+                    {(
+                        !courseHook.isVisible || 
+                        (
+                            courseHook.loading && 
+                            !courseHook.params.search && 
+                            !courseHook.params.faculty &&
+                            !courseHook.params.institution &&
+                            courseHook.params.pageNumber === 0
+                        )
+                    ) ? (
+                        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 lg:gap-8 2xl:flex 2xl:flex-wrap 2xl:justify-between">
+                            {Array.from({ length: 12 }).map((_, index) => (
+                                <CourseSkeleton
+                                    key={index}
+                                    className="md:w-full md:max-w-[400px] h-full"
+                                    optionsEnable={false}
+                                />
+                            ))}
+                        </div>
+                    ) : (
+                        <>  
+                            {(courseHook.courses.length === 0) ? (
+                                <div className="w-full flex flex-col items-center justify-center">
+                                <SearchDraw />
+                                <p>No encontramos ningún programa para esta busqueda.</p>
+                            </div>
                             ) : (
-                                <>
-                                    Mostrar mas educación continuada
-                                    {courseHook.loading ? (
-                                        <LoaderCircle className="animate-spin" />
-                                    ) : (
-                                        <ChevronDown />
-                                    )}
-                                </>
+                                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 lg:gap-8 2xl:flex 2xl:flex-wrap 2xl:justify-between">
+                                    {courseHook.courses.map((course) => (
+                                        <FadeItem key={course.id} className="md:w-full md:max-w-[400px]">
+                                            <Course
+                                                course={course}
+                                                optionsEnable={false}
+                                                className="md:w-full md:max-w-[400px] h-full"
+                                            />
+                                        </FadeItem>
+                                    ))}
+                                </div>
                             )}
-                        </Button>
-                    </FadeItem>
+                            <FadeItem className="flex items-center justify-center space-x-2 py-4">
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => {
+                                        if (courseHook.isLastPage) {
+                                            window.scrollTo({ top: 0, behavior: "smooth" });
+                                        } else {
+                                            courseHook.setParams({
+                                                ...courseHook.params,
+                                                pageNumber: courseHook.params.pageNumber + 1
+                                            });
+                                        }
+                                    }}
+                                    disabled={courseHook.loading}
+                                >
+                                    {courseHook.isLastPage ? (
+                                        <>
+                                            ¡Lo has visto todo! Vuelve arriba.
+                                            <ChevronUp />
+                                        </>
+                                    ) : (
+                                        <>
+                                            Mostrar mas programas
+                                            {courseHook.loading ? (
+                                                <LoaderCircle className="animate-spin" />
+                                            ) : (
+                                                <ChevronDown />
+                                            )}
+                                        </>
+                                    )}
+                                </Button>
+                            </FadeItem>
+                        </>
+                    )}
                 </div>
             </div>
         </section>

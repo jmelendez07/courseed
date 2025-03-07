@@ -234,15 +234,13 @@ const HeroCourse = ({
                     </div>
                 </div>
                 <div className="flex flex-col gap-12 md:gap-20">
-                    <div className="flex bg-muted">
-                        <FadeItem>
-                            <img
-                                src={course.image}
-                                alt={course.title}
-                                className="min-h-[350px] max-h-[600px] w-full rounded-md object-cover lg:h-[600px] lg:max-h-[800px]"
-                            />
-                        </FadeItem>
-                    </div>
+                    <FadeItem className="flex bg-muted">
+                        <img
+                            src={course.image}
+                            alt={course.title}
+                            className="min-h-[350px] max-h-[600px] w-full rounded-md object-cover lg:h-[600px] lg:max-h-[800px]"
+                        />
+                    </FadeItem>
                     <section className="pt-12">
                         <div className="text-center lg:text-left">
                             <FadeItem>

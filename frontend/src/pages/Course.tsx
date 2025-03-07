@@ -1,3 +1,4 @@
+import { HeroCourseSkeleton } from "@/components/skeleton/hero-course-skeleton";
 import { BlogReviews } from "@/components/ui/blog-reviews";
 import { Footer } from "@/components/ui/footer";
 import { HeroCourse } from "@/components/ui/hero-course";
@@ -6,7 +7,7 @@ import useCourse from "@/hooks/useCourse";
 import DialogProvider from "@/providers/DialogProvider";
 import HeadProvider from "@/providers/HeadProvider";
 import React from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 
 function Course() {
     const params = useParams();
@@ -20,11 +21,16 @@ function Course() {
         }
     }, [courseHook.course]);
 
+    const location = useLocation();
+    React.useLayoutEffect(() => {
+        document.documentElement.scrollTo({ top:0, left:0, behavior: "smooth" });
+    }, [location.pathname]);
+
     return (
         <DialogProvider>
             <HeadProvider title={`Courseed ${courseHook.course && '| ' + courseHook.course.title}`} />
             <Navbar />
-            {courseHook.course && (
+            {courseHook.course ? (
                 <>
                     <HeroCourse 
                         course={courseHook.course}
@@ -47,6 +53,8 @@ function Course() {
                         description = "Conoce las valoraciones de otros participantes y toma una decisión informada. Las reseñas te permiten conocer tanto los aspectos positivos como las áreas de mejora que los estudiantes han experimentado, lo que te ayudará a tener una visión completa del curso."
                     />
                 </>
+            ) : (
+                <HeroCourseSkeleton />
             )}
             <Footer />
         </DialogProvider>

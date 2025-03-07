@@ -213,7 +213,7 @@ const Navbar = ({
                                     </DropdownMenuContent>
                                 </DropdownMenu>
                             ) : (
-                                <div className="flex flex-row-reverse gap-2">
+                                <div className="flex flex-row-reverse gap-2 py-2">
                                     <motion.div variants={header}>
                                         <Button asChild size="sm">
                                             <Link

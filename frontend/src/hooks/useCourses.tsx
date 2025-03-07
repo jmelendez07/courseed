@@ -21,14 +21,16 @@ interface ParamsProps {
 
 interface UseCoursesProps {
     size?: number;
+    isVisibleParam?: boolean;
     institutionParam?: InstitutionInterface;
     facultyParam?: CategoryInterface;
     searchParam?: string
 }
 
-function useCourses({ size, institutionParam, facultyParam, searchParam }: UseCoursesProps) {
+function useCourses({ size, isVisibleParam = true, institutionParam, facultyParam, searchParam }: UseCoursesProps) {
     const [courses, setCourses] = React.useState<CourseInterface[]>([]);
-    const [loading, setLoading] = React.useState(false);
+    const [loading, setLoading] = React.useState<boolean>(true);
+    const [isVisible, setIsVisible] = React.useState<boolean>(isVisibleParam);
     const [totalCourses, setTotalCourses] = React.useState<number | null>(null);
     const pageSize: number = size ?? 12;
     const [isLastPage, setIsLastPage] = React.useState<boolean>(false);
@@ -67,7 +69,7 @@ function useCourses({ size, institutionParam, facultyParam, searchParam }: UseCo
                 setIsLastPage(true);
             })
             .finally(() => setLoading(false));
-    }, [params.pageNumber, pageSize, params.institution, params.search, params.faculty]);
+    }, [pageSize, params]);
 
     const handleCreatedCourse = (course: CourseInterface) => {
         setCourses(currentCourses => [
@@ -92,7 +94,9 @@ function useCourses({ size, institutionParam, facultyParam, searchParam }: UseCo
         setCourses(courses.filter(c => c.id !== course.id));
     }
 
-    React.useEffect(() => handleFetch(), [params.pageNumber, params.search, pageSize, params.institution?.id, params.faculty?.id]);
+    React.useEffect(() => {
+        if (isVisible) handleFetch();
+    }, [params.pageNumber, isVisible, params.search, pageSize, params.institution?.id, params.faculty?.id]);
 
     return {
         courses,
@@ -101,6 +105,7 @@ function useCourses({ size, institutionParam, facultyParam, searchParam }: UseCo
         isLastPage,
         totalCourses,
         params,
+        isVisible,
         setCourses,
         setLoading,
         setIsLastPage,
@@ -108,7 +113,8 @@ function useCourses({ size, institutionParam, facultyParam, searchParam }: UseCo
         setParams,
         handleCreatedCourse,
         handleUpdateCourse,
-        handleDeleteCourse
+        handleDeleteCourse,
+        setIsVisible
     };
 }
 
