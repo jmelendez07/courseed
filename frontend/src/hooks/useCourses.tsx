@@ -2,6 +2,7 @@ import APIS from "@/enums/apis";
 import CategoryInterface from "@/interfaces/category";
 import CourseInterface from "@/interfaces/course";
 import InstitutionInterface from "@/interfaces/institution";
+import { useAuth } from "@/providers/AuthProvider";
 import axios, { AxiosResponse } from "axios";
 import React from "react";
 
@@ -34,6 +35,7 @@ function useCourses({ size, isVisibleParam = true, institutionParam, facultyPara
     const [totalCourses, setTotalCourses] = React.useState<number | null>(null);
     const pageSize: number = size ?? 12;
     const [isLastPage, setIsLastPage] = React.useState<boolean>(false);
+    const authHook = useAuth();
 
     const [params, setParams] = React.useState<ParamsProps>({
         pageNumber: 0,
@@ -71,6 +73,32 @@ function useCourses({ size, isVisibleParam = true, institutionParam, facultyPara
             .finally(() => setLoading(false));
     }, [pageSize, params]);
 
+    const handleSearch = React.useCallback(() => {
+        setLoading(true);
+        axios.get(APIS.COURSES, {
+            params: {
+                page: 0,
+                size: pageSize,
+                search: params.search,
+                institutionId: params.institution?.id,
+                categoryId: params.faculty?.id,
+            },
+        })
+            .then((response: AxiosResponse<ResponseCourseProps>) => {
+                setCourses(response.data.content);
+                setIsLastPage(response.data.last || response.data.empty);
+                setTotalCourses(response.data.totalElements);
+            })
+            .catch(() => {
+                setIsLastPage(true);
+            })
+            .finally(() => setLoading(false));
+
+        if (authHook?.user && params.search.trim().length > 0) {
+            axios.post(APIS.SEARCH_HISTORY_CREATE, { search: params.search  })
+        } 
+    }, [pageSize, params]);
+
     const handleCreatedCourse = (course: CourseInterface) => {
         setCourses(currentCourses => [
             course,
@@ -96,7 +124,7 @@ function useCourses({ size, isVisibleParam = true, institutionParam, facultyPara
 
     React.useEffect(() => {
         if (isVisible) handleFetch();
-    }, [params.pageNumber, isVisible, params.search, pageSize, params.institution?.id, params.faculty?.id]);
+    }, [params.pageNumber, isVisible, pageSize, params.institution?.id, params.faculty?.id]);
 
     return {
         courses,
@@ -111,6 +139,7 @@ function useCourses({ size, isVisibleParam = true, institutionParam, facultyPara
         setIsLastPage,
         setTotalCourses,
         setParams,
+        handleSearch,
         handleCreatedCourse,
         handleUpdateCourse,
         handleDeleteCourse,

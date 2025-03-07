@@ -85,7 +85,10 @@ const BlogCourses = ({
                 </div>
                 <div className="w-full max-w-full">
                     <div className="flex flex-col md:flex-row justify-between items-center gap-2">
-                        <div className="relative w-full lg:w-[28rem] lg:max-w-md">
+                        <form onSubmit={e => {
+                            e.preventDefault();
+                            courseHook.handleSearch();
+                        }} className="relative w-full lg:w-[28rem] lg:max-w-md">
                             <FadeItem>
                                 <Input
                                     type="text"
@@ -105,7 +108,7 @@ const BlogCourses = ({
                                     <span className="sr-only">Buscar</span>
                                 </Button>
                             </FadeItem>
-                        </div>
+                        </form>
                         <div className="flex items-center flex-wrap sm:flex-nowrap gap-2">
                             <FadeItem className="w-full">
                                 <ComboBoxResponsive
