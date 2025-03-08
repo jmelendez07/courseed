@@ -13,8 +13,12 @@ import Pricing from "@/components/pricing";
 function Landing() {
     const location = useLocation();
     React.useLayoutEffect(() => {
-        document.documentElement.scrollTo({ top:0, left:0, behavior: "smooth" });
-    }, [location.pathname]);
+        if (location.hash === "#precios") {
+            document.getElementById("precios")?.scrollIntoView({ behavior: "smooth" });
+        } else {
+            document.documentElement.scrollTo({ top:0, left:0, behavior: "smooth" });
+        }
+    }, [location.pathname, location.key]);
 
     return (
         <>

@@ -10,11 +10,11 @@ import com.api.flux.courseed.web.controllers.CategoryController;
 import com.api.flux.courseed.web.controllers.ContentController;
 import com.api.flux.courseed.web.controllers.CourseController;
 import com.api.flux.courseed.web.controllers.InstitutionController;
-import com.api.flux.courseed.web.controllers.PaymentController;
 import com.api.flux.courseed.web.controllers.ReactionController;
 import com.api.flux.courseed.web.controllers.ReviewController;
 import com.api.flux.courseed.web.controllers.RoleController;
 import com.api.flux.courseed.web.controllers.SearchHistoryController;
+import com.api.flux.courseed.web.controllers.SubscriptionController;
 import com.api.flux.courseed.web.controllers.UserController;
 import com.api.flux.courseed.web.controllers.ViewController;
 
@@ -28,7 +28,7 @@ public class RouterConfig {
         InstitutionController institutionController, ViewController viewController,
         ReviewController reviewController, UserController userController,
         RoleController roleController, ReactionController reactionController,
-        SearchHistoryController searchHistoryController, PaymentController paymentController
+        SearchHistoryController searchHistoryController, SubscriptionController subscriptionController
     ) {
         return RouterFunctions.route()
             .path("/auth", () -> authRoutes(authController))
@@ -42,7 +42,7 @@ public class RouterConfig {
             .path("/reactions", () -> reactionRoutes(reactionController))
             .path("/views", () -> viewRoutes(viewController))
             .path("/search-histories", () -> searchHistoryRoutes(searchHistoryController))
-            .path("/payu", () -> payURoutes(paymentController))
+            .path("/subscription", () -> subscriptionRoutes(subscriptionController))
             .build();
     }
 
@@ -182,10 +182,11 @@ public class RouterConfig {
             .build();
     }
 
-    private RouterFunction<ServerResponse> payURoutes(PaymentController paymentController) {
+    private RouterFunction<ServerResponse> subscriptionRoutes(SubscriptionController subscriptionController) {
         return RouterFunctions
             .route()
-            .POST("/confirm", paymentController::confirmPayment)
+            .GET("/auth", subscriptionController::findByAuthUser)
+            .POST("/confirm", subscriptionController::confirm)
             .build();
     }
 
@@ -245,7 +246,7 @@ public class RouterConfig {
     }
 
     @Bean
-    PaymentController paymentController() {
-        return new PaymentController();
+    SubscriptionController subscriptionController() {
+        return new SubscriptionController();
     }
 }

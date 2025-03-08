@@ -128,7 +128,7 @@ function Pricing({
     }
 
     return (
-        <section id="#precios" className="py-12">
+        <section id="precios" className="py-12">
             <div className="w-full px-4">
                 <div className="mx-auto flex flex-col items-center gap-6 text-center">
                     <FadeItem>

@@ -1,12 +1,29 @@
 package com.api.flux.courseed.web.controllers;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
-
+import com.api.flux.courseed.services.implementations.SubscriptionService;
 import reactor.core.publisher.Mono;
 
-public class PaymentController {
-    public Mono<ServerResponse> confirmPayment(ServerRequest request) {
-        return request.formData()
+public class SubscriptionController {
+    
+    @Autowired
+    private SubscriptionService subscriptionService;
+
+    public Mono<ServerResponse> findByAuthUser(ServerRequest serverRequest) {
+        return serverRequest.principal()
+            .flatMap(principal -> subscriptionService.findByAuthUser(
+                principal, 
+                Integer.parseInt(serverRequest.queryParam("page").orElse("0")), 
+                Integer.parseInt(serverRequest.queryParam("size").orElse("10"))
+            ))
+                .flatMap(searchHistories -> ServerResponse.ok().bodyValue(searchHistories))
+                .switchIfEmpty(ServerResponse.notFound().build());
+    }
+
+    public Mono<ServerResponse> confirm(ServerRequest serverRequest) {
+        return serverRequest.formData()
             .flatMap(formData -> {
                 String statePol = formData.getFirst("state_pol"); // ✅ Usa `state_pol`
                 String referenceCode = formData.getFirst("reference_sale"); // ✅ Nombre correcto

@@ -125,6 +125,11 @@ const Navbar = ({
             paramKey: "facultad",
             items: facultyHook.faculties
         },
+        {
+            title: "Suscripciones",
+            url: "/#precios",
+            paramKey: "suscripciones",
+        }
     ];
 
     const getPrincipalRoute = (): string => {
