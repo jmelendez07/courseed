@@ -32,4 +32,5 @@ public interface ViewRepository extends ReactiveMongoRepository<View, String> {
         "{ $match: { $expr: { $lt: ['$currentMonthViews', '$lastMonthViews'] } } }"
     })
     Flux<CourseViewsStatsDto> findCoursesWithDecreasingViews(long lastMonthEpoch);
+    Flux<Void> deleteByUserId(String userId);
 }

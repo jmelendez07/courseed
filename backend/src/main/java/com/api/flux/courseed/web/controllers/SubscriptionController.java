@@ -39,7 +39,6 @@ public class SubscriptionController {
     }
 
     public Mono<ServerResponse> confirm(ServerRequest serverRequest) {
-
         String receivedToken = serverRequest.queryParam("secret").orElse("");
         if (!receivedToken.equals(API_KEY)) {
             return ServerResponse.status(HttpStatus.FORBIDDEN).bodyValue("Token inválido");

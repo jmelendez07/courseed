@@ -21,7 +21,7 @@ function DashboardContentReviews({ className }: { className?: string }) {
             <div className="flex items-center">
                 <h2 className="text-xl font-semibold">Gestion de Reseñas</h2>
             </div>
-            <div className="grid grid-cols-1 items-center md:grid-cols-[1fr,auto] gap-x-4">
+            <div className="grid grid-cols-1 items-center md:grid-cols-[1fr,auto] gap-4">
                 <form
                     onSubmit={e => {
                         e.preventDefault();

@@ -73,13 +73,13 @@ function useCourses({ size, isVisibleParam = true, institutionParam, facultyPara
             .finally(() => setLoading(false));
     }, [pageSize, params]);
 
-    const handleSearch = React.useCallback(() => {
+    const handleSearch = React.useCallback((search?: string) => {
         setLoading(true);
         axios.get(APIS.COURSES, {
             params: {
                 page: 0,
                 size: pageSize,
-                search: params.search,
+                search: search ? search : params.search,
                 institutionId: params.institution?.id,
                 categoryId: params.faculty?.id,
             },

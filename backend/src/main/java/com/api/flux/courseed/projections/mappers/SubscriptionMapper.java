@@ -13,5 +13,7 @@ public interface SubscriptionMapper {
     @Mapping(target = "user", ignore = true)
     SubscriptionDto toSubscriptionDto(Subscription subscription);
 
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
     Subscription toSubscription(SaveSubscriptionDto saveSubscriptionDto);
 }

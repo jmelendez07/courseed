@@ -8,6 +8,7 @@ import SubscriptionCard from "../ui/subscription-card";
 import axios, { AxiosResponse } from "axios";
 import APIS from "@/enums/apis";
 import dayjs from "dayjs";
+import { Link } from "react-router-dom";
 
 interface ResponseProps {
 	content: Subscription[];
@@ -20,7 +21,7 @@ function DashboardSubscriptionList() {
 	const [loading, setLoading] = React.useState<boolean>(true);
 	const [isLastPage, setIslastPage] = React.useState<boolean>(false);
 	const [pageNumber, setPageNumber] = React.useState<number>(0);
-	const pageSize = 2;
+	const pageSize = 6;
 
 	React.useEffect(() => {
 		setLoading(true);
@@ -48,9 +49,11 @@ function DashboardSubscriptionList() {
 		<div className="space-y-6">
 			<div className="flex items-center justify-between">
 				<h2 className="text-3xl font-bold tracking-tight">Mis Suscripciones</h2>
-				<Button variant="outline" size="sm" className="h-8 gap-1">
-					<RefreshCw className="h-3.5 w-3.5" />
-					<span>Actualizar</span>
+				<Button asChild>
+					<Link to="/#precios" className="h-8 gap-1">
+						<RefreshCw className="h-3.5 w-3.5" />
+						<span>Renovar</span>
+					</Link>
 				</Button>
 			</div>
 

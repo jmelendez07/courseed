@@ -25,6 +25,9 @@ public interface UserMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
+    @Mapping(target = "academicLevel", ignore = true)
+    @Mapping(target = "sex", ignore = true)
+    @Mapping(target = "birthdate", ignore = true)
     User toUser(CreateUserDto createUserDto);
 
     @Mapping(target = "id", ignore = true)

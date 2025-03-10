@@ -10,6 +10,7 @@ import reactor.core.publisher.Mono;
 
 @Repository
 public interface SubscriptionRepository extends ReactiveMongoRepository<Subscription, String> {
+    Mono<Subscription> findFirstByUserIdAndStateOrderByEndDateDesc(String userId, String state);
     Flux<Subscription> findByUserIdOrderByCreatedAtDesc(String userId, Pageable pageable);
     Mono<Long> countByUserId(String userId);
 }

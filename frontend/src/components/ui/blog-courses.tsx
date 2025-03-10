@@ -2,7 +2,7 @@ import { Badge } from "@/components/ui/badge";
 import useCourses from "@/hooks/useCourses";
 import Course from "./course";
 import { Button } from "./button";
-import { ChevronDown, ChevronUp, LoaderCircle, Search } from "lucide-react";
+import { ChevronDown, ChevronUp, ClipboardCheck, LoaderCircle, Search } from "lucide-react";
 import { Input } from "./input";
 import useInstitution from "@/hooks/useInstitution";
 import useFaculty from "@/hooks/useFaculty";
@@ -24,6 +24,7 @@ const BlogCourses = ({
 }: BlogCoursesProps) => {
 
     const [searchParams] = useSearchParams();
+    const [clipboardText, setClipboardText] = React.useState<string>("");
     const courseHook = useCourses({
         institutionParam: { id: searchParams.get('institucion'), name: undefined },
         facultyParam: { id: searchParams.get('facultad'), name: undefined },
@@ -63,6 +64,19 @@ const BlogCourses = ({
         });
     }, [searchParams.get('institucion'), searchParams.get('facultad')]);
 
+    React.useEffect(() => {
+        const getClipboardText = async () => {
+            try {
+                const text = await navigator.clipboard.readText();
+                if (text.trim()) setClipboardText(text);
+            } catch (err) {
+                console.error("No se pudo acceder al portapapeles", err);
+            }
+        };
+
+        getClipboardText();
+    }, []);
+
     return (
         <section className="py-20 lg:py-32">
             <div className="w-full mx-auto flex flex-col items-center gap-16 px-4 md:px-8 lg:px-16">
@@ -88,11 +102,11 @@ const BlogCourses = ({
                         <form onSubmit={e => {
                             e.preventDefault();
                             courseHook.handleSearch();
-                        }} className="relative w-full lg:w-[28rem] lg:max-w-md">
-                            <FadeItem>
+                        }} className="flex items-center gap-2 w-full lg:w-[28rem] lg:max-w-md">
+                            <FadeItem className="relative w-full">
                                 <Input
                                     type="text"
-                                    placeholder="Buscar por titulo, descripción, duración..."
+                                    placeholder={clipboardText ? clipboardText : `Buscar por titulo, descripción, duración...`}
                                     value={courseHook.params.search}
                                     onChange={e => {
                                         courseHook.setParams({
@@ -108,6 +122,23 @@ const BlogCourses = ({
                                     <span className="sr-only">Buscar</span>
                                 </Button>
                             </FadeItem>
+                            {(clipboardText && clipboardText !== courseHook.params.search) && (
+                                <Button 
+                                    size="icon" 
+                                    type="button"
+                                    onClick={e => {
+                                        e.preventDefault();
+                                        courseHook.setParams({
+                                            ...courseHook.params,
+                                            search: clipboardText
+                                        });
+                                        courseHook.handleSearch(clipboardText)
+                                    }}
+                                    title="Usar el texto del portapapeles"
+                                >
+                                    <ClipboardCheck />
+                                </Button>
+                            )}
                         </form>
                         <div className="flex items-center flex-wrap sm:flex-nowrap gap-2">
                             <FadeItem className="w-full">
@@ -149,10 +180,10 @@ const BlogCourses = ({
                 </div>
                 <div className="w-full" ref={ref}>
                     {(
-                        !courseHook.isVisible || 
+                        !courseHook.isVisible ||
                         (
-                            courseHook.loading && 
-                            !courseHook.params.search && 
+                            courseHook.loading &&
+                            !courseHook.params.search &&
                             !courseHook.params.faculty &&
                             !courseHook.params.institution &&
                             courseHook.params.pageNumber === 0
@@ -168,12 +199,12 @@ const BlogCourses = ({
                             ))}
                         </div>
                     ) : (
-                        <>  
+                        <>
                             {(courseHook.courses.length === 0) ? (
                                 <div className="w-full flex flex-col items-center justify-center">
-                                <SearchDraw />
-                                <p>No encontramos ningún programa para esta busqueda.</p>
-                            </div>
+                                    <SearchDraw />
+                                    <p>No encontramos ningún programa para esta busqueda.</p>
+                                </div>
                             ) : (
                                 <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 lg:gap-8 2xl:flex 2xl:flex-wrap 2xl:justify-between">
                                     {courseHook.courses.map((course) => (

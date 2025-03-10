@@ -1,6 +1,7 @@
 package com.api.flux.courseed.services.implementations;
 
 import java.security.Principal;
+import java.time.LocalDateTime;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -57,15 +58,32 @@ public class SubscriptionService implements InterfaceSubscriptionService {
     @Override
     public Mono<SubscriptionDto> createSubscription(SaveSubscriptionDto saveSubscriptionDto) {
         return userRepository.findById(saveSubscriptionDto.getUserId())
-            .flatMap(user -> {
-                Subscription subscription = subscriptionMapper.toSubscription(saveSubscriptionDto);
-                return subscriptionRepository.save(subscription)
-                    .map(savedSubscription -> {
-                        SubscriptionDto subscriptionDto = subscriptionMapper.toSubscriptionDto(savedSubscription);
-                        subscriptionDto.setUser(userMapper.toUserDto(user));
-                        return subscriptionDto;
-                    });
-            })
+            .flatMap(user -> 
+                subscriptionRepository.findFirstByUserIdAndStateOrderByEndDateDesc(saveSubscriptionDto.getUserId(), "active")
+                    .switchIfEmpty(Mono.just(new Subscription()))
+                    .flatMap(activeSubscription -> {
+                        Subscription newSubscription = subscriptionMapper.toSubscription(saveSubscriptionDto);
+                        
+                        if (activeSubscription.getId() != null) {
+                            newSubscription.setState("pending");
+                            newSubscription.setStartDate(activeSubscription.getEndDate());
+                        } else {
+                            newSubscription.setState("active");
+                            newSubscription.setStartDate(LocalDateTime.now());
+                        }
+
+                        newSubscription.setEndDate(newSubscription.getStartDate().plusMonths(
+                            saveSubscriptionDto.getPlan().equals("basic") ? 1 : 12
+                        ));
+
+                        return subscriptionRepository.save(newSubscription)
+                            .map(savedSubscription -> {
+                                SubscriptionDto subscriptionDto = subscriptionMapper.toSubscriptionDto(savedSubscription);
+                                subscriptionDto.setUser(userMapper.toUserDto(user));
+                                return subscriptionDto;
+                            });
+                    })
+            )
             .switchIfEmpty(Mono.error(
                 new CustomWebExchangeBindException(
                     saveSubscriptionDto.getUserId(), 

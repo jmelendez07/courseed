@@ -56,7 +56,7 @@ public class SecurityConfig {
                     .pathMatchers(HttpMethod.PUT, "/institutions/*").hasRole(Roles.ADMIN)
                     .pathMatchers(HttpMethod.DELETE, "/institutions/*").hasRole(Roles.ADMIN)
                     .pathMatchers(HttpMethod.GET, "/reactions/course/*").permitAll()
-                    .pathMatchers(HttpMethod.GET, "/reviews", "/reviews/months/count").hasRole(Roles.ADMIN)
+                    .pathMatchers(HttpMethod.GET, "/reviews", "/reviews/months/count").permitAll()
                     .pathMatchers(HttpMethod.GET, "/reviews/course/*").permitAll()
                     .pathMatchers(HttpMethod.GET, "/users", "/users/*", "users/email/*", "/users/months/count").hasRole(Roles.ADMIN)
                     .pathMatchers(HttpMethod.POST, "/users/create").hasRole(Roles.ADMIN)

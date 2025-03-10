@@ -50,4 +50,6 @@ public interface ReviewRepository extends ReactiveMongoRepository<Review, String
         "{ $project: { _id: 0, courseId: '$_id', avgRating: 1 } }"
     })
     Flux<CourseAverageRating> findLowRatedCourses();
+
+    Mono<Void> deleteByUserId(String userId);
 }
