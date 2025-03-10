@@ -4,7 +4,6 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { LogOut } from "lucide-react";
 import { Link } from "react-router-dom";
-import ROLES from "@/enums/roles";
 
 function DashboardContentProfile() {
     const authHook = useAuth();
@@ -18,16 +17,7 @@ function DashboardContentProfile() {
                 <h1 className="text-3xl font-bold">{authHook?.getName()}</h1>
                 <p className="text-xl text-muted-foreground">{authHook?.user?.email}</p>
                 <div className="flex flex-wrap justify-center gap-2 md:justify-start">
-                    {authHook?.user?.roles?.map((role) => (
-                        <Badge key={role} variant="secondary">
-                            {role === ROLES.ADMIN 
-                                ? 'Administrador'
-                                : role === ROLES.USER 
-                                    ? 'Usuario'
-                                    : role
-                            }
-                        </Badge>
-                    ))}
+                    <Badge variant="secondary">{authHook?.getRoleName()}</Badge>
                     {authHook?.user?.academicLevel && (
                         <Badge variant="secondary">
                             Nivel Academico: {authHook.user.academicLevel.charAt(0).toUpperCase() + authHook.user.academicLevel.slice(1, authHook.user.academicLevel.length)}

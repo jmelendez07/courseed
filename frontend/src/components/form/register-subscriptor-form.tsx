@@ -1,15 +1,18 @@
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Link, useNavigate } from "react-router-dom"
-import React from "react"
-import axios, { AxiosError, AxiosResponse } from "axios"
-import APIS from "@/enums/apis"
-import { useAuth } from "@/providers/AuthProvider"
-import { Info, LoaderCircle } from "lucide-react"
-import { useToast } from "@/hooks/use-toast"
-import dayjs from "dayjs"
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Link, useNavigate } from "react-router-dom";
+import React from "react";
+import axios, { AxiosError, AxiosResponse } from "axios";
+import APIS from "@/enums/apis";
+import { useAuth } from "@/providers/AuthProvider";
+import { Info, LoaderCircle } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import dayjs from "dayjs";
+import useSelectedPlan from "@/hooks/useSelectedPlan";
+import UserInterface from "@/interfaces/user";
+import TOKEN from "@/enums/token";
 
 interface FormProps {
     email: string;
@@ -42,6 +45,7 @@ function RegisterSubscriptorForm({
 
     const [loading, setLoading] = React.useState<boolean>(false);
     const authHook = useAuth();
+    const planHook = useSelectedPlan();
     const { toast } = useToast();
     const navigate = useNavigate();
 
@@ -51,17 +55,18 @@ function RegisterSubscriptorForm({
         axios.post(APIS.REGISTER_SUSCRIPTOR, form)
             .then((response: AxiosResponse) => {
                 authHook?.handleToken(response.data.token);
-                setErrors({
-                    email: null,
-                    password: null,
-                    confirmPassword: null,
-                });
+                setErrors({ email: null, password: null, confirmPassword: null });
+        
                 toast({
-                    title: `Bienvenido a coursed, tu suscripción se ha compleado exitosamente!`,
+                    title: `Bienvenido a coursed, sigue con el proceso de pago en payu!`,
                     description: dayjs().format("LLL"),
                 });
-                console.log(response);
-                navigate("/suscriptor", { replace: true });
+
+                if (planHook.selectedPlan) {
+                    handleLogin(response.data.token);
+                } else {
+                    navigate("/#precios", { replace: true });
+                }
             })
             .catch((error: AxiosError<ErrorsProps>) => {
                 setErrors({
@@ -71,6 +76,35 @@ function RegisterSubscriptorForm({
                 });
             })
             .finally(() => setLoading(false));
+    }
+
+    const handleLogin = (token: string) => {
+        axios.get(APIS.USER_AUTHENTICATED, {
+            headers: {
+                Authorization: `${TOKEN.PREFIX} ${token}`
+            }
+        })
+            .then((response: AxiosResponse<UserInterface>) => {
+                if (response.data.id) {
+                    planHook.redirectToPayU(response.data.id);
+                    planHook.clearPlan();
+                } else {
+                    toast({
+                        title: `Tuvimos un problema en nuestro servidor, intenta nuevamente.`,
+                        description: "No pudimos encontrar al usuario autenticado.",
+                        variant: 'destructive',
+                    });
+                    navigate("/#precios", { replace: true });
+                }
+            })
+            .catch((error: AxiosError) => {
+                toast({
+                    title: `Tuvimos un problema en nuestro servidor, intenta nuevamente.`,
+                    description: error.message,
+                    variant: 'destructive',
+                });
+                navigate("/#precios", { replace: true });
+            });
     }
 
     const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {

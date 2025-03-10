@@ -1,15 +1,20 @@
 package com.api.flux.courseed.projections.dtos;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
-public class SubscriptionDto {
+public class SubscriptionDto implements Serializable {
     private String id;
     private UserDto user;
     private String plan;
     private String state;
     private String referenceCode;
     private String transaction;
+    private String paymentMethod;
+    private String currency;
+    private String authorizationCode;
     private Long price;
+    private String responseMessage;
     private LocalDateTime createdAt;
     private LocalDateTime startDate;
     private LocalDateTime endDate;
@@ -93,4 +98,37 @@ public class SubscriptionDto {
     public void setEndDate(LocalDateTime endDate) {
         this.endDate = endDate;
     }
+
+    public String getPaymentMethod() {
+        return paymentMethod;
+    }
+
+    public void setPaymentMethod(String paymentMethod) {
+        this.paymentMethod = paymentMethod;
+    }
+
+    public String getCurrency() {
+        return currency;
+    }
+
+    public void setCurrency(String currency) {
+        this.currency = currency;
+    }
+
+    public String getAuthorizationCode() {
+        return authorizationCode;
+    }
+
+    public void setAuthorizationCode(String authorizationCode) {
+        this.authorizationCode = authorizationCode;
+    }
+
+    public String getResponseMessage() {
+        return responseMessage;
+    }
+
+    public void setResponseMessage(String responseMessage) {
+        this.responseMessage = responseMessage;
+    }
+    
 }

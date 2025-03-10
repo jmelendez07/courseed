@@ -17,7 +17,8 @@ interface AuthContextProps {
     handleUser: () => Promise<any>;
     setUser: React.Dispatch<React.SetStateAction<UserInterface | null>>;
     setLoading: React.Dispatch<React.SetStateAction<boolean>>;
-    getName: () => string
+    getName: () => string;
+    getRoleName: () => string;
 }
 
 const AuthContext = React.createContext<AuthContextProps | null>(null);
@@ -50,6 +51,16 @@ function AuthProvider({ children }: ChildrenProps) {
         return '';
     }, [user?.email]);
 
+    const getRoleName = React.useCallback(() => {
+        if (user?.roles?.some(r => r === ROLES.ADMIN)) {
+            return "Administrador";
+        } else if (user?.roles?.some(r => r === ROLES.SUBSCRIBER)) {
+            return "Suscriptor";
+        } else {
+            return "Usuario";
+        }
+    }, [user?.roles]);
+
     React.useEffect(() => {
         if (token) {
             axios.defaults.headers.common['Authorization'] = `${TOKEN.PREFIX} ${token}`;
@@ -71,7 +82,8 @@ function AuthProvider({ children }: ChildrenProps) {
           handleUser,
           setUser,
           setLoading,
-          getName
+          getName,
+          getRoleName
         }),
         [token, user, loading]
     );

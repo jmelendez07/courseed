@@ -1,5 +1,6 @@
 package com.api.flux.courseed.persistence.repositories;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
 import org.springframework.stereotype.Repository;
 
@@ -9,6 +10,6 @@ import reactor.core.publisher.Mono;
 
 @Repository
 public interface SubscriptionRepository extends ReactiveMongoRepository<Subscription, String> {
-    Flux<Subscription> findByUserId(String userId);
+    Flux<Subscription> findByUserIdOrderByCreatedAtDesc(String userId, Pageable pageable);
     Mono<Long> countByUserId(String userId);
 }

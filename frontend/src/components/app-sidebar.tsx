@@ -1,4 +1,5 @@
 import {
+	CreditCard,
 	GraduationCap,
 	LayoutPanelLeft,
 	MessageSquareText,
@@ -149,6 +150,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 				title: "Programas",
 				icon: GraduationCap,
 				url: "/suscriptor/programas"
+			},
+			{
+				title: "Suscripciones",
+				icon: CreditCard,
+				url: "/suscriptor/suscripciones"
 			}
 		]
 	}
@@ -158,7 +164,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 			<SidebarHeader>
 				<TeamSwitcher 
 					teams={isAdmin() ? dataAdmin.actions : dataUser.actions} 
-					roles={authHook?.user?.roles ? authHook.user.roles : []}
+					role={authHook?.getRoleName() ? authHook.getRoleName() : ""}
 				/>
 			</SidebarHeader>
 			<SidebarContent>

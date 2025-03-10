@@ -42,7 +42,7 @@ public class RouterConfig {
             .path("/reactions", () -> reactionRoutes(reactionController))
             .path("/views", () -> viewRoutes(viewController))
             .path("/search-histories", () -> searchHistoryRoutes(searchHistoryController))
-            .path("/subscription", () -> subscriptionRoutes(subscriptionController))
+            .path("/subscriptions", () -> subscriptionRoutes(subscriptionController))
             .build();
     }
 

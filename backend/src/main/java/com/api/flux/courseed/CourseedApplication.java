@@ -17,6 +17,8 @@ public class CourseedApplication {
 		System.setProperty("MONGODB_URI", dotenv.get("MONGODB_URI"));
 		System.setProperty("ADMIN_EMAIL", dotenv.get("ADMIN_EMAIL"));
 		System.setProperty("ADMIN_PASS", dotenv.get("ADMIN_PASS"));
+		System.setProperty("PAYU_API_KEY", dotenv.get("PAYU_API_KEY"));
+		System.setProperty("PAYU_MERCHANT_ID", dotenv.get("PAYU_MERCHANT_ID"));
 		
 		SpringApplication.run(CourseedApplication.class, args);
 	}

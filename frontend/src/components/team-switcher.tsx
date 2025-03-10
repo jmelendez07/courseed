@@ -16,30 +16,19 @@ import {
 	useSidebar,
 } from "@/components/ui/sidebar";
 import { Link } from "react-router-dom";
-import ROLES from "@/enums/roles";
 
 export function TeamSwitcher({
 	teams,
-	roles,
+	role,
 }: {
 	teams: {
 		name: string
 		logo: React.ElementType,
 		action?: () => void
 	}[]
-	roles: string[]
+	role: string
 }) {
 	const { isMobile } = useSidebar();
-
-	const getRoleName = () => {
-		if (roles.some(r => r === ROLES.ADMIN)) {
-			return 'Administrador';
-		} else if (roles.some(r => r === ROLES.SUBSCRIBER)) {
-			return 'Suscriptor';
-		} else {
-			return 'Usuario';
-		}
-	}
 
 	return (
 		<SidebarMenu>
@@ -61,7 +50,7 @@ export function TeamSwitcher({
 									Courseed
 								</span>
 								<span className="truncate text-xs">
-									{getRoleName()}
+									{role}
 								</span>
 							</div>
 							<ChevronsUpDown className="ml-auto" />

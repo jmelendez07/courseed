@@ -4,7 +4,9 @@ import java.time.LocalDateTime;
 
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
+@Document(collection = "subscriptions")
 public class Subscription {
 
     @Id
@@ -14,6 +16,10 @@ public class Subscription {
     private String state;
     private String referenceCode;
     private String transaction;
+    private String paymentMethod;
+    private String currency;
+    private String authorizationCode;
+    private String responseMessage;
     private Long price;
 
     @CreatedDate
@@ -23,6 +29,38 @@ public class Subscription {
 
     public String getId() {
         return id;
+    }
+
+    public String getPaymentMethod() {
+        return paymentMethod;
+    }
+
+    public void setPaymentMethod(String paymentMethod) {
+        this.paymentMethod = paymentMethod;
+    }
+
+    public String getCurrency() {
+        return currency;
+    }
+
+    public void setCurrency(String currency) {
+        this.currency = currency;
+    }
+
+    public String getAuthorizationCode() {
+        return authorizationCode;
+    }
+
+    public void setAuthorizationCode(String authorizationCode) {
+        this.authorizationCode = authorizationCode;
+    }
+
+    public String getResponseMessage() {
+        return responseMessage;
+    }
+
+    public void setResponseMessage(String responseMessage) {
+        this.responseMessage = responseMessage;
     }
 
     public void setId(String id) {

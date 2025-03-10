@@ -47,6 +47,7 @@ enum APIS {
     SEARCH_HISTORY_CREATE = 'api/search-histories/create',
     SUBSCRIBE = 'api/auth/subscribe',
     REGISTER_SUSCRIPTOR = 'api/auth/register/subscriptor',
+    SUBSCRIPTIONS_BY_AUTH_USER = 'api/subscriptions/auth'
 }
 
 export default APIS;

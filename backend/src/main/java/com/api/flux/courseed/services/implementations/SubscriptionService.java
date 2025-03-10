@@ -42,7 +42,7 @@ public class SubscriptionService implements InterfaceSubscriptionService {
 
         return userRepository.findByEmail(principal.getName())
         .flatMap(user -> 
-            subscriptionRepository.findByUserId(user.getId())
+            subscriptionRepository.findByUserIdOrderByCreatedAtDesc(user.getId(), pageable)
                 .map(subscription -> {
                     SubscriptionDto subscriptionDto = subscriptionMapper.toSubscriptionDto(subscription);
                     subscriptionDto.setUser(userMapper.toUserDto(user));
