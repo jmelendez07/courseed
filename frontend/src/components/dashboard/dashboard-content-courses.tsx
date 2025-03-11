@@ -1,6 +1,6 @@
 import useCourses from "@/hooks/useCourses";
 import useInstitution from "@/hooks/useInstitution";
-import { ChevronDown, ChevronUp, LoaderCircle } from "lucide-react";
+import { ChevronDown, ChevronUp, LoaderCircle, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import ComboBoxResponsive from "@/components/ui/combo-box-responsive";
 import Course from "@/components/ui/course";
@@ -22,7 +22,17 @@ function DashboardContentCourses({ className }: { className?: string }) {
                 <h2 className="text-xl font-semibold">Gestion de Programas</h2>
             </div>
             <div className="grid grid-cols-1 items-center md:grid-cols-[1fr,auto] gap-x-4">
-                <div className="flex items-center gap-2">
+                <form 
+                    onSubmit={e => {
+                        e.preventDefault();
+                        courseHook.setParams({
+                            ...courseHook.params,
+                            pageNumber: 0,
+                        });
+                        courseHook.handleSearch();
+                    }}
+                    className="flex items-center gap-2"
+                >
                     <Input
                         type="text"
                         disabled={courseHook.loading}
@@ -37,7 +47,13 @@ function DashboardContentCourses({ className }: { className?: string }) {
                         }}
                         className="max-w-sm"
                     />
-                </div>
+                    <Button
+                        type="submit"
+                        disabled={courseHook.loading}
+                    >
+                        {courseHook.loading ? <LoaderCircle className="animate-spin" /> : <Search />}
+                    </Button>
+                </form>
                 <ComboBoxResponsive
                     placeholder="Filtrar por Institución..."
                     labelAll="Todas las instituciones"

@@ -7,7 +7,6 @@ import com.api.flux.courseed.persistence.documents.Category;
 import com.api.flux.courseed.projections.dtos.CategoryDto;
 import com.api.flux.courseed.projections.dtos.SaveCategoryDto;
 
-
 @Mapper(componentModel = "spring")
 public interface CategoryMapper {
     CategoryDto toCategoryDto(Category category);
