@@ -14,6 +14,7 @@ enum APIS {
     REGISTER = 'api/auth/register',
     COURSES = 'api/courses',
     COURSES_TOTAL = 'api/courses/total/this-month',
+    COURSES_BY_TYPE = 'api/courses/type',
     COURSES_BY_INSTITUTION = 'api/courses/institution',
     COURSES_BY_FACULTY = 'api/courses/category',
     COURSES_BY_AUTH_USER = 'api/courses/auth',

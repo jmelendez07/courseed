@@ -82,6 +82,17 @@ public class CourseController {
             .switchIfEmpty(ServerResponse.notFound().build());
     }
 
+    public Mono<ServerResponse> getCoursesByType(ServerRequest serverRequest) {
+        return courseService
+            .getCoursesByType(
+                serverRequest.queryParam("type").orElse(""),
+                Integer.parseInt(serverRequest.queryParam("page").orElse("0")), 
+                Integer.parseInt(serverRequest.queryParam("size").orElse("10"))
+            )
+                .flatMap(courses -> ServerResponse.ok().bodyValue(courses))
+                .switchIfEmpty(ServerResponse.notFound().build());
+    }
+
     public Mono<ServerResponse> getTopCoursesWithReviewsAndReactions(ServerRequest serverRequest) {
         return courseService.getTopCoursesWithReviewsAndReactions(
             Integer.parseInt(serverRequest.queryParam("page").orElse("0")), 

@@ -524,5 +524,40 @@ public class CourseService implements InterfaceCourseService {
             .zipWith(courseRepository.count())
             .map(p -> new PageImpl<>(p.getT1(), pageable, p.getT2()));
     }
+
+    @Override
+    public Mono<Page<CourseDto>> getCoursesByType(String type, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+
+        return courseRepository.findByType(type, pageable)
+            .flatMap(course -> {
+                Mono<Category> categoryMono = categoryRepository.findById(course.getCategoryId());
+                Mono<Institution> institutionMono = institutionRepository.findById(course.getInstitutionId());
+                Flux<Content> contentFlux = contentRepository.findByCourseId(course.getId());
+                Flux<Reaction> reactionFlux = reactionRepository.findByCourseId(course.getId());
+                Flux<Review> reviewFlux = reviewRepository.findByCourseId(course.getId());
+
+                return Mono.zip(categoryMono, institutionMono, contentFlux.collectList(), reactionFlux.collectList(), reviewFlux.collectList())
+                    .map(tuple -> {
+                        CourseDto courseDto = courseMapper.toCourseDto(course);
+                        courseDto.setCategory(categoryMapper.toCategoryDto(tuple.getT1()));
+                        courseDto.setInstitution(institutionMapper.toInstitutionDto(tuple.getT2()));
+                        courseDto.setContents(tuple.getT3().stream()
+                            .map(contentMapper::toContentDto)
+                            .toList()
+                        );
+                        courseDto.setReactions(tuple.getT4().stream().map(reactionMapper::toReactionDto).toList());
+                        courseDto.setReviews(tuple.getT5().stream()
+                            .map(reviewMapper::toReviewDto)
+                            .toList()
+                        );
+
+                        return courseDto;
+                    });
+            })
+            .collectList()
+            .zipWith(courseRepository.count())
+            .map(p -> new PageImpl<>(p.getT1(), pageable, p.getT2()));
+    }
     
 }

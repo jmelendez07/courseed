@@ -19,6 +19,7 @@ public interface InterfaceCourseService {
     Mono<Page<CourseDto>> getAllCourses(String search, String categoryId, String institutionId, int page, int size);
     Mono<Page<CourseDto>> getCoursesByCategoryId(String categoryId, int page, int size);
     Mono<Page<CourseDto>> getCoursesByInstitutionId(String institutionId, int page, int size);
+    Mono<Page<CourseDto>> getCoursesByType(String type, int page, int size);
     Mono<Page<CourseDto>> searchCoursesByText(String text, int page, int size);
     Mono<CourseDto> getCourseById(String id);
     Mono<CourseDto> createCourse(Principal principal, SaveCourseDto saveCourseDto);

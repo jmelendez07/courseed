@@ -11,6 +11,7 @@ class CourseInteface:
     price: Optional[float]
     duration: Optional[str]
     modality: Optional[str]
+    type: str
     institution: str
     category: Optional[str]
     contents: list[str]

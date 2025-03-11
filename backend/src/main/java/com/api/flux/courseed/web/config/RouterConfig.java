@@ -89,6 +89,7 @@ public class RouterConfig {
             .GET("/auth", courseController::getCoursesByAuthUser)
             .GET("/search", courseController::searchCoursesByText)
             .GET("/reviews/avg", courseController::getTopCoursesWithRatingAvg)
+            .GET("/type", courseController::getCoursesByType)
             .GET("/{id}", courseController::getCourseById)
             .GET("/category/{categoryId}", courseController::getCoursesByCategoryId)
             .GET("/institution/{institutionId}", courseController::getCoursesByInstitutionId)

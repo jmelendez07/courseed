@@ -13,6 +13,7 @@ public class CourseDto implements Serializable {
     private String duration;
     private String modality;
     private CategoryDto category;
+    private String type;
     private InstitutionDto institution;
     private UserDto user;
     private List<ContentDto> contents;
@@ -66,6 +67,14 @@ public class CourseDto implements Serializable {
 
     public void setPrice(Double price) {
         this.price = price;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 
     public String getDuration() {

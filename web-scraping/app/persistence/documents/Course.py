@@ -9,6 +9,7 @@ class Course(Document):
     price = FloatField()
     duration = StringField()
     modality = StringField()
+    type = StringField()
     categoryId = StringField(required=True)
     institutionId = StringField(required=True)
 

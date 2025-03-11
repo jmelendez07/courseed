@@ -19,6 +19,7 @@ public class Course {
     private Double price;
     private String duration;
     private String modality;
+    private String type;
     private String categoryId;
     private String institutionId;
     private String userId;
@@ -99,6 +100,14 @@ public class Course {
 
     public void setModality(String modality) {
         this.modality = modality;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 
     public String getCategoryId() {

@@ -43,6 +43,7 @@ public interface CourseRepository extends ReactiveMongoRepository<Course, String
     Flux<Course> searchCourses(String text, Pageable pageable);
     Flux<Course> findByCategoryId(String categoryId, Pageable pageable);
     Flux<Course> findByInstitutionId(String institutionId, Pageable pageable);
+    Flux<Course> findByType(String type, Pageable pageable);
     Flux<Course> findByUserIdAndTitleContainingOrderByCreatedAtDesc(String userId, String title, Pageable pageable);
     Mono<Long> countByInstitutionId(String institutionId);
 }

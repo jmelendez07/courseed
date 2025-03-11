@@ -7,9 +7,10 @@ from app.persistence.documents.Content import Content
 from typing import Optional
 import requests
 import re
+import unicodedata
 
 class Javeriana(BaseScraper):
-    INSTITUTION: str = "Pontificia Universidad Javeriana"
+    INSTITUTION: str = "pontificia universidad javeriana"
     PAGE_URL: str = "https://educacionvirtual.javeriana.edu.co"
     BODY: dict[str, str] = {
         "query": "",
@@ -60,7 +61,10 @@ class Javeriana(BaseScraper):
 
             duration = self.cleanText(f"{courseData["duracion"]} {courseData["unidadDuracion"]}")
             modality = self.cleanText(courseData["modalidad"])
-            category = self.cleanText(courseData["facultad"][-1].replace("Facultad de", "")).lower()
+            category = self.cleanText(courseData["facultad"][-1].replace("Facultad de", ""))
+            category = self.normalize_string(category)
+            type = self.normalize_string(courseData["tipoPrograma"])
+            type = "curso" if type == "mooc cursos gratuitos" else type
 
             contents: list[str] = []
 
@@ -73,6 +77,7 @@ class Javeriana(BaseScraper):
                 price=price,
                 duration=duration,
                 modality=modality,
+                type=type,
                 institution=self.INSTITUTION,
                 category=category,
                 contents=contents
@@ -99,6 +104,28 @@ class Javeriana(BaseScraper):
     def cleanText(self, text: str) -> str:
         cleanedText = re.sub(r'[\t\n\xa0]', ' ', text).strip()
         return cleanedText
+    
+    def normalize_string(self, text: str) -> str:
+        text = text.lower()
+        resultado = []
+        alphabet = "abcdefghijklmnñopqrstuvwxyz"
+        replaces = {
+            'á': 'a', 'é': 'e', 'í': 'i', 'ó': 'o', 'ú': 'u',
+            'à': 'a', 'è': 'e', 'ì': 'i', 'ò': 'o', 'ù': 'u',
+            'ä': 'a', 'ë': 'e', 'ï': 'i', 'ö': 'o', 'ü': 'u',
+            'â': 'a', 'ê': 'e', 'î': 'i', 'ô': 'o', 'û': 'u'
+        }
+
+        for character in text:
+            if character in replaces:
+                resultado.append(replaces[character])
+            elif character in alphabet:
+                resultado.append(character)
+            elif character.isspace():
+                resultado.append(character)
+        
+        return ''.join(resultado)
+    
 
     def saveToDatabase(self, courses: list[CourseInteface]):
         for course in courses:
@@ -115,6 +142,7 @@ class Javeriana(BaseScraper):
                     set__price=course.price,
                     set__duration=course.duration,
                     set__modality=course.modality,
+                    set__type=course.type,
                     set__categoryId=str(categoryDocument.id),
                     set__institutionId=str(institutionDocument.id),
                     new=True
