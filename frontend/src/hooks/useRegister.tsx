@@ -52,6 +52,7 @@ function useRegister() {
         birthdate: null
     });
     const [loading, setLoading] = React.useState<boolean>(false);
+    const [disabled, setDisabled] = React.useState<boolean>(false);
     
     const auth = useAuth();
     const navigate = useNavigate();
@@ -98,6 +99,8 @@ function useRegister() {
                     sex: error.response.data.sex,
                     birthdate: error.response.data.birthdate
                 });
+
+                setDisabled(true);
             })
             .finally(() => setLoading(false));
     }
@@ -154,15 +157,38 @@ function useRegister() {
             });
     }
 
+    const setError = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setCredentialsErrors({
+            ...credentialsErrors,
+            ...(
+                (
+                    e.target.id === "password" && 
+                    e.target.value === credentials.confirmPassword && 
+                    credentialsErrors.confirmPassword === "La confirmación de la contraseña no coincide con la contraseña original."
+                ) ? { confirmPassword: null } : {}
+            ),
+            [e.target.id]: null
+        });
+    }
+
+    React.useEffect(() => {
+        if (Object.values(credentialsErrors).every(value => value === null || value === undefined)) {
+            setDisabled(false);
+        }
+    }, [credentialsErrors]);
+
     return {
         credentials,
         credentialsErrors,
         loading,
+        disabled,
         setCredentials,
         setCredentialsErrors,
         setLoading,
         setCredential,
-        handleRegister
+        handleRegister,
+        setDisabled,
+        setError
     }
 }
 

@@ -65,7 +65,7 @@ function PieChart({
                         <LoaderCircle className="animate-spin text-zinc-400 dark:text-white" />
                     </div>
                 ) : (
-                    <ChartContainer config={chartConfig} className="mx-auto aspect-square max-h-[250px] overflow-hidden">
+                    <ChartContainer config={chartConfig} className="mx-auto aspect-square w-full max-h-[250px] overflow-hidden">
                         <PieChartRechart>
                             <ChartTooltip
                                 content={<ChartTooltipContent nameKey="value" hideLabel />}

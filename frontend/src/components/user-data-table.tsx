@@ -221,8 +221,8 @@ function UserDataTable() {
 	});
 
 	return (
-		<div className="w-full">
-			<div className="flex items-center pb-4 flex-col gap-2 sm:flex-row sm:justify-between">
+		<div className="max-w-full">
+			<div className="flex sm:items-center pb-4 flex-col gap-2 sm:flex-row sm:justify-between">
 				<div className="flex items-center">
 					<h2 className="text-xl font-semibold">Gestion de Usuarios</h2>
 				</div>

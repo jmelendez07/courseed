@@ -1,6 +1,6 @@
 import React from "react";
-import AreaChart from "@/components/area-chart";
-import PieChart from "@/components/pie-chart";
+import AreaChart from "@/components/charts/area-chart";
+import PieChart from "@/components/charts/pie-chart";
 import axios, { AxiosResponse } from "axios";
 import RolesWithUsersCount from "@/interfaces/roles-with-users-count";
 import APIS from "@/enums/apis";

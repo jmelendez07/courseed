@@ -44,6 +44,7 @@ function RegisterSubscriptorForm({
     });
 
     const [loading, setLoading] = React.useState<boolean>(false);
+    const [disabled, setDisabled] = React.useState<boolean>(false);
     const authHook = useAuth();
     const planHook = useSelectedPlan();
     const { toast } = useToast();
@@ -74,6 +75,7 @@ function RegisterSubscriptorForm({
                     password: error.response?.data.password ?? null,
                     confirmPassword: error.response?.data.confirmPassword ?? null,
                 });
+                setDisabled(true);
             })
             .finally(() => setLoading(false));
     }
@@ -113,6 +115,19 @@ function RegisterSubscriptorForm({
             [e.target.id]: e.target.value
         });
     }
+    
+    const setError = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setErrors({
+            ...errors,
+            [e.target.id]: null
+        });
+    }
+
+    React.useEffect(() => {
+        if (Object.values(errors).every(value => value === null || value === undefined)) {
+            setDisabled(false);
+        }
+    }, [errors]);
 
     return (
         <div className={cn("flex flex-col gap-6", className)} {...props}>
@@ -147,7 +162,10 @@ function RegisterSubscriptorForm({
                                 autoComplete="email"
                                 placeholder="m@example.com"
                                 value={form.email}
-                                onChange={handleOnChange}
+                                onChange={e => {
+                                    handleOnChange(e);
+                                    setError(e);
+                                }}
                                 disabled={loading}
                             />
                             {errors.email && (
@@ -166,7 +184,10 @@ function RegisterSubscriptorForm({
                                 type="password"
                                 autoComplete="new-password"
                                 value={form.password}
-                                onChange={handleOnChange}
+                                onChange={e => {
+                                    handleOnChange(e);
+                                    setError(e);
+                                }}
                                 disabled={loading}
                             />
                             {errors.password && (
@@ -185,7 +206,10 @@ function RegisterSubscriptorForm({
                                 type="password"
                                 autoComplete="new-password"
                                 value={form.confirmPassword}
-                                onChange={handleOnChange}
+                                onChange={e => {
+                                    handleOnChange(e);
+                                    setError(e);
+                                }}
                                 disabled={loading}
                             />
                             {errors.confirmPassword && (
@@ -200,7 +224,7 @@ function RegisterSubscriptorForm({
                         <Button 
                             type="submit" 
                             className="w-full"
-                            disabled={loading}
+                            disabled={loading || disabled}
                         >
                             Registrarse
                             {loading && (

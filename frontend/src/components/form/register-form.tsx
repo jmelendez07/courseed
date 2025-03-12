@@ -1,4 +1,4 @@
-import { cn } from "@/lib/utils";
+import { cn, validateEmail, validatePasswordLength } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -40,33 +40,70 @@ export function RegisterForm({
 	};
 
 	const nextStep = () => {
+		let disabled: boolean = false;
 		if (register.credentials.email.trim().length === 0) {
-			register.setCredentialsErrors({
-				...register.credentialsErrors,
+			register.setCredentialsErrors(current => ({
+				...current,
 				email: "Debes completar el campo correspondiente al correo electrónico."
-			});
-		} else if (register.credentials.password.trim().length === 0) {
-			register.setCredentialsErrors({
-				...register.credentialsErrors,
-				email: null,
-				password: "Debes completar el campo correspondiente a la contraseña."
-			});
-		} else if (register.credentials.confirmPassword.trim().length === 0) {
-			register.setCredentialsErrors({
-				...register.credentialsErrors,
-				email: null,
-				password: null,
-				confirmPassword: "Debes completar el campo correspondiente a la contraseña."
-			});
-		} else {
-			setCurrentStep(STEPS.TWO);
-			register.setCredentialsErrors({
-				...register.credentialsErrors,
-				email: null,
-				password: null,
-				confirmPassword: null
-			});
+			}));
+			disabled = true;
 		}
+		
+		if (register.credentials.password.trim().length === 0) {
+			register.setCredentialsErrors(current => ({
+				...current,
+				password: "Debes completar el campo correspondiente a la contraseña."
+			}));
+			disabled = true;
+		} 
+
+		if (register.credentials.confirmPassword.trim().length === 0) {
+			register.setCredentialsErrors(current => ({
+				...current,
+				confirmPassword: "Debes completar el campo correspondiente a la contraseña."
+			}));
+			disabled = true;
+		} 
+
+		if (disabled) {
+			return register.setDisabled(true);	
+		}
+
+		if (!validateEmail(register.credentials.email)) {
+			register.setCredentialsErrors(current => ({
+				...current,
+				email: "Asegúrate de que el correo electrónico proporcionado sea correcto y válido."
+			}));
+			disabled = true;
+		}
+
+		if (!validatePasswordLength(register.credentials.password)) {
+			register.setCredentialsErrors(current => ({
+				...current,
+				password: "Es necesario que la contraseña que elijas tenga un mínimo de 8 y un máximo de 20 caracteres."
+			}));
+			disabled = true;
+		} 
+		
+		if (register.credentials.password !== register.credentials.confirmPassword) {
+			register.setCredentialsErrors(current => ({
+				...current,
+				confirmPassword: "La confirmación de la contraseña no coincide con la contraseña original."
+			}));
+			disabled = true;
+		}
+
+		if (disabled) {
+			return register.setDisabled(true);	
+		}
+		
+		setCurrentStep(STEPS.TWO);
+		register.setCredentialsErrors({
+			...register.credentialsErrors,
+			email: null,
+			password: null,
+			confirmPassword: null
+		});
 	}
 
 	return (
@@ -96,7 +133,10 @@ export function RegisterForm({
 							type="email"
 							autoComplete="email"
 							placeholder="nombre@organizacion.tipo"
-							onChange={register.setCredential}
+							onChange={e => {
+								register.setCredential(e)
+								register.setError(e)
+							}}
 							value={register.credentials.email}
 							disabled={register.loading}
 						/>
@@ -115,7 +155,10 @@ export function RegisterForm({
 							id="password"
 							type="password"
 							autoComplete="new-password"
-							onChange={register.setCredential}
+							onChange={e => {
+								register.setCredential(e);
+								register.setError(e);
+							}}
 							value={register.credentials.password}
 							disabled={register.loading}
 						/>
@@ -134,7 +177,10 @@ export function RegisterForm({
 							id="confirmPassword"
 							type="password"
 							autoComplete="new-password"
-							onChange={register.setCredential}
+							onChange={e => {
+								register.setCredential(e);
+								register.setError(e);
+							}}
 							value={register.credentials.confirmPassword}
 							disabled={register.loading}
 						/>
@@ -150,7 +196,7 @@ export function RegisterForm({
 					<Button
 						type="button"
 						className="w-full"
-						disabled={register.loading}
+						disabled={register.loading || register.disabled}
 						onClick={(e) => {
 							e.preventDefault();
 							nextStep();
@@ -164,10 +210,16 @@ export function RegisterForm({
 					<div className="grid gap-2">
 						<Label htmlFor="academicLevel">Nivel Academico</Label>
 						<Select
-							onValueChange={value => register.setCredentials({
-								...register.credentials,
-								academicLevel: value
-							})}
+							onValueChange={value => {
+								register.setCredentials({
+									...register.credentials,
+									academicLevel: value
+								});
+								register.setCredentialsErrors({
+									...register.credentialsErrors,
+									academicLevel: null
+								});
+							}}
 							value={register.credentials.academicLevel}
 						>
 							<SelectTrigger>
@@ -200,10 +252,16 @@ export function RegisterForm({
 					<div className="grid gap-2">
 						<Label htmlFor="sex">Sexo</Label>
 						<Select
-							onValueChange={value => register.setCredentials({
-								...register.credentials,
-								sex: value
-							})}
+							onValueChange={value => {
+								register.setCredentials({
+									...register.credentials,
+									sex: value
+								});
+								register.setCredentialsErrors({
+									...register.credentialsErrors,
+									sex: null
+								});
+							}}
 							value={register.credentials.sex}
 						>
 							<SelectTrigger>
@@ -255,10 +313,16 @@ export function RegisterForm({
 									locale={es}
 									mode="single"
 									selected={register.credentials.birthdate}
-									onSelect={(value) => register.setCredentials({
-										...register.credentials,
-										birthdate: value
-									})}
+									onSelect={(value) => {
+										register.setCredentials({
+											...register.credentials,
+											birthdate: value
+										});
+										register.setCredentialsErrors({
+											...register.credentialsErrors,
+											birthdate: null
+										});
+									}}
 									disabled={(date: Date) =>
 										date > new Date() || date < new Date("1900-01-01")
 									}
@@ -277,7 +341,11 @@ export function RegisterForm({
 							</p>
 						)}
 					</div>
-					<Button type="submit" className="w-full" disabled={register.loading}>
+					<Button 
+						type="submit" 
+						className="w-full" 
+						disabled={register.loading || register.disabled}
+					>
 						Registrarse
 						{register.loading && (
 							<LoaderCircle className="animate-spin" />

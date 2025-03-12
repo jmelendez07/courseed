@@ -1,6 +1,6 @@
 import React from "react";
-import BarChart from "@/components/bar-chart";
-import PieChart from "@/components/pie-chart";
+import BarChart from "@/components/charts/bar-chart";
+import PieChart from "@/components/charts/pie-chart";
 import InstitutionsWithCoursesCount from "@/interfaces/institutions-with-courses-count";
 import axios, { AxiosResponse } from "axios";
 import APIS from "@/enums/apis";
