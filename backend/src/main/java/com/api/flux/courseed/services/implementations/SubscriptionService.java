@@ -2,6 +2,7 @@ package com.api.flux.courseed.services.implementations;
 
 import java.security.Principal;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -18,6 +19,7 @@ import com.api.flux.courseed.projections.dtos.SubscriptionDto;
 import com.api.flux.courseed.projections.mappers.SubscriptionMapper;
 import com.api.flux.courseed.projections.mappers.UserMapper;
 import com.api.flux.courseed.services.interfaces.InterfaceSubscriptionService;
+import com.api.flux.courseed.services.interfaces.Roles;
 import com.api.flux.courseed.web.exceptions.CustomWebExchangeBindException;
 
 import reactor.core.publisher.Mono;
@@ -58,8 +60,11 @@ public class SubscriptionService implements InterfaceSubscriptionService {
     @Override
     public Mono<SubscriptionDto> createSubscription(SaveSubscriptionDto saveSubscriptionDto) {
         return userRepository.findById(saveSubscriptionDto.getUserId())
-            .flatMap(user -> 
-                subscriptionRepository.findFirstByUserIdAndStateOrderByEndDateDesc(saveSubscriptionDto.getUserId(), "active")
+            .flatMap(user -> {
+                boolean isSubscriber = user.getRoles().stream()
+                    .anyMatch(role -> role.equals(Roles.PREFIX + Roles.SUBSCRIBER));
+
+                return subscriptionRepository.findFirstByUserIdAndStateOrderByEndDateDesc(saveSubscriptionDto.getUserId(), "active")
                     .switchIfEmpty(Mono.just(new Subscription()))
                     .flatMap(activeSubscription -> {
                         Subscription newSubscription = subscriptionMapper.toSubscription(saveSubscriptionDto);
@@ -76,14 +81,22 @@ public class SubscriptionService implements InterfaceSubscriptionService {
                             saveSubscriptionDto.getPlan().equals("basic") ? 1 : 12
                         ));
 
-                        return subscriptionRepository.save(newSubscription)
+                        Mono<SubscriptionDto> subscriptionMono = subscriptionRepository.save(newSubscription)
                             .map(savedSubscription -> {
                                 SubscriptionDto subscriptionDto = subscriptionMapper.toSubscriptionDto(savedSubscription);
                                 subscriptionDto.setUser(userMapper.toUserDto(user));
                                 return subscriptionDto;
                             });
-                    })
-            )
+
+                        if (!isSubscriber) {
+                            user.setRoles(Arrays.asList(Roles.PREFIX + Roles.SUBSCRIBER));
+                            return userRepository.save(user)
+                                .then(subscriptionMono);
+                        }
+
+                        return subscriptionMono;
+                    });
+            })
             .switchIfEmpty(Mono.error(
                 new CustomWebExchangeBindException(
                     saveSubscriptionDto.getUserId(), 

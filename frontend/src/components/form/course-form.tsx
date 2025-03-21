@@ -133,6 +133,7 @@ function CourseForm({ course, onCreated, onUpdated }: CourseFormProps) {
                 }
             })
             .catch((error: AxiosError<ErrorProps>) => {
+                console.log(error);
                 setErrors({
                     url: error.response?.data.url ?? null,
                     title: error.response?.data.title ?? null,
