@@ -9,7 +9,6 @@ import WorkShopsGallery from "@/components/workshops-gallery";
 import DiplomasGallery from "@/components/diplomas-gallery";
 import CoursesGallery from "@/components/courses-gallery";
 import Pricing from "@/components/pricing";
-import ProfileFormDialog from "@/components/form/profile-form-dialog";
 
 function Landing() {
     const location = useLocation();
@@ -24,7 +23,6 @@ function Landing() {
     return (
         <main className="relative">
             <HeadProvider title="Courseed" />
-            <ProfileFormDialog />
             <Navbar />
             <Hero />
             <CoursesGallery />
