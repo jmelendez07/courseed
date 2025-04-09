@@ -20,6 +20,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Theme from "@/components/ui/theme";
 import { useAuth } from "@/providers/AuthProvider";
+import HeadProvider from "@/providers/HeadProvider";
 
 function Dashboard() {
     const authHook = useAuth();
@@ -27,6 +28,7 @@ function Dashboard() {
     return (
         <SidebarProvider>
             <AppSidebar />
+            <HeadProvider title="Usuario" />
             <SidebarInset>
                 <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12 justify-between">
                     <div className="flex items-center gap-2 px-4">

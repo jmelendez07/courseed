@@ -81,9 +81,9 @@ function AreaChart({
                         accessibilityLayer
                         data = { chartData }
                         margin = {{
-                            left: 12,
                             top: 20,
-                            right: 12,
+                            left: 30,
+                            right: 30,
                         }}
                     >
                 <CartesianGrid vertical={false} />

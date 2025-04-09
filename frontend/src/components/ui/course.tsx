@@ -5,6 +5,7 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import CourseInterface from "@/interfaces/course";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./dropdown-menu";
 import { Link } from "react-router-dom";
+import LazyImage from "@/components/ui/LazyImage";
 
 interface CourseComponentProps {
 	className?: string;
@@ -46,9 +47,8 @@ function Course({ className, course, optionsEnable, handleEdit, handleDelete }: 
 			`}
 		>
 			<div className="relative">
-				<img
-					src={course.image}
-					alt={course.title}
+				<LazyImage 
+					src={course.image ?? ""} 
 					className="w-full h-[200px] object-cover rounded-t-lg"
 				/>
 				<Badge variant="secondary" className={`absolute top-2 ${optionsEnable ? "left-2" : "right-2"}`}>

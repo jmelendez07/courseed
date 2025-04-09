@@ -30,8 +30,9 @@ function useLogin() {
         email: null,
         password: null,
         auth: null
-    })
+    });
     const [loading, setLoading] = React.useState<boolean>(false);
+    const [disabled, setDisabled] = React.useState<boolean>(false);
     const [token, setToken] = React.useState<string | null>(null);
 
     const auth = useAuth();
@@ -41,6 +42,14 @@ function useLogin() {
         setCredentials({
             ...credentials,
             [e.target.id]: e.target.value
+        });
+    }
+
+    const setError = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setCredentialsErrors({
+            ...credentialsErrors,
+            [e.target.id]: null,
+            ...(e.target.id === "password" && credentialsErrors.auth ? { auth: null } : {})
         });
     }
 
@@ -70,11 +79,12 @@ function useLogin() {
                 }
 
                 setCredentialsErrors({
-                    email: error.response.data.email,
-                    password: error.response.data.password,
-                    auth: error.response.data.auth
+                    email: error.response.data.email ?? null,
+                    password: error.response.data.password ?? null,
+                    auth: error.response.data.auth ?? null
                 });
 
+                setDisabled(true);
             })
             .finally(() => {
                 setLoading(false);
@@ -112,17 +122,26 @@ function useLogin() {
             });
     }
 
+    React.useEffect(() => {
+        if (Object.values(credentialsErrors).every(value => value === null || value === undefined)) {
+            setDisabled(false);
+        }
+    }, [credentialsErrors]);
+
     return {
         credentials,
         credentialsErrors,
         loading,
         token,
+        disabled,
         setCredentials,
         setCredential,
         setCredentialsErrors,
         setLoading,
         setToken,
-        handleLogin
+        handleLogin,
+        setDisabled,
+        setError
     };
 }
 

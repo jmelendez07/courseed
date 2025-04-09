@@ -1,6 +1,6 @@
 import React from "react";
-import BarChartHorizontal from "@/components/bar-chart-horizontal";
-import LineChart from "@/components/line-chart";
+import BarChartHorizontal from "@/components/charts/bar-chart-horizontal";
+import LineChart from "@/components/charts/line-chart";
 import axios, { AxiosResponse } from "axios";
 import APIS from "@/enums/apis";
 import CoursesWithRatingAvg from "@/interfaces/courses-with-rating-avg";

@@ -4,7 +4,7 @@ export default {
     content: ["./index.html", "./src/**/*.{ts,tsx,js,jsx}"],
 	safelist: [
 		{
-		  pattern: /bg-(red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue)-(500|600|700|800)/,
+		  pattern: /bg-(red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue)-(100|200|300|400|500|600|700|800)/,
 		  variants: ["hover"],
 		},
 		{

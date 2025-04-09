@@ -34,7 +34,7 @@ import React from "react";
 import ROLES from "@/enums/roles";
 import { THEME, ThemeContext } from "@/providers/ThemeProvider";
 import Color from "./Color";
-import { motion } from "motion/react";
+import { motion, useMotionValueEvent, useScroll } from "motion/react";
 import FadeItem from "./fadeItem";
 
 interface MenuItem {
@@ -110,6 +110,8 @@ const Navbar = ({
     const facultyHook = useFaculty({ size: 7 });
     const authHook = useAuth();
     const themeContext = React.useContext(ThemeContext);
+    const { scrollY } = useScroll();
+    const [hidden, setHidden] = React.useState<boolean>(false);
 
     const menu: MenuItem[] = [
         { title: "Educacion continuada", url: "/educacion" },
@@ -142,9 +144,26 @@ const Navbar = ({
         }
     }
 
+    useMotionValueEvent(scrollY, "change", (latest) => {
+        const previous = scrollY.getPrevious() ?? 0;
+        setHidden(latest > previous && latest > 150);
+    });
+
     return (
-        <motion.section initial="initial" animate="animate" className="py-4 flex justify-center">
-            <div className="w-full px-4 md:px-8 xl:px-12 2xl:px-16">
+        <motion.nav
+            variants={{
+                visible: { y: 0 },
+                hidden: { y: "-100%" },
+            }}
+            animate={hidden ? "hidden" : "visible"}
+            transition={{ duration: 0.35, ease: "easeInOut" }}
+            className="sticky top-0 z-50 py-4 flex justify-center border-b border-zinc-100 dark:border-zinc-600 bg-white dark:bg-zinc-950"
+        >
+            <motion.div 
+                initial="initial" 
+                animate="animate"
+                className="w-full px-4 md:px-8 xl:px-12 2xl:px-16"
+            >
                 <FadeItem>
                     <nav className="hidden items-center justify-between lg:flex">
                         <motion.div variants={stagger} className="flex items-center gap-6">
@@ -382,8 +401,8 @@ const Navbar = ({
                         </div>
                     </div>
                 </FadeItem>
-            </div>
-        </motion.section>
+            </motion.div>
+        </motion.nav>
     );
 };
 

@@ -16,6 +16,8 @@ import {
 	SidebarMenuSubItem,
 } from "@/components/ui/sidebar"
 import { Link, useLocation } from "react-router-dom"
+import React from "react"
+import { ColorContext } from "@/providers/ColorProvider"
 
 export function NavMain({
 	items,
@@ -33,6 +35,7 @@ export function NavMain({
 }) {
 
 	const location = useLocation();
+	const colorContext = React.useContext(ColorContext); 
 
 	return (
 		<SidebarGroup>
@@ -64,6 +67,10 @@ export function NavMain({
 															if (subItem.action) subItem.action()
 														}}
 														asChild
+														className={decodeURIComponent(location.pathname) === subItem.url 
+															? `bg-${colorContext?.color}-600 text-white hover:bg-${colorContext?.color}-700 hover:text-white` 
+															: ""
+														}
 													>
 														{(subItem.action || !subItem.url) ? (
 															<span className="cursor-pointer">{subItem.title}</span>
@@ -79,7 +86,14 @@ export function NavMain({
 									</CollapsibleContent>
 								</>
 							) : (
-								<SidebarMenuButton asChild tooltip={item.title}>
+								<SidebarMenuButton 
+									asChild 
+									tooltip={item.title} 
+									className={decodeURIComponent(location.pathname) === item.url 
+										? `bg-${colorContext?.color}-600 text-white hover:bg-${colorContext?.color}-700 hover:text-white` 
+										: ""
+									}
+								>
 									<Link to={item.url ?? ''}>
 										{item.icon && <item.icon />}
 										<span>{item.title}</span>

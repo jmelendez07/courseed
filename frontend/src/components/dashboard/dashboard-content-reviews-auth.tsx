@@ -23,7 +23,7 @@ function DashboardContentReviewsAuth({ className }: DashboardContentReviewsAuthP
                 {
                     reviewsHook.reviews.length > 0 ? (
                         <>
-                            <div className="flex items-center pb-4 flex-col gap-2 sm:flex-row sm:justify-between">
+                            <div className="flex sm:items-center pb-4 flex-col gap-2 sm:flex-row sm:justify-between">
                                 <div>
                                     <h1 className="text-3xl font-bold tracking-tight">Reseñas de Programas</h1>
                                     <p className="text-muted-foreground">Visualiza tus valoraciones y comentarios.</p>
@@ -33,7 +33,7 @@ function DashboardContentReviewsAuth({ className }: DashboardContentReviewsAuthP
                                         e.preventDefault();
                                         reviewsHook.handleSearch();
                                     }}
-                                    className="flex items-center gap-2"
+                                    className="flex items-center gap-2 w-full"
                                 >
                                     <Input
                                         type="text"
@@ -46,7 +46,7 @@ function DashboardContentReviewsAuth({ className }: DashboardContentReviewsAuthP
                                                 searchText: e.target.value
                                             });
                                         }}
-                                        className="w-96 max-w-sm"
+                                        className="w-full sm:max-w-sm"
                                     />
                                     <Button
                                         type="submit"

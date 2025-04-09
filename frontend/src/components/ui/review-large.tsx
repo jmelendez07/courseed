@@ -5,6 +5,7 @@ import { ArrowUpRight, Edit, MoreVertical, Star, Trash2 } from "lucide-react";
 import ReviewCourseUserInterface from "@/interfaces/review-course-user";
 import { Avatar, AvatarFallback } from "./avatar";
 import { Link } from "react-router-dom";
+import LazyImage from "./LazyImage";
 
 interface ReviewComponentProps {
 	review: ReviewCourseUserInterface;
@@ -59,9 +60,8 @@ function ReviewLarge({ review, handleEdit, handleDelete, className }: ReviewComp
 			</CardHeader>
 			<CardContent>
 				<div className="relative w-full overflow-hidden mb-2">
-					<img
-						src={review.course.image}
-						alt={review.course.title}
+					<LazyImage 
+						src={review.course.image ?? ""}
 						className="w-full object-cover rounded-lg h-32 max-h-32 bg-zinc-100 dark:bg-zinc-900"
 					/>
 				</div>

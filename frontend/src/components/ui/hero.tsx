@@ -8,6 +8,7 @@ import { Link } from "react-router-dom";
 import DialogCourses from "../dialog-courses";
 import React from "react";
 import FadeItem from "./fadeItem";
+import LazyImage from "./LazyImage";
 
 interface HeroProps {
     heading?: string;
@@ -106,9 +107,10 @@ const Hero = ({
                                             <FadeItem
                                                 className="h-full w-full"
                                             >
-                                                <img
-                                                    src={courseHook.courses[0].image}
-                                                    alt=""
+                                                <LazyImage 
+                                                    src={courseHook.courses[0].image ?? ""}
+                                                    width={1100}
+                                                    height={600}
                                                     className="object-cover h-full w-full object-center"
                                                 />
                                             </FadeItem>
@@ -119,9 +121,10 @@ const Hero = ({
                                             <div className="absolute left-[5%] top-1/2 w-[110%] max-w-[25rem] -translate-y-1/2 overflow-hidden rounded-md">
                                                 <FadeItem>
                                                     <AspectRatio ratio={1.739130435 / 1}>
-                                                        <img
-                                                            src={courseHook.courses[1].image}
-                                                            alt=""
+                                                        <LazyImage 
+                                                            src={courseHook.courses[1].image ?? ""}
+                                                            width={1100}
+                                                            height={600}
                                                             className="size-full object-cover object-center"
                                                         />
                                                     </AspectRatio>
@@ -134,9 +137,10 @@ const Hero = ({
                                             <div className="absolute left-[9%] top-[9%] w-[200%] max-w-[37.5rem] overflow-hidden rounded-md">
                                                 <FadeItem>
                                                     <AspectRatio ratio={1.6 / 1}>
-                                                        <img
-                                                            src={courseHook.courses[2].image}
-                                                            alt=""
+                                                        <LazyImage 
+                                                            src={courseHook.courses[2].image ?? ""}
+                                                            width={1100}
+                                                            height={600}
                                                             className="size-full object-cover object-center"
                                                         />
                                                     </AspectRatio>
@@ -154,9 +158,10 @@ const Hero = ({
                                                         className="absolute z-20 w-full"
                                                     />
                                                     {courseHook.courses.length > 3 && (
-                                                        <img
-                                                            src={courseHook.courses[3].image}
-                                                            alt=""
+                                                        <LazyImage 
+                                                            src={courseHook.courses[3].image ?? ""}
+                                                            width={1100}
+                                                            height={600}
                                                             className="absolute z-10 w-full rounded-[16%] h-full object-cover"
                                                         />
                                                     )}

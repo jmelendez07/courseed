@@ -23,7 +23,7 @@ export function LoginForm({
 			{...props}
 		>
 			<div className="flex flex-col items-center gap-2 text-center">
-				<h1 className="text-2xl font-bold">Inicie sesión en su cuenta</h1>
+				<h1 className="text-2xl font-bold">Inicia sesión en su cuenta</h1>
 				<p className="text-balance text-sm text-zinc-500 dark:text-zinc-400">
 					Ingrese su correo electrónico a continuación para iniciar sesión en su cuenta
 				</p>
@@ -36,7 +36,10 @@ export function LoginForm({
 						type="email" 
 						placeholder="nombre@organizacion.tipo"
 						autoComplete="email" 
-						onChange={login.setCredential}
+						onChange={e => {
+							login.setCredential(e);
+							login.setError(e);
+						}}
 						value={login.credentials.email}
 						disabled={login.loading}
 					/>
@@ -55,7 +58,10 @@ export function LoginForm({
 						id="password" 
 						type="password" 
 						autoComplete="current-password"
-						onChange={login.setCredential}
+						onChange={e => {
+							login.setCredential(e);
+							login.setError(e);
+						}}
 						value={login.credentials.password}
 						disabled={login.loading}
 					/>
@@ -68,7 +74,7 @@ export function LoginForm({
 						</p>
 					)}
 				</div>
-				<Button type="submit" className="w-full" disabled={login.loading}>
+				<Button type="submit" className="w-full" disabled={login.loading || login.disabled}>
 					Acceder
 					{login.loading && (
 						<LoaderCircle className="animate-spin" />

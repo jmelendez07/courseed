@@ -17,3 +17,13 @@ export function splitString(str: string): string[] {
 
 	return characters;
 }
+
+export function validateEmail(email: string): boolean {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+};
+
+export function validatePasswordLength(password: string): boolean {
+    const length = password.trim().length;
+	return length > 7 && length < 21;
+};
