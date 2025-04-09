@@ -19,8 +19,8 @@ class WebScraping:
         # uao = AutonomaDeOccidente(url="https://estudiarvirtual.uao.edu.co/categoria/autogestionado/")
         # uao.scrape()
 
-        javeriana = Javeriana(url="https://educacionvirtual.javeriana.edu.co/prg-api/searchpuj/general-search-program")
-        javeriana.scrape()
+        # javeriana = Javeriana(url="https://educacionvirtual.javeriana.edu.co/prg-api/searchpuj/general-search-program")
+        # javeriana.scrape()
 
         # uniAtlantico = UniAtlantico(url="https://www.uniatlantico.edu.co/departamento-de-extension-y-proyeccion-social/diplomados/")
         # uniAtlantico.scrape()
@@ -28,8 +28,8 @@ class WebScraping:
         # uniMagdalena = UniMagdalena(url="https://bloque10.unimagdalena.edu.co/diplomados")
         # uniMagdalena.scrape()
 
-        # uniTecnar = UniTecnar(url="https://www.unitecnar.edu.co/educacion-continuada")
-        # uniTecnar.scrape()
+        uniTecnar = UniTecnar(url="https://www.unitecnar.edu.co/educacion-continuada")
+        uniTecnar.scrape()
         
 
 if __name__ == "__main__":
