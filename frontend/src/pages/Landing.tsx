@@ -9,6 +9,7 @@ import WorkShopsGallery from "@/components/workshops-gallery";
 import DiplomasGallery from "@/components/diplomas-gallery";
 import CoursesGallery from "@/components/courses-gallery";
 import Pricing from "@/components/pricing";
+import ProfileFormDialog from "@/components/form/profile-form-dialog";
 
 function Landing() {
     const location = useLocation();
@@ -21,8 +22,9 @@ function Landing() {
     }, [location.pathname, location.key]);
 
     return (
-        <>
+        <main className="relative">
             <HeadProvider title="Courseed" />
+            <ProfileFormDialog />
             <Navbar />
             <Hero />
             <CoursesGallery />
@@ -31,7 +33,7 @@ function Landing() {
             <Pricing />
             <Logos heading="Con la confianza de estas instituciones" />
             <Footer />
-        </>
+        </main>
     );
 }
 
