@@ -58,7 +58,8 @@ public class SecurityConfig {
                     .pathMatchers(HttpMethod.GET, "/reactions/course/*").permitAll()
                     .pathMatchers(HttpMethod.GET, "/reviews", "/reviews/months/count").hasRole(Roles.ADMIN)
                     .pathMatchers(HttpMethod.GET, "/reviews/course/*").permitAll()
-                    .pathMatchers(HttpMethod.GET, "/users", "/users/*", "users/email/*", "/users/months/count").hasRole(Roles.ADMIN)
+                    // .pathMatchers(HttpMethod.GET, "/users", "/users/*", "users/email/*", "/users/months/count").hasRole(Roles.ADMIN)
+                    .pathMatchers(HttpMethod.GET, "/users", "/users/*", "users/email/*", "/users/months/count").permitAll()
                     .pathMatchers(HttpMethod.POST, "/users/create").hasRole(Roles.ADMIN)
                     .pathMatchers(HttpMethod.PUT, "/users/*", "/users/email/*", "/users/password/*", "/users/roles/*").hasRole(Roles.ADMIN)
                     .pathMatchers(HttpMethod.DELETE, "/users/*").hasRole(Roles.ADMIN)
@@ -66,6 +67,7 @@ public class SecurityConfig {
                     .pathMatchers(HttpMethod.GET, "/views/course/*").permitAll()
                     .pathMatchers(HttpMethod.GET, "/subscriptions/auth").hasRole(Roles.SUBSCRIBER)
                     .pathMatchers(HttpMethod.POST, "/subscriptions/confirm").permitAll()
+                    .pathMatchers(HttpMethod.GET, "/predictions/user-course-recomended", "/predictions/courses-recomended-for-user").permitAll()
                     .anyExchange().authenticated())
                 .addFilterAt(authenticationWebFilter, SecurityWebFiltersOrder.AUTHENTICATION);
 

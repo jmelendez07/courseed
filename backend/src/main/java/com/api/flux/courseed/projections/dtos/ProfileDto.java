@@ -2,7 +2,6 @@ package com.api.flux.courseed.projections.dtos;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.List;
 
 public class ProfileDto implements Serializable {
     private String id;
@@ -12,17 +11,17 @@ public class ProfileDto implements Serializable {
     private Double budget;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-    private List<CategoryDto> interests;
+    private CategoryDto interest;
 
     public ProfileDto() {}
 
-    public ProfileDto(String id, String knowledgeLevel, int availableHoursTime, String platformPrefered, Double budget, List<CategoryDto> interests, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public ProfileDto(String id, String knowledgeLevel, int availableHoursTime, String platformPrefered, Double budget, CategoryDto interest, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
         this.knowledgeLevel = knowledgeLevel;
         this.availableHoursTime = availableHoursTime;
         this.platformPrefered = platformPrefered;
         this.budget = budget;
-        this.interests = interests;
+        this.interest = interest;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
@@ -79,12 +78,12 @@ public class ProfileDto implements Serializable {
         return id;
     }
 
-    public List<CategoryDto> getInterests() {
-        return interests;
+    public CategoryDto getInterest() {
+        return interest;
     }
 
-    public void setInterests(List<CategoryDto> interests) {
-        this.interests = interests;
+    public void setInterest(CategoryDto interest) {
+        this.interest = interest;
     }
 
     public void setId(String id) {

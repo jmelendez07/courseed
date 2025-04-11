@@ -1,14 +1,13 @@
 package com.api.flux.courseed.persistence.documents;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-@Document(collection = "profiles")
+@Document(collection = "user_profiles")
 public class Profile {
 
     @Id
@@ -16,9 +15,9 @@ public class Profile {
     private String userId;
     private String knowledgeLevel;
     private int availableHoursTime;
-    private String platformPrefered;
+    private String platformPreference;
     private Double budget;
-    private List<String> interests;
+    private String interest;
 
     @CreatedDate
     private LocalDateTime createdAt;
@@ -59,11 +58,11 @@ public class Profile {
     }
 
     public String getPlatformPrefered() {
-        return platformPrefered;
+        return platformPreference;
     }
 
     public void setPlatformPrefered(String platformPrefered) {
-        this.platformPrefered = platformPrefered;
+        this.platformPreference = platformPrefered;
     }
 
     public Double getBudget() {
@@ -90,12 +89,11 @@ public class Profile {
         this.updatedAt = updatedAt;
     }
 
-    public List<String> getInterests() {
-        return interests;
+    public String getInterest() {
+        return interest;
     }
 
-    public void setInterests(List<String> interests) {
-        this.interests = interests;
-
+    public void setInterest(String interest) {
+        this.interest = interest;
     }
 }

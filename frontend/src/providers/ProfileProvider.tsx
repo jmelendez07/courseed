@@ -7,7 +7,6 @@ interface ChildrenProps {
     children: React.ReactNode,
 }
 
-
 interface ProfileContextProps {
     open: boolean;
     setOpen: React.Dispatch<React.SetStateAction<boolean>>;

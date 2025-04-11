@@ -10,8 +10,8 @@ import com.api.flux.courseed.web.controllers.CategoryController;
 import com.api.flux.courseed.web.controllers.ContentController;
 import com.api.flux.courseed.web.controllers.CourseController;
 import com.api.flux.courseed.web.controllers.InstitutionController;
-import com.api.flux.courseed.web.controllers.ProfileController;
 import com.api.flux.courseed.web.controllers.PredictionController;
+import com.api.flux.courseed.web.controllers.ProfileController;
 import com.api.flux.courseed.web.controllers.ReactionController;
 import com.api.flux.courseed.web.controllers.ReviewController;
 import com.api.flux.courseed.web.controllers.RoleController;
@@ -209,7 +209,8 @@ public class RouterConfig {
     private RouterFunction<ServerResponse> predictionRoutes(PredictionController predictionController) {
         return RouterFunctions
             .route()
-            .GET("/recomended", predictionController::getRecomendedCourses)
+            .GET("/user-course-recomended", predictionController::getUserCourseRecomended)
+            .GET("/courses-recomended-for-user", predictionController::getRecomendedCoursesByUser)
             .build();
     }
 

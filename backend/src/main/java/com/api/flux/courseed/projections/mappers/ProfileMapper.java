@@ -10,7 +10,7 @@ import com.api.flux.courseed.projections.dtos.SaveProfileDto;
 @Mapper(componentModel = "spring")
 public interface ProfileMapper {
 
-    @Mapping(target = "interests", ignore = true)
+    @Mapping(target = "interest", ignore = true)
     ProfileDto toProfileDto(Profile profile);
 
     @Mapping(target = "id", ignore = true)

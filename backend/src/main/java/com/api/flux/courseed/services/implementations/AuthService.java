@@ -2,7 +2,6 @@ package com.api.flux.courseed.services.implementations;
 
 import java.security.Principal;
 import java.util.Arrays;
-import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.ReactiveAuthenticationManager;
@@ -10,7 +9,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
 import com.api.flux.courseed.persistence.documents.Reaction;
 import com.api.flux.courseed.persistence.documents.Review;
 import com.api.flux.courseed.persistence.documents.User;
@@ -87,23 +85,15 @@ public class AuthService implements InterfaceAuthService {
                 Flux<Reaction> reactionFlux = reactionRepository.findByUserId(user.getId());
                 Flux<View> viewFlux = viewRepository.findByUserId(user.getId());
                 Mono<ProfileDto> profileMono = profileRepository.findByUserId(user.getId())
-                    .flatMap(profile -> {
-                        ProfileDto profileDto = profileMapper.toProfileDto(profile);
-
-                        List<String> interestIds = profile.getInterests();
-                        if (interestIds == null || interestIds.isEmpty()) {
-                            return Mono.just(profileDto);
-                        }
-                        
-                        return Flux.fromIterable(interestIds)
-                            .flatMap(interestId -> categoryRepository.findById(interestId))
-                            .map(categoryMapper::toCategoryDto)
-                            .collectList()
-                            .map(interests -> {
-                                profileDto.setInterests(interests);
-                                return profileDto;
-                            });
-                    })
+                    .flatMap(profile -> categoryRepository.findById(profile.getInterest()) 
+                        .map(categoryMapper::toCategoryDto)
+                        .map(category -> {
+                            ProfileDto profileDto = profileMapper.toProfileDto(profile);
+                            profileDto.setInterest(category);
+                            return profileDto;
+                        })
+                        .defaultIfEmpty(profileMapper.toProfileDto(profile))
+                    )
                     .defaultIfEmpty(new ProfileDto());
 
                 return Mono.zip(reviewFlux.collectList(), reactionFlux.collectList(), viewFlux.collectList(), profileMono)

@@ -12,12 +12,21 @@ public class PredictionController {
 
     @Autowired
     private PredictionService predictionService;
+
+    public Mono<ServerResponse> getUserCourseRecomended(ServerRequest serverRequest) {
+        String userId = serverRequest.queryParam("userId").orElse("");
+        String courseId = serverRequest.queryParam("courseId").orElse("");
+
+        return predictionService.getUserCourseRecomended(userId, courseId)
+            .flatMap(userCourseRecomended -> ServerResponse.ok().bodyValue(userCourseRecomended))
+            .switchIfEmpty(ServerResponse.notFound().build());
+    }
+
+    public Mono<ServerResponse> getRecomendedCoursesByUser(ServerRequest serverRequest) {
+        String userId = serverRequest.queryParam("userId").orElse("");
     
-    public Mono<ServerResponse> getRecomendedCourses(ServerRequest serverRequest) {
-        return serverRequest.principal()
-            .flatMap(principal -> predictionService.recomendedCourses(principal)
-                .flatMap(courses -> ServerResponse.ok().bodyValue(courses))
-                .switchIfEmpty(ServerResponse.notFound().build())  
-            );
+        return predictionService.getRecomendedCoursesByUser(userId)
+            .flatMap(courses -> ServerResponse.ok().bodyValue(courses))
+            .switchIfEmpty(ServerResponse.notFound().build());
     }
 }
