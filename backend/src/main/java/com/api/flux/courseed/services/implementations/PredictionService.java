@@ -16,6 +16,7 @@ import com.api.flux.courseed.persistence.repositories.UserCourseRecomendedReposi
 import com.api.flux.courseed.persistence.repositories.UserInterestRepository;
 import com.api.flux.courseed.projections.dtos.CategoryDto;
 import com.api.flux.courseed.projections.dtos.CourseDto;
+import com.api.flux.courseed.projections.dtos.FormPredictionDto;
 import com.api.flux.courseed.projections.dtos.InstitutionDto;
 import com.api.flux.courseed.projections.dtos.RecomendeCourseDto;
 import com.api.flux.courseed.projections.mappers.CategoryMapper;
@@ -131,6 +132,53 @@ public class PredictionService implements InterfacePredictionService {
                     ))
                 )
             );
+    }
+
+    public Mono<RecomendeCourseDto> predictCourseRecommendation(FormPredictionDto formData) {
+        try {
+            // Crear la instancia para la predicción
+            Instance instance = new DenseInstance(16);
+            instance.setDataset(dataStructure);
+            
+            // Asignar los valores desde el DTO a la instancia
+            instance.setValue(0, formData.getUser_profileId());
+            instance.setValue(1, formData.getUser_interest());
+            instance.setValue(2, formData.getUser_availableTime());
+            instance.setValue(3, formData.getBudget());
+            instance.setValue(4, formData.getPlatform_preference());
+            instance.setValue(5, formData.getCourse_id());
+            instance.setValue(6, formData.getCourse_institution());
+            instance.setValue(7, formData.getCourse_modality());
+            instance.setValue(8, formData.getCourse_duration());
+            instance.setValue(9, formData.getCourse_price());
+            instance.setValue(10, formData.getCourse_category());
+            instance.setValue(11, formData.getCourse_rating_avg());
+            instance.setValue(12, formData.getCourse_max_reaction());
+            instance.setValue(13, formData.getCourse_visits());
+            instance.setValue(14, formData.getCourse_reviews_count());
+
+            double predictionValue = classifier.classifyInstance(instance);
+            String prediction = dataStructure.classAttribute().value((int) predictionValue);            
+
+            double[] probabilities = classifier.distributionForInstance(instance);
+            double confidence = probabilities[(int) predictionValue];
+            DecimalFormat df = new DecimalFormat("#.#");
+            String confidencePercentage = df.format(confidence * 100) + "%";
+
+            RecomendeCourseDto result = new RecomendeCourseDto();
+            result.setId(formData.getCourse_id());
+            result.setTitle("Curso específico");
+            result.setCategory(formData.getCourse_category());
+            result.setInstitution(formData.getCourse_institution());
+            result.setPrice(formData.getCourse_price() != null ? formData.getCourse_price().toString() : "0");
+            result.setRecommended("true".equals(prediction));
+            result.setConfidence(confidencePercentage);
+            
+            return Mono.just(result);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Mono.error(new RuntimeException("Error al realizar la predicción", e));
+        }
     }
 
     public Mono<List<RecomendeCourseDto>> getRecomendedCoursesByUser(String userId) {

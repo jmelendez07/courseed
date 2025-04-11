@@ -12,6 +12,9 @@ import { Check, ChevronsUpDown, LoaderCircle } from "lucide-react"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command"
 import { cn } from "@/lib/utils"
+import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form"
+import { useForm } from "react-hook-form"
+import { Input } from "@/components/ui/input"
 
 
 interface UserCourseResult {
@@ -50,13 +53,13 @@ export default function Prediction() {
         user: null,
         course: null
     });
-    
+
     const [section1Result, setSection1Result] = useState<UserCourseResult>({
         class: null,
         result: null,
         confidence: null
     });
-    
+
     const fetchSection1 = React.useCallback(() => {
         setSection1Loading(true);
         axios.get('api/predictions/user-course-recomended', {
@@ -104,10 +107,25 @@ export default function Prediction() {
 
     // SECTION 3: Formulario de predicción
     const [section3Loading, setSection3Loading] = useState(false);
-    
-    const [section3Form, setSection3Form] = useState<section1FormInterface>({
-        user: null,
-        course: null
+
+    const section3Form = useForm({
+        defaultValues: {
+            user_profileId: "",
+            user_interest: "",
+            user_availableTime: 0,
+            budget: 0,
+            platform_preference: "",
+            course_id: "",
+            course_institution: "",
+            course_modality: "",
+            course_duration: 0,
+            course_price: 0,
+            course_category: "",
+            course_rating_avg: 0,
+            course_max_reaction: "",
+            course_visits: 0,
+            course_reviews_count: 0,
+        },
     });
 
     const [section3Result, setSection3Result] = useState<UserCourseResult>({
@@ -116,14 +134,9 @@ export default function Prediction() {
         confidence: null
     });
 
-    const fetchSection3 = React.useCallback(() => {
+    const fetchSection3 = (data: any) => {
         setSection3Loading(true);
-        axios.get('api/predictions/form-prediction', {
-            params: {
-                userId: section3Form.user,
-                courseId: section3Form.course,
-            }
-        })
+        axios.post('api/predictions/form-prediction', data)
             .then(response => {
                 console.log(response);
             })
@@ -131,7 +144,7 @@ export default function Prediction() {
                 console.error("Error fetching user-course prediction:", error)
             })
             .finally(() => setTimeout(() => setSection3Loading(false), 500));
-    }, []);
+    };
 
     React.useEffect(() => {
         axios.get(APIS.USERS, {
@@ -148,20 +161,22 @@ export default function Prediction() {
             });
     }, []);
 
-    React.useEffect(() => {{
-        axios.get(APIS.COURSES, {
-            params: {
-                size: 1000,
-                page: 0
-            }
-        })
-            .then(response => {
-                setCourses(response.data.content);
+    React.useEffect(() => {
+        {
+            axios.get(APIS.COURSES, {
+                params: {
+                    size: 1000,
+                    page: 0
+                }
             })
-            .catch(error => {
-                console.error("Error fetching courses:", error)
-            });
-    }}, []);
+                .then(response => {
+                    setCourses(response.data.content);
+                })
+                .catch(error => {
+                    console.error("Error fetching courses:", error)
+                });
+        }
+    }, []);
 
     return (
         <main>
@@ -189,8 +204,8 @@ export default function Prediction() {
                                     </SelectTrigger>
                                     <SelectContent>
                                         {users.map((user) => (
-                                            <SelectItem 
-                                                key={user.id} 
+                                            <SelectItem
+                                                key={user.id}
                                                 value={user.id ?? ""}
                                             >
                                                 {user.email}
@@ -223,31 +238,31 @@ export default function Prediction() {
                                     </PopoverTrigger>
                                     <PopoverContent className="w-[400px] p-0">
                                         <Command>
-                                        <CommandInput placeholder="Buscar una curso..." />
-                                        <CommandList>
-                                            <CommandEmpty>No hay resultados.</CommandEmpty>
-                                            <CommandGroup>
-                                            {courses.map((course) => (
-                                                <CommandItem
-                                                    key={course.id}
-                                                    value={course.title}
-                                                    onSelect={(currentValue) => {
-                                                        setOpen(false);
-                                                        const currentId = courses.find(course => course.title === currentValue)?.id;
-                                                        setSection1Form({ ...section1Form, course: currentId ?? "" });
-                                                    }}
-                                                >
-                                                {course.title}
-                                                <Check
-                                                    className={cn(
-                                                    "ml-auto",
-                                                    section1Form.course === course.id ? "opacity-100" : "opacity-0"
-                                                    )}
-                                                />
-                                                </CommandItem>
-                                            ))}
-                                            </CommandGroup>
-                                        </CommandList>
+                                            <CommandInput placeholder="Buscar una curso..." />
+                                            <CommandList>
+                                                <CommandEmpty>No hay resultados.</CommandEmpty>
+                                                <CommandGroup>
+                                                    {courses.map((course) => (
+                                                        <CommandItem
+                                                            key={course.id}
+                                                            value={course.title}
+                                                            onSelect={(currentValue) => {
+                                                                setOpen(false);
+                                                                const currentId = courses.find(course => course.title === currentValue)?.id;
+                                                                setSection1Form({ ...section1Form, course: currentId ?? "" });
+                                                            }}
+                                                        >
+                                                            {course.title}
+                                                            <Check
+                                                                className={cn(
+                                                                    "ml-auto",
+                                                                    section1Form.course === course.id ? "opacity-100" : "opacity-0"
+                                                                )}
+                                                            />
+                                                        </CommandItem>
+                                                    ))}
+                                                </CommandGroup>
+                                            </CommandList>
                                         </Command>
                                     </PopoverContent>
                                 </Popover>
@@ -270,10 +285,10 @@ export default function Prediction() {
                                 {section1Result?.class === null || section1Result?.result === null || section1Loading ? (
                                     <TableRow>
                                         <TableCell colSpan={3} className="text-center text-muted-foreground">
-                                            {section1Loading 
+                                            {section1Loading
                                                 ? <div className="w-full flex justify-center">
-                                                    <LoaderCircle className="animate-spin" />    
-                                                </div> 
+                                                    <LoaderCircle className="animate-spin" />
+                                                </div>
                                                 : 'No hay registros'}
                                         </TableCell>
                                     </TableRow>
@@ -338,7 +353,7 @@ export default function Prediction() {
                                         <TableCell colSpan={6} className="text-center text-muted-foreground">
                                             {section2Loading
                                                 ? <div className="w-full flex justify-center">
-                                                    <LoaderCircle className="animate-spin" />   
+                                                    <LoaderCircle className="animate-spin" />
                                                 </div>
                                                 : 'No hay recomendaciones disponibles'
                                             }
@@ -368,6 +383,228 @@ export default function Prediction() {
                         <CardDescription>Información detallada para la predicción</CardDescription>
                     </CardHeader>
                     <CardContent>
+                        <Form {...section3Form}>
+                            <form onSubmit={section3Form.handleSubmit(fetchSection3)} className="space-y-6">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    {/* User Information */}
+                                    <div className="space-y-4">
+                                        <h3 className="text-lg font-medium">Información del Usuario</h3>
+
+                                        <FormField
+                                            control={section3Form.control}
+                                            name="user_profileId"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel>ID de Perfil</FormLabel>
+                                                    <FormControl>
+                                                        <Input {...field} />
+                                                    </FormControl>
+                                                </FormItem>
+                                            )}
+                                        />
+
+                                        <FormField
+                                            control={section3Form.control}
+                                            name="user_interest"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel>Interés</FormLabel>
+                                                    <FormControl>
+                                                        <Input {...field} />
+                                                    </FormControl>
+                                                </FormItem>
+                                            )}
+                                        />
+
+                                        <FormField
+                                            control={section3Form.control}
+                                            name="user_availableTime"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel>Tiempo Disponible (horas)</FormLabel>
+                                                    <FormControl>
+                                                        <Input type="number" {...field} />
+                                                    </FormControl>
+                                                </FormItem>
+                                            )}
+                                        />
+
+                                        <FormField
+                                            control={section3Form.control}
+                                            name="budget"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel>Presupuesto</FormLabel>
+                                                    <FormControl>
+                                                        <Input type="number" {...field} />
+                                                    </FormControl>
+                                                </FormItem>
+                                            )}
+                                        />
+
+                                        <FormField
+                                            control={section3Form.control}
+                                            name="platform_preference"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel>Preferencia de Plataforma</FormLabel>
+                                                    <FormControl>
+                                                        <Input {...field} />
+                                                    </FormControl>
+                                                </FormItem>
+                                            )}
+                                        />
+                                    </div>
+
+                                    {/* Course Information */}
+                                    <div className="space-y-4">
+                                        <h3 className="text-lg font-medium">Información del Curso</h3>
+
+                                        <FormField
+                                            control={section3Form.control}
+                                            name="course_id"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel>ID del Curso</FormLabel>
+                                                    <FormControl>
+                                                        <Input {...field} />
+                                                    </FormControl>
+                                                </FormItem>
+                                            )}
+                                        />
+
+                                        <FormField
+                                            control={section3Form.control}
+                                            name="course_institution"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel>Institución</FormLabel>
+                                                    <FormControl>
+                                                        <Input {...field} />
+                                                    </FormControl>
+                                                </FormItem>
+                                            )}
+                                        />
+
+                                        <FormField
+                                            control={section3Form.control}
+                                            name="course_modality"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel>Modalidad</FormLabel>
+                                                    <FormControl>
+                                                        <Input {...field} />
+                                                    </FormControl>
+                                                </FormItem>
+                                            )}
+                                        />
+
+                                        <FormField
+                                            control={section3Form.control}
+                                            name="course_duration"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel>Duración (horas)</FormLabel>
+                                                    <FormControl>
+                                                        <Input type="number" {...field} />
+                                                    </FormControl>
+                                                </FormItem>
+                                            )}
+                                        />
+
+                                        <FormField
+                                            control={section3Form.control}
+                                            name="course_price"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel>Precio</FormLabel>
+                                                    <FormControl>
+                                                        <Input type="number" {...field} />
+                                                    </FormControl>
+                                                </FormItem>
+                                            )}
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div className="space-y-4">
+                                        <FormField
+                                            control={section3Form.control}
+                                            name="course_category"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel>Categoría</FormLabel>
+                                                    <FormControl>
+                                                        <Input {...field} />
+                                                    </FormControl>
+                                                </FormItem>
+                                            )}
+                                        />
+
+                                        <FormField
+                                            control={section3Form.control}
+                                            name="course_rating_avg"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel>Calificación Promedio</FormLabel>
+                                                    <FormControl>
+                                                        <Input {...field} />
+                                                    </FormControl>
+                                                </FormItem>
+                                            )}
+                                        />
+                                    </div>
+
+                                    <div className="space-y-4">
+                                        <FormField
+                                            control={section3Form.control}
+                                            name="course_max_reaction"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel>Reacción Máxima</FormLabel>
+                                                    <FormControl>
+                                                        <Input {...field} />
+                                                    </FormControl>
+                                                </FormItem>
+                                            )}
+                                        />
+
+                                        <FormField
+                                            control={section3Form.control}
+                                            name="course_visits"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel>Visitas</FormLabel>
+                                                    <FormControl>
+                                                        <Input type="number" {...field} />
+                                                    </FormControl>
+                                                </FormItem>
+                                            )}
+                                        />
+
+                                        <FormField
+                                            control={section3Form.control}
+                                            name="course_reviews_count"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel>Número de Reseñas</FormLabel>
+                                                    <FormControl>
+                                                        <Input type="number" {...field} />
+                                                    </FormControl>
+                                                </FormItem>
+                                            )}
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="py-6 flex items-center justify-center">
+                                    <Button type="submit" className="w-[80%] mx-auto">
+                                        Enviar Prediccion
+                                    </Button>
+                                </div>
+                            </form>
+                        </Form>
                         <Table>
                             <TableHeader>
                                 <TableRow>
@@ -380,10 +617,10 @@ export default function Prediction() {
                                 {section3Result?.class === null || section3Result?.result === null || section3Loading ? (
                                     <TableRow>
                                         <TableCell colSpan={3} className="text-center text-muted-foreground">
-                                            {section3Loading 
+                                            {section3Loading
                                                 ? <div className="w-full flex justify-center">
-                                                    <LoaderCircle className="animate-spin" />    
-                                                </div> 
+                                                    <LoaderCircle className="animate-spin" />
+                                                </div>
                                                 : 'No hay registros'}
                                         </TableCell>
                                     </TableRow>
