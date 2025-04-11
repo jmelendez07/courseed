@@ -10,6 +10,7 @@ import com.api.flux.courseed.web.controllers.CategoryController;
 import com.api.flux.courseed.web.controllers.ContentController;
 import com.api.flux.courseed.web.controllers.CourseController;
 import com.api.flux.courseed.web.controllers.InstitutionController;
+import com.api.flux.courseed.web.controllers.PredictionController;
 import com.api.flux.courseed.web.controllers.ReactionController;
 import com.api.flux.courseed.web.controllers.ReviewController;
 import com.api.flux.courseed.web.controllers.RoleController;
@@ -28,7 +29,8 @@ public class RouterConfig {
         InstitutionController institutionController, ViewController viewController,
         ReviewController reviewController, UserController userController,
         RoleController roleController, ReactionController reactionController,
-        SearchHistoryController searchHistoryController, SubscriptionController subscriptionController
+        SearchHistoryController searchHistoryController, SubscriptionController subscriptionController,
+        PredictionController predictionController
     ) {
         return RouterFunctions.route()
             .path("/auth", () -> authRoutes(authController))
@@ -43,6 +45,7 @@ public class RouterConfig {
             .path("/views", () -> viewRoutes(viewController))
             .path("/search-histories", () -> searchHistoryRoutes(searchHistoryController))
             .path("/subscriptions", () -> subscriptionRoutes(subscriptionController))
+            .path("/predictions", () -> predictionRoutes(predictionController))
             .build();
     }
 
@@ -191,6 +194,13 @@ public class RouterConfig {
             .build();
     }
 
+    private RouterFunction<ServerResponse> predictionRoutes(PredictionController predictionController) {
+        return RouterFunctions
+            .route()
+            .GET("/recomended", predictionController::getRecomendedCourses)
+            .build();
+    }
+
     @Bean
     AuthController authController() {
         return new AuthController();
@@ -249,5 +259,10 @@ public class RouterConfig {
     @Bean
     SubscriptionController subscriptionController() {
         return new SubscriptionController();
+    }
+
+    @Bean
+    PredictionController predictionController() {
+        return new PredictionController();
     }
 }
