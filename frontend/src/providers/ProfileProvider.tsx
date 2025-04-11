@@ -1,6 +1,7 @@
 import React from "react";
 import ProfileFormDialog from "@/components/form/profile-form-dialog";
 import ConfettiExplosion from "react-confetti-explosion";
+import { useAuth } from "./AuthProvider";
 
 interface ChildrenProps {
     children: React.ReactNode,
@@ -16,8 +17,17 @@ const ProfileContext = React.createContext<ProfileContextProps | null>(null);
 
 function ProfileProvider({ children }: ChildrenProps) {
 
-    const [open, setOpen] = React.useState<boolean>(true);
+    const [open, setOpen] = React.useState<boolean>(false);
     const [isExploding, setIsExploding] = React.useState(false);
+    const authHook = useAuth();
+
+    React.useEffect(() => {
+        if (authHook?.user && (!authHook.user.profile || Object.values(authHook.user.profile).some(value => value === null))) {
+            setOpen(true);
+        } else {
+            setOpen(false);
+        }
+    }, [authHook?.user]);
 
     const contextValue: ProfileContextProps = React.useMemo(
         () => ({

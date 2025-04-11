@@ -1,3 +1,5 @@
+import ProfileInterface from "./profile";
+
 interface UserInterface {
     id: string | null | undefined;
     email: string;
@@ -9,6 +11,7 @@ interface UserInterface {
     updatedAt?: string;
     reviews?: number;
     views?: number;
+    profile: ProfileInterface;
 }
 
 export default UserInterface;
