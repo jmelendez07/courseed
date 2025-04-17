@@ -10,6 +10,8 @@ import com.api.flux.courseed.web.controllers.CategoryController;
 import com.api.flux.courseed.web.controllers.ContentController;
 import com.api.flux.courseed.web.controllers.CourseController;
 import com.api.flux.courseed.web.controllers.InstitutionController;
+import com.api.flux.courseed.web.controllers.PredictionController;
+import com.api.flux.courseed.web.controllers.ProfileController;
 import com.api.flux.courseed.web.controllers.ReactionController;
 import com.api.flux.courseed.web.controllers.ReviewController;
 import com.api.flux.courseed.web.controllers.RoleController;
@@ -28,7 +30,9 @@ public class RouterConfig {
         InstitutionController institutionController, ViewController viewController,
         ReviewController reviewController, UserController userController,
         RoleController roleController, ReactionController reactionController,
-        SearchHistoryController searchHistoryController, SubscriptionController subscriptionController
+        SearchHistoryController searchHistoryController, SubscriptionController subscriptionController,
+        ProfileController profileController,
+        PredictionController predictionController
     ) {
         return RouterFunctions.route()
             .path("/auth", () -> authRoutes(authController))
@@ -43,6 +47,8 @@ public class RouterConfig {
             .path("/views", () -> viewRoutes(viewController))
             .path("/search-histories", () -> searchHistoryRoutes(searchHistoryController))
             .path("/subscriptions", () -> subscriptionRoutes(subscriptionController))
+            .path("/profiles", () -> profileRoutes(profileController))
+            .path("/predictions", () -> predictionRoutes(predictionController))
             .build();
     }
 
@@ -191,6 +197,24 @@ public class RouterConfig {
             .build();
     }
 
+    private RouterFunction<ServerResponse> profileRoutes(ProfileController profileController) {
+        return RouterFunctions
+            .route()
+            .GET("/auth", profileController::getProfileByAuth)
+            .GET("/{id}", profileController::getProfileById)
+            .POST("/create", profileController::createProfile)
+            .build();
+    }
+
+    private RouterFunction<ServerResponse> predictionRoutes(PredictionController predictionController) {
+        return RouterFunctions
+            .route()
+            .GET("/user-course-recomended", predictionController::getUserCourseRecomended)
+            .GET("/courses-recomended-for-user", predictionController::getRecomendedCoursesByUser)
+            .POST("/form-prediction", predictionController::predictCourseRecommendation)
+            .build();
+    }
+
     @Bean
     AuthController authController() {
         return new AuthController();
@@ -249,5 +273,15 @@ public class RouterConfig {
     @Bean
     SubscriptionController subscriptionController() {
         return new SubscriptionController();
+    }
+
+    @Bean
+    ProfileController profileController() {
+        return new ProfileController();
+    }
+
+    @Bean
+    PredictionController predictionController() {
+        return new PredictionController();
     }
 }

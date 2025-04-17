@@ -16,6 +16,7 @@ public class UserDto implements Serializable {
     private int reactions;
     private int reviews;
     private int views;
+    private ProfileDto profile;
 
     public UserDto() {}
 
@@ -117,5 +118,13 @@ public class UserDto implements Serializable {
 
     public void setBirthdate(LocalDateTime birthdate) {
         this.birthdate = birthdate;
-    }        
+    }    
+    
+    public ProfileDto getProfile() {
+        return profile;
+    }
+    
+    public void setProfile(ProfileDto profile) {
+        this.profile = profile;
+    }
 }

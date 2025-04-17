@@ -230,9 +230,9 @@ function CourseForm({ course, onCreated, onUpdated }: CourseFormProps) {
                     <div className="grid gap-2">
                         <Label htmlFor="email">Titulo</Label>
                         <Input
+                            id="title"
                             type="text"
                             autoComplete="name"
-                            id="title"
                             placeholder="Coloca el titulo del curso..."
                             value={form.title}
                             onChange={handleOnChange}

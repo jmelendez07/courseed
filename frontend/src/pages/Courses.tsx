@@ -2,6 +2,7 @@ import { BlogCourses } from "@/components/ui/blog-courses";
 import { Footer } from "@/components/ui/footer";
 import { Navbar } from "@/components/ui/navbar";
 import HeadProvider from "@/providers/HeadProvider";
+import ProfileProvider from "@/providers/ProfileProvider";
 import React from "react";
 import { useLocation } from "react-router-dom";
 
@@ -12,15 +13,17 @@ function Courses() {
     }, [location.pathname]);
     
     return (
-        <>
-            <HeadProvider title="Courseed | Educación Continuada" />
-            <Navbar />
-            <BlogCourses
-                heading="Educación Continuada"
-                description="Explora nuestra amplia gama de cursos y diplomados para seguir aprendiendo y creciendo profesionalmente."
-            />
-            <Footer />
-        </>
+        <main className="relative">
+            <ProfileProvider>
+                <HeadProvider title="Courseed | Educación Continuada" />
+                <Navbar />
+                <BlogCourses
+                    heading="Educación Continuada"
+                    description="Explora nuestra amplia gama de cursos y diplomados para seguir aprendiendo y creciendo profesionalmente."
+                />
+                <Footer />
+            </ProfileProvider>
+        </main>
     );
 }
 

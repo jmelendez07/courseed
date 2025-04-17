@@ -22,6 +22,7 @@ import CoursesSubscriber from "@/pages/auth/subscriptor/Courses";
 import ProtectedSubscriberRoute from "./ProtectedSubscriberRoute";
 import RegisterSubscribe from "@/pages/auth/RegisterSubscribe";
 import Subscriptions from "@/pages/auth/subscriptor/Subscriptions";
+import Prediction from "@/pages/prediction";
 
 function Routes() {
 
@@ -53,6 +54,10 @@ function Routes() {
         {
             path: '/404',
             element: <Page404 />
+        },
+        {
+            path: '/prediccion',
+            element: <Prediction />
         }
     ];
 

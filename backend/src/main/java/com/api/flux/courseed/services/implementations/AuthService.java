@@ -9,22 +9,26 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
 import com.api.flux.courseed.persistence.documents.Reaction;
 import com.api.flux.courseed.persistence.documents.Review;
 import com.api.flux.courseed.persistence.documents.User;
 import com.api.flux.courseed.persistence.documents.View;
+import com.api.flux.courseed.persistence.repositories.CategoryRepository;
+import com.api.flux.courseed.persistence.repositories.ProfileRepository;
 import com.api.flux.courseed.persistence.repositories.ReactionRepository;
 import com.api.flux.courseed.persistence.repositories.ReviewRepository;
 import com.api.flux.courseed.persistence.repositories.UserRepository;
 import com.api.flux.courseed.persistence.repositories.ViewRepository;
 import com.api.flux.courseed.projections.dtos.LoginUserDto;
+import com.api.flux.courseed.projections.dtos.ProfileDto;
 import com.api.flux.courseed.projections.dtos.RegisterSubscriptorDto;
 import com.api.flux.courseed.projections.dtos.RegisterUserDto;
 import com.api.flux.courseed.projections.dtos.TokenDto;
 import com.api.flux.courseed.projections.dtos.UpdateAuthPasswordDto;
 import com.api.flux.courseed.projections.dtos.UpdateProfileDto;
 import com.api.flux.courseed.projections.dtos.UserDto;
+import com.api.flux.courseed.projections.mappers.CategoryMapper;
+import com.api.flux.courseed.projections.mappers.ProfileMapper;
 import com.api.flux.courseed.projections.mappers.UserMapper;
 import com.api.flux.courseed.services.interfaces.InterfaceAuthService;
 import com.api.flux.courseed.services.interfaces.Roles;
@@ -47,10 +51,22 @@ public class AuthService implements InterfaceAuthService {
     private UserMapper userMapper;
 
     @Autowired
+    private ProfileMapper profileMapper;
+
+    @Autowired
+    private CategoryMapper categoryMapper;
+
+    @Autowired
     private ReactionRepository reactionRepository;
 
     @Autowired
     private ViewRepository viewRepository;
+
+    @Autowired
+    private ProfileRepository profileRepository;
+
+    @Autowired
+    private CategoryRepository categoryRepository;
 
     @Autowired
     private ReactiveAuthenticationManager reactiveAuthenticationManager;
@@ -68,13 +84,25 @@ public class AuthService implements InterfaceAuthService {
                 Flux<Review> reviewFlux = reviewRepository.findByUserId(user.getId());
                 Flux<Reaction> reactionFlux = reactionRepository.findByUserId(user.getId());
                 Flux<View> viewFlux = viewRepository.findByUserId(user.getId());
+                Mono<ProfileDto> profileMono = profileRepository.findByUserId(user.getId())
+                    .flatMap(profile -> categoryRepository.findById(profile.getInterest()) 
+                        .map(categoryMapper::toCategoryDto)
+                        .map(category -> {
+                            ProfileDto profileDto = profileMapper.toProfileDto(profile);
+                            profileDto.setInterest(category);
+                            return profileDto;
+                        })
+                        .defaultIfEmpty(profileMapper.toProfileDto(profile))
+                    )
+                    .defaultIfEmpty(new ProfileDto());
 
-                return Mono.zip(reviewFlux.collectList(), reactionFlux.collectList(), viewFlux.collectList())
+                return Mono.zip(reviewFlux.collectList(), reactionFlux.collectList(), viewFlux.collectList(), profileMono)
                     .map(tuple -> {
                         UserDto userDto = userMapper.toUserDto(user);
                         userDto.setReviews(tuple.getT1().size());
                         userDto.setReactions(tuple.getT2().size());
                         userDto.setViews(tuple.getT3().size());
+                        userDto.setProfile(tuple.getT4());
 
                         return userDto;
                     });

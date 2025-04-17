@@ -14,6 +14,7 @@ public interface UserMapper {
     @Mapping(target = "reactions", ignore = true)
     @Mapping(target = "reviews", ignore = true)
     @Mapping(target = "views", ignore = true)
+    @Mapping(target = "profile", ignore = true)
     UserDto toUserDto(User user);
 
     @Mapping(target = "id", ignore = true)

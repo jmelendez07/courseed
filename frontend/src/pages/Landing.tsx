@@ -21,7 +21,7 @@ function Landing() {
     }, [location.pathname, location.key]);
 
     return (
-        <>
+        <main className="relative">
             <HeadProvider title="Courseed" />
             <Navbar />
             <Hero />
@@ -31,7 +31,7 @@ function Landing() {
             <Pricing />
             <Logos heading="Con la confianza de estas instituciones" />
             <Footer />
-        </>
+        </main>
     );
 }
 

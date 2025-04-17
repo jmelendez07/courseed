@@ -2,7 +2,7 @@ import { Badge } from "@/components/ui/badge";
 import useCourses from "@/hooks/useCourses";
 import Course from "./course";
 import { Button } from "./button";
-import { ChevronDown, ChevronUp, ClipboardCheck, LoaderCircle, Search } from "lucide-react";
+import { ChevronDown, ChevronUp, ClipboardCheck, LoaderCircle, Search, ThumbsUp } from "lucide-react";
 import { Input } from "./input";
 import useInstitution from "@/hooks/useInstitution";
 import useFaculty from "@/hooks/useFaculty";
@@ -176,6 +176,10 @@ const BlogCourses = ({
                                 />
                             </FadeItem>
                         </div>
+                    </div>
+                    <div className="mt-6 border-t border-gray-200 pt-4 text-lg inline-flex items-center gap-2">
+                        Hemos encontrado <b>597</b> programas recomendados para ti
+                        <ThumbsUp className="text-sky-600" />
                     </div>
                 </div>
                 <div className="w-full" ref={ref}>
