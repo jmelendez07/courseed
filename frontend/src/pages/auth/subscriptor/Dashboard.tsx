@@ -1,5 +1,6 @@
 import { AppSidebar } from "@/components/app-sidebar";
 import DashboardCategoriesAnalytics from "@/components/dashboard/dashboard-categories-analytics";
+import WelcomeBanner from "@/components/dashboard/welcome-banner";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
 import Color from "@/components/ui/Color";
 import { Separator } from "@/components/ui/separator";
@@ -44,12 +45,8 @@ function Dashboard() {
                         </div>
                     </header>
                     <main className="flex-1 p-6">
-                        <div className="mb-8">
-                            <h1 className="text-3xl font-bold tracking-tight">Bienvenid@, {authHook?.getName()}</h1>
-                            <p className="text-muted-foreground mb-6">
-                                Visualiza y analiza predicciones sobre programas académicos y categorias populares.
-                            </p>
-
+                        <div className="mb-8 space-y-4">
+                            <WelcomeBanner />
                             <Tabs defaultValue="futuros" className="w-full">
                                 <TabsList className="mb-4">
                                     <TabsTrigger value="futuros">Programas en Periodo Futuro</TabsTrigger>

@@ -2,8 +2,7 @@ import { ColorContext } from "@/providers/ColorProvider";
 import React from "react";
 
 function LoginDraw() {
-
-    const colorContext = React.useContext(ColorContext); 
+    const colorContext = React.useContext(ColorContext);
 
     return (
         <svg xmlns="http://www.w3.org/2000/svg" width="869.99994" height="520.13854" viewBox="0 0 869.99994 520.13854" role="img">

@@ -2,6 +2,7 @@ import { AppSidebar } from "@/components/app-sidebar";
 import DashboardCourseOferts from "@/components/dashboard/dashboard-courses-oferts";
 import DashboardRecomendedCourses from "@/components/dashboard/dashboard-recomended-courses";
 import DashboardSearchHistories from "@/components/dashboard/dashboard-search-histories";
+import WelcomeBanner from "@/components/dashboard/welcome-banner";
 import {
     Breadcrumb,
     BreadcrumbItem,
@@ -19,12 +20,9 @@ import {
 } from "@/components/ui/sidebar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Theme from "@/components/ui/theme";
-import { useAuth } from "@/providers/AuthProvider";
 import HeadProvider from "@/providers/HeadProvider";
 
 function Dashboard() {
-    const authHook = useAuth();
-
     return (
         <SidebarProvider>
             <AppSidebar />
@@ -54,10 +52,7 @@ function Dashboard() {
                     </div>
                 </header>
                 <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
-                    <div>
-                        <h1 className="text-3xl font-bold tracking-tight">Bienvenid@, {authHook?.getName()}</h1>
-                        <p className="text-muted-foreground">Continúa aprendiendo donde lo dejaste</p>
-                    </div>
+                    <WelcomeBanner />
                     <Tabs defaultValue="recomendados" className="flex-1 flex flex-col items-start">
                         <TabsList className="mb-4">
                             <TabsTrigger value="recomendados">Recomendados</TabsTrigger>
