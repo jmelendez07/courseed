@@ -67,7 +67,8 @@ public class SecurityConfig {
                     .pathMatchers(HttpMethod.GET, "/views/course/*").permitAll()
                     .pathMatchers(HttpMethod.GET, "/subscriptions/auth").hasRole(Roles.SUBSCRIBER)
                     .pathMatchers(HttpMethod.POST, "/subscriptions/confirm").permitAll()
-                    .pathMatchers(HttpMethod.GET, "/predictions/user-course-recomended", "/predictions/courses-recomended-for-user", "/predictions/form-prediction").permitAll()
+                    .pathMatchers(HttpMethod.GET, "/predictions/user-course-recomended", "/predictions/courses-recomended-for-user").permitAll()
+                    .pathMatchers(HttpMethod.POST, "/predictions/form-prediction").permitAll()
                     .anyExchange().authenticated())
                 .addFilterAt(authenticationWebFilter, SecurityWebFiltersOrder.AUTHENTICATION);
 

@@ -139,6 +139,11 @@ export default function Prediction() {
         axios.post('api/predictions/form-prediction', data)
             .then(response => {
                 console.log(response);
+                setSection3Result({
+                    class: "Recomendar curso",
+                    result: response.data.recomended,
+                    confidence: response.data.confidence
+                });
             })
             .catch(error => {
                 console.error("Error fetching user-course prediction:", error)
