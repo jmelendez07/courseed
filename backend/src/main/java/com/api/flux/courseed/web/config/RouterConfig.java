@@ -1,6 +1,8 @@
 package com.api.flux.courseed.web.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.MediaType;
+import org.springframework.web.reactive.function.server.RequestPredicates;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.RouterFunctions;
 import org.springframework.web.reactive.function.server.ServerResponse;
@@ -71,8 +73,6 @@ public class RouterConfig {
             .GET("", categoryController::getAllCategories)
             .GET("/{id}", categoryController::getCategoryById)
             .GET("/name/{name}", categoryController::getCategoryByName)
-            .POST(categoryController::createCategory)
-            .PUT("/{id}", categoryController::updateCategory)
             .DELETE("/{id}", categoryController::deleteCategory)
             .build();
     }
@@ -110,11 +110,12 @@ public class RouterConfig {
         return RouterFunctions
             .route()
             .GET("", institutionController::getAllInstitutions)
+            .GET("/auth", institutionController::getInstitutionByAuth)
             .GET("/{id}", institutionController::getInstitutionById)
             .GET("/name/{name}", institutionController::getInstitutionByName)
             .GET("/courses/count", institutionController::getInstitutionsWithCoursesCount)
-            .POST(institutionController::createInstitution)
-            .PUT("/{id}", institutionController::updateInstitution)
+            .POST(RequestPredicates.accept(MediaType.MULTIPART_FORM_DATA), institutionController::createInstitution)
+            .PUT("/{id}", RequestPredicates.accept(MediaType.MULTIPART_FORM_DATA), institutionController::updateInstitution)
             .DELETE("/{id}", institutionController::deleteInstitution)
             .build();
     }

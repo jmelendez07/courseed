@@ -1,5 +1,6 @@
 import { AppSidebar } from "@/components/app-sidebar";
 import DashboardContentProfile from "@/components/dashboard/dashboard-content-profile";
+import DashboardInstitutionProfile from "@/components/dashboard/dashboard-institution-profile";
 import DashboardStatsProfile from "@/components/dashboard/dashboard-stats-profile";
 import {
     Breadcrumb,
@@ -18,10 +19,15 @@ import {
     SidebarTrigger,
 } from "@/components/ui/sidebar";
 import Theme from "@/components/ui/theme";
+import ROLES from "@/enums/roles";
+import { useAuth } from "@/providers/AuthProvider";
 import DialogProvider from "@/providers/DialogProvider";
 import HeadProvider from "@/providers/HeadProvider";
 
 function Profile() {
+
+    const authHook = useAuth();
+
     return (
         <SidebarProvider>
             <DialogProvider>
@@ -53,6 +59,12 @@ function Profile() {
                     </header>
                     <div className="flex flex-col gap-8 p-8">
                         <DashboardContentProfile />
+                        { authHook?.user?.roles?.some((role: string) => role === ROLES.SUBSCRIBER) && (
+                            <>
+                                <Separator className="my-4" />
+                                <DashboardInstitutionProfile /> 
+                            </>
+                        ) }
                         <Separator className="my-4" />
                         <ProfileCards />
                         <Separator className="my-4" />

@@ -155,7 +155,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 				title: "Suscripciones",
 				icon: CreditCard,
 				url: "/suscriptor/suscripciones"
-			}
+			},
 		]
 	}
 

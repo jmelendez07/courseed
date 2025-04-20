@@ -63,7 +63,7 @@ export function TeamSwitcher({
 						sideOffset={4}
 					>
 						<DropdownMenuLabel className="text-xs text-zinc-500 dark:text-zinc-400">
-							Enlaces
+							Acciones Rapidas
 						</DropdownMenuLabel>
 						<DropdownMenuItem
 							className="gap-2 p-2 flex justify-between"

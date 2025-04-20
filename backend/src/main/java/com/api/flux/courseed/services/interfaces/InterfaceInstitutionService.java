@@ -1,5 +1,6 @@
 package com.api.flux.courseed.services.interfaces;
 
+import java.security.Principal;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
@@ -14,7 +15,8 @@ public interface InterfaceInstitutionService {
     Mono<List<InstitutionWithCoursesCountDto>> getInstitutionsWithCoursesCount(int page, int size);
     Mono<InstitutionDto> getInstitutionById(String id);
     Mono<InstitutionDto> getInstitutionByName(String name);
-    Mono<Object> createInstitution(SaveInstitutionDto saveInstitutionDto);
-    Mono<Object> updateInstitution(String id, SaveInstitutionDto saveInstitutionDto);
+    Mono<InstitutionDto> getInstitutionByAuth(Principal principal);
+    Mono<Object> createInstitution(Principal principal, SaveInstitutionDto saveInstitutionDto, String baseurl);
+    Mono<Object> updateInstitution(String id, Principal principal, SaveInstitutionDto saveInstitutionDto, String baseurl);
     Mono<Boolean> deleteInstitution(String id);
 }

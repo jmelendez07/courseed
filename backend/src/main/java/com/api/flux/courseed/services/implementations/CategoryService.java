@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 
 import com.api.flux.courseed.persistence.repositories.CategoryRepository;
 import com.api.flux.courseed.projections.dtos.CategoryDto;
-import com.api.flux.courseed.projections.dtos.SaveCategoryDto;
 import com.api.flux.courseed.projections.mappers.CategoryMapper;
 import com.api.flux.courseed.services.interfaces.InterfaceCategoryService;
 import com.api.flux.courseed.web.exceptions.CustomWebExchangeBindException;
@@ -60,47 +59,6 @@ public class CategoryService implements InterfaceCategoryService {
                     "No hemos podido encontrar la categoría indicada por su nombre. Te sugerimos que verifiques y lo intentes nuevamente."
                 ).getWebExchangeBindException()
             ));
-    }
-
-    @Override
-    public Mono<Object> createCategory(SaveCategoryDto saveCategoryDto) {
-        return categoryRepository.findByName(saveCategoryDto.getName())
-            .flatMap(category -> Mono.error(
-                new CustomWebExchangeBindException(
-                    saveCategoryDto.getName(), 
-                    "name", 
-                    "La categoría que has mencionado ya está registrada. Asegúrate de elegir un nombre diferente e intenta nuevamente."
-                ).getWebExchangeBindException()
-            ))
-            .switchIfEmpty(categoryRepository.save(categoryMapper.toCategory(saveCategoryDto))
-                .map(categoryMapper::toCategoryDto)
-            );
-    }
-
-    @Override
-    public Mono<Object> updateCategory(String id, SaveCategoryDto saveCategoryDto) {
-        return categoryRepository.findByName(saveCategoryDto.getName())
-            .flatMap(categoryByName -> Mono.error(
-                new CustomWebExchangeBindException(
-                    saveCategoryDto.getName(), 
-                    "name", 
-                    "La categoría que has mencionado ya está registrada. Asegúrate de elegir un nombre diferente e intenta nuevamente."
-                ).getWebExchangeBindException()
-            ))
-            .switchIfEmpty(categoryRepository.findById(id)
-                .flatMap(category -> {
-                    category.setName(saveCategoryDto.getName());
-                    return categoryRepository.save(category)
-                        .map(categoryMapper::toCategoryDto);
-                })
-                .switchIfEmpty(Mono.error(
-                    new CustomWebExchangeBindException(
-                        id, 
-                        "categoryId", 
-                        "No hemos podido encontrar la categoría indicada. Te sugerimos que verifiques la información y lo intentes de nuevo."
-                    ).getWebExchangeBindException()
-                ))    
-            );
     }
 
     @Override
