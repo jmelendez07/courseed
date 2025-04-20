@@ -19,6 +19,7 @@ public class User {
     private String sex;
     private LocalDateTime birthdate;
     private List<String> roles;
+    private String image;
 
     @CreatedDate
     private LocalDateTime createdAt;
@@ -115,6 +116,14 @@ public class User {
 
     public void setBirthdate(LocalDateTime birthdate) {
         this.birthdate = birthdate;
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
     }
 
 }

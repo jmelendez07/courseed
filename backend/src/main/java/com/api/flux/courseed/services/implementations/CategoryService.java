@@ -76,5 +76,4 @@ public class CategoryService implements InterfaceCategoryService {
                 ).getWebExchangeBindException())
             );
     }
-
 }

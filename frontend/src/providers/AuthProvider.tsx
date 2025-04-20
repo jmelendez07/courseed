@@ -19,6 +19,7 @@ interface AuthContextProps {
     setLoading: React.Dispatch<React.SetStateAction<boolean>>;
     getName: () => string;
     getRoleName: () => string;
+    setImage: (image: string) => void;
 }
 
 const AuthContext = React.createContext<AuthContextProps | null>(null);
@@ -61,6 +62,12 @@ function AuthProvider({ children }: ChildrenProps) {
         }
     }, [user?.roles]);
 
+    const setImage = React.useCallback((image: string) => {
+        if (user) {
+            setUser({ ...user, image: image });
+        }
+    }, [user]);
+
     React.useEffect(() => {
         if (token) {
             axios.defaults.headers.common['Authorization'] = `${TOKEN.PREFIX} ${token}`;
@@ -83,7 +90,8 @@ function AuthProvider({ children }: ChildrenProps) {
           setUser,
           setLoading,
           getName,
-          getRoleName
+          getRoleName,
+          setImage
         }),
         [token, user, loading]
     );

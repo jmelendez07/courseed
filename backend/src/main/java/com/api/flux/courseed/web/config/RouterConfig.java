@@ -64,6 +64,7 @@ public class RouterConfig {
             .PUT("/password", authController::updatePassword)
             .PUT("/profile", authController::updateProfile)
             .PUT("/subscribe", authController::subscribe)
+            .PUT("/upload-avatar", RequestPredicates.accept(MediaType.MULTIPART_FORM_DATA), authController::uploadAvatar)
             .build();
     }
 

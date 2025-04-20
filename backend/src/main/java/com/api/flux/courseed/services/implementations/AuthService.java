@@ -1,9 +1,14 @@
 package com.api.flux.courseed.services.implementations;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.Principal;
 import java.util.Arrays;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.security.authentication.ReactiveAuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -76,6 +81,8 @@ public class AuthService implements InterfaceAuthService {
 
     @Autowired    
     private PasswordEncoder passwordEncoder;
+
+    private String uploadPath = "uploads/avatars";
 
     @Override
     public Mono<UserDto> getAuthUser(Principal principal) {
@@ -275,5 +282,42 @@ public class AuthService implements InterfaceAuthService {
                             .map(auth -> new TokenDto(jwtUtil.create(auth)));
                     });
             }));
+    }
+
+    @Override
+    public Mono<UserDto> updloadAvatar(Principal principal, FilePart image, String baseUrl) {
+       return userRepository.findByEmail(principal.getName())
+            .flatMap(user -> {
+                String filename = UUID.randomUUID() + "-" + image.filename();
+                Path uploadDir = Paths.get(uploadPath).toAbsolutePath().normalize();
+                Path filePath = uploadDir.resolve(filename);
+
+                if (user.getImage() != null) {
+                    Path oldFilePath = Paths.get(uploadDir.toString(), user.getImage().substring(user.getImage().lastIndexOf("/") + 1));
+                    try {
+                        Files.deleteIfExists(oldFilePath);
+                    } catch (Exception e) {
+                        return Mono.error(new RuntimeException("Error al eliminar la imagen antigua: " + e.getMessage()));
+                    }
+                }
+
+                return Mono.fromCallable(() -> {
+                    Files.createDirectories(uploadDir);
+                    return filePath;
+                })
+                    .flatMap(path -> image.transferTo(path))
+                    .then(Mono.defer(() -> {
+                        user.setImage(baseUrl + "/" + uploadPath + "/" + filename);
+                        return userRepository.save(user)
+                            .map(userMapper::toUserDto);
+                    }));
+            })
+            .switchIfEmpty(Mono.error(
+                new CustomWebExchangeBindException(
+                    principal.getName(), 
+                    "auth", 
+                    "Parece que el usuario autenticado no se encuentra en el sistema. Te recomendamos cerrar sesión y volver a ingresar."
+                ).getWebExchangeBindException()
+            ));
     }
 }

@@ -29,13 +29,13 @@ import InstitutionInterface from "@/interfaces/institution";
 import CategoryInterface from "@/interfaces/category";
 import { useAuth } from "@/providers/AuthProvider";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "./dropdown-menu";
-import { Avatar, AvatarFallback } from "./avatar";
 import React from "react";
 import ROLES from "@/enums/roles";
 import { THEME, ThemeContext } from "@/providers/ThemeProvider";
 import Color from "./Color";
 import { motion, useMotionValueEvent, useScroll } from "motion/react";
 import FadeItem from "./fadeItem";
+import AvatarProfile from "./avatar-profile";
 
 interface MenuItem {
     title: string;
@@ -192,9 +192,7 @@ const Navbar = ({
                                             variants={header}
                                             className="flex items-center justify-start gap-3 p-2"
                                         >
-                                            <Avatar className="h-8 w-8 rounded-lg">
-                                                <AvatarFallback className="rounded-lg">{authHook?.user?.email.slice(0, 2).toUpperCase()}</AvatarFallback>
-                                            </Avatar>
+                                            <AvatarProfile imageUrl={authHook.user.image} name={authHook.getName()} className="shadow-lg" />
                                             <div className="grid flex-1 text-left text-sm leading-tight">
                                                 <span className="truncate font-semibold">{authHook.getName()}</span>
                                                 <span className="truncate text-xs">{authHook?.user?.email}</span>
@@ -210,9 +208,7 @@ const Navbar = ({
                                     >
                                         <DropdownMenuLabel className="p-0 font-normal">
                                             <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
-                                                <Avatar className="h-8 w-8 rounded-lg">
-                                                    <AvatarFallback className="rounded-lg">{authHook?.user?.email.slice(0, 2).toUpperCase()}</AvatarFallback>
-                                                </Avatar>
+                                                <AvatarProfile imageUrl={authHook.user.image} name={authHook.getName()} />
                                                 <div className="grid flex-1 text-left text-sm leading-tight">
                                                     <span className="truncate font-semibold">{authHook.getName()}</span>
                                                     <span className="truncate text-xs">{authHook?.user?.email}</span>
@@ -320,9 +316,7 @@ const Navbar = ({
                                                         <div
                                                             className="flex items-center justify-start gap-3 p-2"
                                                         >
-                                                            <Avatar className="h-8 w-8 rounded-lg">
-                                                                <AvatarFallback className="rounded-lg">{authHook?.user?.email.slice(0, 2).toUpperCase()}</AvatarFallback>
-                                                            </Avatar>
+                                                            <AvatarProfile imageUrl={authHook.user.image} name={authHook.getName()} className="shadow-lg" />
                                                             <div className="grid flex-1 text-left text-sm leading-tight">
                                                                 <span className="truncate font-semibold">{authHook.getName()}</span>
                                                                 <span className="truncate text-xs">{authHook?.user?.email}</span>
@@ -338,9 +332,7 @@ const Navbar = ({
                                                     >
                                                         <DropdownMenuLabel className="p-0 font-normal">
                                                             <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
-                                                                <Avatar className="h-8 w-8 rounded-lg">
-                                                                    <AvatarFallback className="rounded-lg">{authHook?.user?.email.slice(0, 2).toUpperCase()}</AvatarFallback>
-                                                                </Avatar>
+                                                                <AvatarProfile imageUrl={authHook.user.image} name={authHook.getName()} />
                                                                 <div className="grid flex-1 text-left text-sm leading-tight">
                                                                     <span className="truncate font-semibold">{authHook.getName()}</span>
                                                                     <span className="truncate text-xs">{authHook?.user?.email}</span>

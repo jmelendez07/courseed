@@ -12,6 +12,7 @@ interface UserInterface {
     reviews?: number;
     views?: number;
     profile: ProfileInterface;
+    image?: string;
 }
 
 export default UserInterface;
