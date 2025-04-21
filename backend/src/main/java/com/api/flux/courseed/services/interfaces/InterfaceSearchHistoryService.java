@@ -10,6 +10,7 @@ import com.api.flux.courseed.projections.dtos.SearchHistoryDto;
 import reactor.core.publisher.Mono;
 
 public interface InterfaceSearchHistoryService {
-    Mono<Page<SearchHistoryDto>> findByAuthUser(Principal principal, int page, int size);
+    Mono<Page<SearchHistoryDto>> findByAuthUser(Principal principal, String search, int page, int size);
     Mono<SearchHistoryDto> createSearchHistory(Principal principal, SaveSearchHistoryDto saveSearchHistoryDto);
+    Mono<Boolean> deleteSearchHistory(Principal principal, String id);
 }

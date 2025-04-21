@@ -21,7 +21,8 @@ public class SearchHistoryController {
     public Mono<ServerResponse> findByAuthUser(ServerRequest serverRequest) {
         return serverRequest.principal()
             .flatMap(principal -> searchHistoryService.findByAuthUser(
-                principal, 
+                principal,
+                serverRequest.queryParam("search").orElse(""),
                 Integer.parseInt(serverRequest.queryParam("page").orElse("0")), 
                 Integer.parseInt(serverRequest.queryParam("size").orElse("10"))
             ))
@@ -39,5 +40,15 @@ public class SearchHistoryController {
                     .switchIfEmpty(ServerResponse.notFound().build())
                 )
             );
+    }
+
+    public Mono<ServerResponse> deleteSearchHistory(ServerRequest serverRequest) {
+        return serverRequest.principal()
+            .flatMap(principal -> searchHistoryService.deleteSearchHistory(
+                principal, 
+                serverRequest.pathVariable("id")
+            ))
+                .flatMap(searchHistories -> ServerResponse.ok().bodyValue(searchHistories))
+                .switchIfEmpty(ServerResponse.notFound().build());
     }
 }

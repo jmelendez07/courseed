@@ -1,12 +1,14 @@
 package com.api.flux.courseed.projections.dtos;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 public class SearchHistoryDto {
     private String id;
     private UserDto user;
     private String search;
     private LocalDateTime createdAt;
+    private List<CourseDto> courses;
 
     public SearchHistoryDto(String id, UserDto user, String search, LocalDateTime createdAt) {
         this.id = id;
@@ -45,6 +47,14 @@ public class SearchHistoryDto {
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public List<CourseDto> getCourses() {
+        return courses;
+    }
+
+    public void setCourses(List<CourseDto> courses) {
+        this.courses = courses;
     }
 
         

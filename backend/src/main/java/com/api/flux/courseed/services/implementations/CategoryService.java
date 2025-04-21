@@ -76,4 +76,8 @@ public class CategoryService implements InterfaceCategoryService {
                 ).getWebExchangeBindException())
             );
     }
+
+    public String standarizeName(String name) {
+        
+    }
 }

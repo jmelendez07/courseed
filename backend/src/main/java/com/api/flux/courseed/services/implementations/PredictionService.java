@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 import com.api.flux.courseed.persistence.documents.UserCourseRecomended;
@@ -19,6 +20,7 @@ import com.api.flux.courseed.persistence.repositories.UserCourseRecomendedReposi
 import com.api.flux.courseed.persistence.repositories.UserInterestRepository;
 import com.api.flux.courseed.persistence.repositories.UserRepository;
 import com.api.flux.courseed.persistence.repositories.ViewRepository;
+import com.api.flux.courseed.projections.dtos.CourseDto;
 import com.api.flux.courseed.projections.dtos.FormPredictionDto;
 import com.api.flux.courseed.projections.dtos.MostCommonReactionDto;
 import com.api.flux.courseed.projections.dtos.RecomendeCourseDto;
@@ -315,5 +317,9 @@ public class PredictionService implements InterfacePredictionService {
                 )
             )
             .defaultIfEmpty(0);
+    }
+
+    public Mono<Page<CourseDto>> getRecomendedCoursesByAuth(Principal principal, int page, int size) {
+        
     }
 }
