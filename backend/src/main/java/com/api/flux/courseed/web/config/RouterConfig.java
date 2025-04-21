@@ -188,6 +188,7 @@ public class RouterConfig {
             .route()
             .GET("/auth", searchHistoryController::findByAuthUser)
             .POST("/create", searchHistoryController::createSearchHistory)
+            .DELETE("/{id}", searchHistoryController::deleteSearchHistory)
             .build();
     }
 

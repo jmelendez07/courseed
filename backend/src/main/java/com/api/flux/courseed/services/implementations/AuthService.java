@@ -92,15 +92,7 @@ public class AuthService implements InterfaceAuthService {
                 Flux<Reaction> reactionFlux = reactionRepository.findByUserId(user.getId());
                 Flux<View> viewFlux = viewRepository.findByUserId(user.getId());
                 Mono<ProfileDto> profileMono = profileRepository.findByUserId(user.getId())
-                    .flatMap(profile -> categoryRepository.findById(profile.getInterest()) 
-                        .map(categoryMapper::toCategoryDto)
-                        .map(category -> {
-                            ProfileDto profileDto = profileMapper.toProfileDto(profile);
-                            profileDto.setInterest(category);
-                            return profileDto;
-                        })
-                        .defaultIfEmpty(profileMapper.toProfileDto(profile))
-                    )
+                    .map(profileMapper::toProfileDto)
                     .defaultIfEmpty(new ProfileDto());
 
                 return Mono.zip(reviewFlux.collectList(), reactionFlux.collectList(), viewFlux.collectList(), profileMono)

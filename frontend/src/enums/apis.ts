@@ -50,6 +50,7 @@ enum APIS {
     VIEWS_COURSES_DECREASING = 'api/views/courses/this-month/decreasing',
     SEARCH_HISTORIES_BY_AUTH_USER = 'api/search-histories/auth',
     SEARCH_HISTORY_CREATE = 'api/search-histories/create',
+    SEARCH_HISTORY_DELETE = 'api/search-histories/',
     SUBSCRIBE = 'api/auth/subscribe',
     REGISTER_SUSCRIPTOR = 'api/auth/register/subscriptor',
     SUBSCRIPTIONS_BY_AUTH_USER = 'api/subscriptions/auth',

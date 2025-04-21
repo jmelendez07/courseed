@@ -35,17 +35,24 @@ public class SearchHistoryService implements InterfaceSearchHistoryService {
     @Autowired
     private UserMapper userMapper;
 
+    @Autowired
+    private CourseService courseService;
+
     @Override
-    public Mono<Page<SearchHistoryDto>> findByAuthUser(Principal principal, int page, int size) {
+    public Mono<Page<SearchHistoryDto>> findByAuthUser(Principal principal, String search, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
 
         return userRepository.findByEmail(principal.getName())
-            .flatMap(user -> searchHistoryRepository.findByUserIdOrderByCreatedAtDesc(user.getId(), pageable)
-                .map(searchHistory -> {
+            .flatMap(user -> searchHistoryRepository.findByUserIdAndSearchContainingIgnoreCaseOrderByCreatedAtDesc(user.getId(), search, pageable)
+                .flatMapSequential(searchHistory -> {
                     SearchHistoryDto searchHistoryDto = searchHistoryMapper.toSearchHistoryDto(searchHistory);
                     searchHistoryDto.setUser(userMapper.toUserDto(user));
-
-                    return searchHistoryDto;
+                    
+                    return courseService.getAllCourses(searchHistory.getSearch(), null, null, 0, 4)
+                        .map(coursePage -> {
+                            searchHistoryDto.setCourses(coursePage.getContent());
+                            return searchHistoryDto;
+                        });
                 })
                 .collectList()
                 .zipWith(searchHistoryRepository.count())
@@ -69,5 +76,13 @@ public class SearchHistoryService implements InterfaceSearchHistoryService {
                     });
             });
     }
-    
+
+    @Override
+    public Mono<Boolean> deleteSearchHistory(Principal principal, String id) {
+        return userRepository.findByEmail(principal.getName())
+            .flatMap(user -> searchHistoryRepository.findByIdAndUserId(id, user.getId())
+                .flatMap(searchHistory -> searchHistoryRepository.delete(searchHistory).thenReturn(true))
+                .defaultIfEmpty(false)
+            );
+    }
 }

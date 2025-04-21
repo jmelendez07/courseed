@@ -1,7 +1,6 @@
 package com.api.flux.courseed.web.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
@@ -55,5 +54,16 @@ public class PredictionController {
                     .bodyValue(Map.of("totalCourses", totalCourses))
                 )
             );
+    }
+
+    public Mono<ServerResponse> getRecomendedCoursesByAuth(ServerRequest serverRequest) {
+        return serverRequest.principal()
+            .flatMap(principal -> predictionService.getRecomendedCoursesByAuth(
+                principal, 
+                Integer.parseInt(serverRequest.queryParam("page").orElse("0")), 
+                Integer.parseInt(serverRequest.queryParam("size").orElse("10"))
+            ))
+                .flatMap(courses -> ServerResponse.ok().bodyValue(courses))
+                .switchIfEmpty(ServerResponse.notFound().build());
     }
 }

@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 import com.api.flux.courseed.persistence.documents.UserCourseRecomended;
@@ -16,6 +17,7 @@ import com.api.flux.courseed.persistence.repositories.ProfileRepository;
 import com.api.flux.courseed.persistence.repositories.UserCourseRecomendedRepository;
 import com.api.flux.courseed.persistence.repositories.UserInterestRepository;
 import com.api.flux.courseed.persistence.repositories.UserRepository;
+import com.api.flux.courseed.projections.dtos.CourseDto;
 import com.api.flux.courseed.projections.dtos.FormPredictionDto;
 import com.api.flux.courseed.projections.dtos.RecomendeCourseDto;
 import com.api.flux.courseed.projections.mappers.CategoryMapper;
@@ -66,15 +68,15 @@ public class PredictionService implements InterfacePredictionService {
     private Instances dataStructure;
     private Classifier classifier;
 
-    // public PredictionService() throws Exception {
-    //     ClassPathResource modelResource = new ClassPathResource("j48modelCourseed.model");
-    //     classifier = (Classifier) weka.core.SerializationHelper.read(modelResource.getInputStream());
+    public PredictionService() throws Exception {
+        ClassPathResource modelResource = new ClassPathResource("j48modelCourseed.model");
+        classifier = (Classifier) weka.core.SerializationHelper.read(modelResource.getInputStream());
 
-    //     ClassPathResource arffResource = new ClassPathResource("CourseedUsers.user_course_dataset.arff");
-    //     DataSource source = new DataSource(arffResource.getInputStream());
-    //     dataStructure = source.getDataSet();
-    //     dataStructure.setClassIndex(dataStructure.numAttributes() - 1);
-    // }
+        ClassPathResource arffResource = new ClassPathResource("CourseedUsers.user_course_dataset.arff");
+        DataSource source = new DataSource(arffResource.getInputStream());
+        dataStructure = source.getDataSet();
+        dataStructure.setClassIndex(dataStructure.numAttributes() - 1);
+    }
 
     public Mono<UserCourseRecomended> getUserCourseRecomended(String userId, String courseId) {
         return profileRepository.findByUserId(userId)
@@ -269,5 +271,9 @@ public class PredictionService implements InterfacePredictionService {
                     )
                 )
             );
+    }
+
+    public Mono<Page<CourseDto>> getRecomendedCoursesByAuth(Principal principal, int page, int size) {
+        
     }
 }
