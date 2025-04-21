@@ -559,5 +559,5 @@ public class CourseService implements InterfaceCourseService {
             .zipWith(courseRepository.count())
             .map(p -> new PageImpl<>(p.getT1(), pageable, p.getT2()));
     }
-    
+
 }

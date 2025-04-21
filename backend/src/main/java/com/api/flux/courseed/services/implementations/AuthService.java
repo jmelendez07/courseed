@@ -18,7 +18,6 @@ import com.api.flux.courseed.persistence.documents.Reaction;
 import com.api.flux.courseed.persistence.documents.Review;
 import com.api.flux.courseed.persistence.documents.User;
 import com.api.flux.courseed.persistence.documents.View;
-import com.api.flux.courseed.persistence.repositories.CategoryRepository;
 import com.api.flux.courseed.persistence.repositories.ProfileRepository;
 import com.api.flux.courseed.persistence.repositories.ReactionRepository;
 import com.api.flux.courseed.persistence.repositories.ReviewRepository;
@@ -32,7 +31,6 @@ import com.api.flux.courseed.projections.dtos.TokenDto;
 import com.api.flux.courseed.projections.dtos.UpdateAuthPasswordDto;
 import com.api.flux.courseed.projections.dtos.UpdateProfileDto;
 import com.api.flux.courseed.projections.dtos.UserDto;
-import com.api.flux.courseed.projections.mappers.CategoryMapper;
 import com.api.flux.courseed.projections.mappers.ProfileMapper;
 import com.api.flux.courseed.projections.mappers.UserMapper;
 import com.api.flux.courseed.services.interfaces.InterfaceAuthService;
@@ -59,9 +57,6 @@ public class AuthService implements InterfaceAuthService {
     private ProfileMapper profileMapper;
 
     @Autowired
-    private CategoryMapper categoryMapper;
-
-    @Autowired
     private ReactionRepository reactionRepository;
 
     @Autowired
@@ -69,9 +64,6 @@ public class AuthService implements InterfaceAuthService {
 
     @Autowired
     private ProfileRepository profileRepository;
-
-    @Autowired
-    private CategoryRepository categoryRepository;
 
     @Autowired
     private ReactiveAuthenticationManager reactiveAuthenticationManager;
@@ -92,15 +84,7 @@ public class AuthService implements InterfaceAuthService {
                 Flux<Reaction> reactionFlux = reactionRepository.findByUserId(user.getId());
                 Flux<View> viewFlux = viewRepository.findByUserId(user.getId());
                 Mono<ProfileDto> profileMono = profileRepository.findByUserId(user.getId())
-                    .flatMap(profile -> categoryRepository.findById(profile.getInterest()) 
-                        .map(categoryMapper::toCategoryDto)
-                        .map(category -> {
-                            ProfileDto profileDto = profileMapper.toProfileDto(profile);
-                            profileDto.setInterest(category);
-                            return profileDto;
-                        })
-                        .defaultIfEmpty(profileMapper.toProfileDto(profile))
-                    )
+                    .map(profileMapper::toProfileDto)
                     .defaultIfEmpty(new ProfileDto());
 
                 return Mono.zip(reviewFlux.collectList(), reactionFlux.collectList(), viewFlux.collectList(), profileMono)

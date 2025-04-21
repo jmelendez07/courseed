@@ -6,27 +6,53 @@ import React from "react";
 import { ColorContext } from "@/providers/ColorProvider";
 import axios from "axios";
 import APIS from "@/enums/apis";
+import SlotCounter from 'react-slot-counter';
 
-interface RecommendedProgramsBannerProps {
-    programCount: number;
-    allProgramsUrl: string;
-    className?: string;
-}
-
-export function RecommendedProgramsBanner({
-    programCount = 5,
-    allProgramsUrl = "/programs",
-    className,
-}: RecommendedProgramsBannerProps) {
+export function RecommendedProgramsBanner() {
     const colorContext = React.useContext(ColorContext);
-    // si haces este useEffect tu pc se va trabar 
-    // React.useEffect(() => {
-    //     axios.get(APIS.USER_COURSES_RECOMENDED_COUNT).then((response) => {
-    //         console.log(response);
-    //     });
-    // }, [])
+    const [programCount, setProgramCount] = React.useState<number>(0);
+    const [loading, setLoading] = React.useState<boolean>(true);
+    const [isVisible, setIsVisible] = React.useState<boolean>(false);
+
+    const ref = React.useRef<HTMLDivElement>(null);
+
+    React.useEffect(() => {
+        const observer = new IntersectionObserver(
+            (entries) => {
+                if (entries[0].isIntersecting) {
+                    setIsVisible(true);
+                    observer.disconnect();
+                }
+            },
+        );
+
+        if (ref.current) {
+            observer.observe(ref.current);
+        }
+
+        return () => observer.disconnect();
+    }, [ref.current]);
+     
+    React.useEffect(() => {
+        if (!isVisible) return;
+
+        setLoading(true);
+        axios.get(APIS.USER_COURSES_RECOMENDED_COUNT)
+            .then((response) => {
+                if (typeof response.data.totalCourses === "number") {
+                    setProgramCount(response.data.totalCourses);
+                }
+            })
+            .catch((error) => {
+                console.error("Error fetching recommended programs count:", error);
+            })
+            .finally(() => {
+                setLoading(false);
+            });
+    }, [isVisible]);
+
     return (
-        <div className="relative overflow-hidden rounded-lg">
+        <div ref={ref} className="relative overflow-hidden rounded-lg">
             {/* Fondo con colores y líneas diagonales */}
             <div className={`absolute inset-0 bg-gradient-to-r from-${colorContext?.color}-700 to-${colorContext?.getReverseColor()}-500`}>
                 {/* Líneas diagonales decorativas */}
@@ -55,7 +81,11 @@ export function RecommendedProgramsBanner({
                     </div>
                     <div>
                         <h3 className="text-xl font-semibold flex items-center">
-                            {programCount} programas recomendados
+                            <SlotCounter 
+                                value={programCount}
+                                startValue={0}
+                            />
+                            <span className="ml-1">programas recomendados</span>
                         </h3>
                         <p className="text-white/80 mt-1">
                             Descubre programas seleccionados especialmente para ti
@@ -66,7 +96,7 @@ export function RecommendedProgramsBanner({
                     asChild
                     className="bg-white text-blue-700 hover:bg-white/90 hover:text-blue-800 whitespace-nowrap"
                 >
-                    <Link to={allProgramsUrl} className="flex items-center">
+                    <Link to="/educacion" className="flex items-center">
                         <BookOpen className="mr-2 h-4 w-4" />
                         Ver todos los programas
                         <ArrowRight className="ml-2 h-4 w-4" />

@@ -17,7 +17,6 @@ public class Profile {
     private int availableHoursTime;
     private String platformPreference;
     private Double budget;
-    private String interest;
 
     @CreatedDate
     private LocalDateTime createdAt;
@@ -87,13 +86,5 @@ public class Profile {
 
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
-    }
-
-    public String getInterest() {
-        return interest;
-    }
-
-    public void setInterest(String interest) {
-        this.interest = interest;
     }
 }

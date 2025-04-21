@@ -13,14 +13,15 @@ import com.api.flux.courseed.persistence.repositories.CategoryRepository;
 import com.api.flux.courseed.persistence.repositories.CourseRepository;
 import com.api.flux.courseed.persistence.repositories.InstitutionRepository;
 import com.api.flux.courseed.persistence.repositories.ProfileRepository;
+import com.api.flux.courseed.persistence.repositories.ReactionRepository;
+import com.api.flux.courseed.persistence.repositories.ReviewRepository;
 import com.api.flux.courseed.persistence.repositories.UserCourseRecomendedRepository;
 import com.api.flux.courseed.persistence.repositories.UserInterestRepository;
 import com.api.flux.courseed.persistence.repositories.UserRepository;
+import com.api.flux.courseed.persistence.repositories.ViewRepository;
 import com.api.flux.courseed.projections.dtos.FormPredictionDto;
+import com.api.flux.courseed.projections.dtos.MostCommonReactionDto;
 import com.api.flux.courseed.projections.dtos.RecomendeCourseDto;
-import com.api.flux.courseed.projections.mappers.CategoryMapper;
-import com.api.flux.courseed.projections.mappers.CourseMapper;
-import com.api.flux.courseed.projections.mappers.InstitutionMapper;
 import com.api.flux.courseed.services.interfaces.InterfacePredictionService;
 
 import reactor.core.publisher.Mono;
@@ -55,26 +56,26 @@ public class PredictionService implements InterfacePredictionService {
     private ProfileRepository profileRepository;
 
     @Autowired
-    private CourseMapper courseMapper;
+    private ReviewRepository reviewRepository;
 
     @Autowired
-    private CategoryMapper categoryMapper;
+    private ReactionRepository reactionRepository;
 
     @Autowired
-    private InstitutionMapper institutionMapper;
+    private ViewRepository viewRepository;
 
     private Instances dataStructure;
     private Classifier classifier;
 
-    // public PredictionService() throws Exception {
-    //     ClassPathResource modelResource = new ClassPathResource("j48modelCourseed.model");
-    //     classifier = (Classifier) weka.core.SerializationHelper.read(modelResource.getInputStream());
+    public PredictionService() throws Exception {
+        ClassPathResource modelResource = new ClassPathResource("j48modelCourseed.model");
+        classifier = (Classifier) weka.core.SerializationHelper.read(modelResource.getInputStream());
 
-    //     ClassPathResource arffResource = new ClassPathResource("CourseedUsers.user_course_dataset.arff");
-    //     DataSource source = new DataSource(arffResource.getInputStream());
-    //     dataStructure = source.getDataSet();
-    //     dataStructure.setClassIndex(dataStructure.numAttributes() - 1);
-    // }
+        ClassPathResource arffResource = new ClassPathResource("CourseedUsers.user_course_dataset.arff");
+        DataSource source = new DataSource(arffResource.getInputStream());
+        dataStructure = source.getDataSet();
+        dataStructure.setClassIndex(dataStructure.numAttributes() - 1);
+    }
 
     public Mono<UserCourseRecomended> getUserCourseRecomended(String userId, String courseId) {
         return profileRepository.findByUserId(userId)
@@ -258,9 +259,53 @@ public class PredictionService implements InterfacePredictionService {
                 .flatMap(profile -> userInterestRepository.findByUserProfileId(profile.getId())
                     .flatMap(userInterest -> categoryRepository.findById(userInterest.getCategoryId())
                         .flatMap(interest -> courseRepository.findAll()
-                            .flatMap(course -> userCourseRecomendedRepository.findByCourseIdAndUserProfileId(course.getId(), profile.getId())
-                                .flatMap(courseRecomended -> {
-                                    return Mono.just(courseRecomended.isRecomended() ? 1 : 0);
+                            .flatMap(course -> categoryRepository.findById(course.getCategoryId())
+                                .flatMap(category -> {
+                                    Mono<Double> ratingAvgMono = reviewRepository.getAverageRatingByCourseId(course.getId())
+                                        .defaultIfEmpty(0.0);
+                                    
+                                    Mono<String> maxReactionMono = reactionRepository.findMostCommonReactionByCourseId(course.getId())
+                                        .map(MostCommonReactionDto::getType)
+                                        .defaultIfEmpty("NONE");
+                                    
+                                    Mono<Long> viewsCountMono = viewRepository.countByCourseId(course.getId())
+                                        .defaultIfEmpty(0L);
+                                    
+                                    Mono<Long> reviewsCountMono = reviewRepository.countByCourseId(course.getId())
+                                        .defaultIfEmpty(0L);
+                                    
+                                    return Mono.zip(ratingAvgMono, maxReactionMono, viewsCountMono, reviewsCountMono)
+                                        .flatMap(tuple -> {
+                                            Double ratingAvg = tuple.getT1();
+                                            String maxReaction = tuple.getT2();
+                                            Long viewsCount = tuple.getT3();
+                                            Long reviewsCount = tuple.getT4();
+                                            
+                                            try {
+                                                Instance instance = new DenseInstance(13);
+                                                instance.setDataset(dataStructure);
+                                                instance.setValue(0, interest.getName());
+                                                instance.setValue(1, profile.getAvailableHoursTime());
+                                                instance.setValue(2, profile.getBudget());
+                                                instance.setValue(3, profile.getPlatformPrefered());
+                                                instance.setValue(4, course.getModality());
+                                                instance.setValue(5, course.getDuration());
+                                                instance.setValue(6, course.getPrice());
+                                                instance.setValue(7, category.getName());
+                                                instance.setValue(8, ratingAvg);
+                                                instance.setValue(9, maxReaction);
+                                                instance.setValue(10, viewsCount.intValue());
+                                                instance.setValue(11, reviewsCount.intValue());
+
+                                                double predictionValue = classifier.classifyInstance(instance);
+                                                String prediction = dataStructure.classAttribute().value((int) predictionValue);
+
+                                                return Mono.just(prediction.equals("true") ? 1 : 0);
+                                            } catch (Exception e) {
+                                                e.printStackTrace();
+                                                return Mono.just(0);
+                                            }
+                                        });
                                 })
                                 .defaultIfEmpty(0)
                             )
@@ -268,6 +313,7 @@ public class PredictionService implements InterfacePredictionService {
                         )
                     )
                 )
-            );
+            )
+            .defaultIfEmpty(0);
     }
 }

@@ -51,5 +51,12 @@ public interface ReviewRepository extends ReactiveMongoRepository<Review, String
     })
     Flux<CourseAverageRating> findLowRatedCourses();
 
+    @Aggregation(pipeline = {
+        "{ $match: { courseId: ?0 } }",
+        "{ $group: { _id: null, avgRating: { $avg: '$rating' } } }",
+        "{ $project: { _id: 0, avgRating: 1 } }"
+    })
+    Mono<Double> getAverageRatingByCourseId(String courseId);
+
     Mono<Void> deleteByUserId(String userId);
 }

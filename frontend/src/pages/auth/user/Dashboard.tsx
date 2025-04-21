@@ -1,5 +1,4 @@
 import { AppSidebar } from "@/components/app-sidebar";
-import DashboardCourseOferts from "@/components/dashboard/dashboard-courses-oferts";
 import DashboardRecomendedCourses from "@/components/dashboard/dashboard-recomended-courses";
 import DashboardSearchHistories from "@/components/dashboard/dashboard-search-histories";
 import { RecommendedProgramsBanner } from "@/components/dashboard/recommended-programs-banner";
@@ -66,7 +65,7 @@ function Dashboard() {
                             <DashboardSearchHistories />
                         </TabsContent>
                     </Tabs>
-                    <RecommendedProgramsBanner programCount={10} allProgramsUrl="/educacion"/>  
+                    <RecommendedProgramsBanner />  
                 </div>
             </SidebarInset>
         </SidebarProvider>
