@@ -10,6 +10,7 @@ enum APIS {
     USER_UPDATE_PASSWORD = 'api/users/password/',
     USER_UPDATE_ROLES = 'api/users/roles/',
     USER_DELETE = 'api/users/',
+    USER_COURSES_RECOMENDED_COUNT = 'api/predictions/total-courses-recomended',
     LOGIN = 'api/auth/login',
     REGISTER = 'api/auth/register',
     COURSES = 'api/courses',

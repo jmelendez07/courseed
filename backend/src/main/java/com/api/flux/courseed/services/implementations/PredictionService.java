@@ -1,5 +1,6 @@
 package com.api.flux.courseed.services.implementations;
 
+import java.security.Principal;
 import java.text.DecimalFormat;
 import java.util.List;
 
@@ -14,6 +15,7 @@ import com.api.flux.courseed.persistence.repositories.InstitutionRepository;
 import com.api.flux.courseed.persistence.repositories.ProfileRepository;
 import com.api.flux.courseed.persistence.repositories.UserCourseRecomendedRepository;
 import com.api.flux.courseed.persistence.repositories.UserInterestRepository;
+import com.api.flux.courseed.persistence.repositories.UserRepository;
 import com.api.flux.courseed.projections.dtos.FormPredictionDto;
 import com.api.flux.courseed.projections.dtos.RecomendeCourseDto;
 import com.api.flux.courseed.projections.mappers.CategoryMapper;
@@ -41,6 +43,9 @@ public class PredictionService implements InterfacePredictionService {
     private InstitutionRepository institutionRepository;
 
     @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
     private UserCourseRecomendedRepository userCourseRecomendedRepository;
 
     @Autowired
@@ -61,15 +66,15 @@ public class PredictionService implements InterfacePredictionService {
     private Instances dataStructure;
     private Classifier classifier;
 
-    public PredictionService() throws Exception {
-        ClassPathResource modelResource = new ClassPathResource("courseedmodel.model");
-        classifier = (Classifier) weka.core.SerializationHelper.read(modelResource.getInputStream());
+    // public PredictionService() throws Exception {
+    //     ClassPathResource modelResource = new ClassPathResource("j48modelCourseed.model");
+    //     classifier = (Classifier) weka.core.SerializationHelper.read(modelResource.getInputStream());
 
-        ClassPathResource arffResource = new ClassPathResource("CourseedUsers.user_course_dataset.arff");
-        DataSource source = new DataSource(arffResource.getInputStream());
-        dataStructure = source.getDataSet();
-        dataStructure.setClassIndex(dataStructure.numAttributes() - 1);
-    }
+    //     ClassPathResource arffResource = new ClassPathResource("CourseedUsers.user_course_dataset.arff");
+    //     DataSource source = new DataSource(arffResource.getInputStream());
+    //     dataStructure = source.getDataSet();
+    //     dataStructure.setClassIndex(dataStructure.numAttributes() - 1);
+    // }
 
     public Mono<UserCourseRecomended> getUserCourseRecomended(String userId, String courseId) {
         return profileRepository.findByUserId(userId)
@@ -245,5 +250,24 @@ public class PredictionService implements InterfacePredictionService {
             )
             .collectList()
         );
+    }
+
+    public Mono<Integer> getTotalCoursesRecomended(Principal principal) {
+        return userRepository.findByEmail(principal.getName())
+            .flatMap(user -> profileRepository.findByUserId(user.getId())
+                .flatMap(profile -> userInterestRepository.findByUserProfileId(profile.getId())
+                    .flatMap(userInterest -> categoryRepository.findById(userInterest.getCategoryId())
+                        .flatMap(interest -> courseRepository.findAll()
+                            .flatMap(course -> userCourseRecomendedRepository.findByCourseIdAndUserProfileId(course.getId(), profile.getId())
+                                .flatMap(courseRecomended -> {
+                                    return Mono.just(courseRecomended.isRecomended() ? 1 : 0);
+                                })
+                                .defaultIfEmpty(0)
+                            )
+                            .reduce(0, Integer::sum)
+                        )
+                    )
+                )
+            );
     }
 }

@@ -213,6 +213,7 @@ public class RouterConfig {
             .route()
             .GET("/user-course-recomended", predictionController::getUserCourseRecomended)
             .GET("/courses-recomended-for-user", predictionController::getRecomendedCoursesByUser)
+            .GET("/total-courses-recomended", predictionController::getTotalCoursesRecomended)
             .POST("/form-prediction", predictionController::predictCourseRecommendation)
             .build();
     }
