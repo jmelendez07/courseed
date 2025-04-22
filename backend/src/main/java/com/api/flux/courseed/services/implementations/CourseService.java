@@ -561,30 +561,29 @@ public class CourseService implements InterfaceCourseService {
     }
 
     public String standarizeModality(String modality) {
-        // Normalizar: quitar espacios extras y convertir a minúsculas para comparación sin distinción de mayúsculas
+
+        if (modality == null || modality.isEmpty()) {
+            return "none";
+        }
+        
         String modalityLower = modality.trim().toLowerCase();
         
-        // Hibrido (Rojo) - Modalidades codificadas con color rojo
         if (modalityLower.matches(".*(hibrid|blended|mixt|semipresencial|presencial con sesiones remotas|presencial - sesiones remotas|presencial y virtual).*")) {
             return "hibrido";
         }
         
-        // Presencial (Rosa) - Modalidades codificadas con color rosa
         if (modalityLower.matches(".*(presencial|asistencia personal|campus ternera|edad mínima).*")) {
             return "presencial";
         }
         
-        // Virtual (Azul) - Modalidades codificadas con color azul
         if (modalityLower.matches(".*(virtual|online|teams|zoom|webex|remota con sesiones).*")) {
             return "virtual";
         }
         
-        // A distancia (Azul oscuro) - Modalidades codificadas con color azul oscuro
         if (modalityLower.matches(".*(distancia|remot|a distancia|último modulo presencial|último fin de semana presencial).*")) {
             return "a distancia";
         }
         
-        // Si ninguna coincide, devolver none (Gris)
         return "none";
     }
 

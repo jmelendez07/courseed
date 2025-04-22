@@ -17,6 +17,7 @@ public class Profile {
     private int availableHoursTime;
     private String platformPreference;
     private Double budget;
+    private String interest;
 
     @CreatedDate
     private LocalDateTime createdAt;
@@ -30,6 +31,22 @@ public class Profile {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public String getPlatformPreference() {
+        return platformPreference;
+    }
+
+    public void setPlatformPreference(String platformPreference) {
+        this.platformPreference = platformPreference;
+    }
+
+    public String getInterest() {
+        return interest;
+    }
+
+    public void setInterest(String interest) {
+        this.interest = interest;
     }
 
     public String getUserId() {

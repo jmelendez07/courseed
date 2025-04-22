@@ -65,7 +65,7 @@ function Dashboard() {
                             <DashboardSearchHistories />
                         </TabsContent>
                     </Tabs>
-                    {/* <RecommendedProgramsBanner />   */}
+                    <RecommendedProgramsBanner />
                 </div>
             </SidebarInset>
         </SidebarProvider>

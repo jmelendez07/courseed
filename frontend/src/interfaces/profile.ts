@@ -1,5 +1,3 @@
-import CategoryInterface from "./category";
-
 interface ProfileInterface {
     id: string;
     knowledgeLevel: string;
@@ -8,7 +6,7 @@ interface ProfileInterface {
     budget: number;
     createdAt: string;
     updatedAt: string;
-    interest: CategoryInterface[];
+    interest: string;
 }
 
 export default ProfileInterface;

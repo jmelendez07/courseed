@@ -78,85 +78,68 @@ public class CategoryService implements InterfaceCategoryService {
     }
 
     public String standarizeCategory(String categoryName) {
-        // Normalizar: quitar espacios extras y convertir a minúsculas para comparación sin distinción de mayúsculas
         String category = categoryName.trim().toLowerCase();
         
-        // arquitectura (Rojo)
-        if (category.matches(".*(arquitectura y dis[e|e]ño).*")) {
+        if (category.matches(".*(arquitectura y dis[e|e][n|ñ]o).*")) {
             return "arquitectura";
         }
         
-        // artes y humanidades (azul petroleo)
         if (category.matches(".*(artes|artes y humanidades|ciencias humanas|humanidades).*")) {
             return "artes y humanidades";
         }
         
-        // ciencias sociales (celeste)
         if (category.matches(".*(centro interdisciplinario de estudios sobre desarrollo|ciencias sociales|ciencias sociales y humanidades).*")) {
             return "ciencias sociales";
         }
         
-        // ciencias de la educacion (lila)
         if (category.matches(".*(ciencias de la educacion|educacion).*")) {
             return "ciencias de la educacion";
         }
         
-        // ciencias de la salud (fucsia)
         if (category.matches(".*(ciencias de la salud|enfermeria|medicina|odontologia|psicologia|quimica y farmacia).*")) {
             return "ciencias de la salud";
         }
         
-        // ciencias (verde claro)
         if (category.matches(".*(ciencias|ciencias basicas).*")) {
             return "ciencias";
         }
         
-        // derecho (verde oscuro)
         if (category.matches(".*(ciencias juridicas|derecho|derecho canonico|escuela de negocios leyes y sociedad).*")) {
             return "derecho";
         }
         
-        // ciencias politicas (naranja)
         if (category.matches(".*(ciencias politicas y relaciones internacionales|escuela de gobierno alberto lleras camargo|escuela de gobierno y etica publica).*")) {
             return "ciencias politicas";
         }
         
-        // comunicacion y lenguaje (gris)
         if (category.matches(".*(comunicacion y lenguaje).*")) {
             return "comunicacion y lenguaje";
         }
         
-        // ingenieria (amarillo)
         if (category.matches(".*(diseño e ingenieria|ingenieria).*")) {
             return "ingenieria";
         }
         
-        // ambiental (negro)
         if (category.matches(".*(estudios ambientales y rurales|instituto ideeas|instituto pensar|vicerrectoria de investigacion y creacion).*")) {
             return "ambiental";
         }
         
-        // filosofia (rojo oscuro)
         if (category.matches(".*(filosof[i|í]a|teolog[i|í]a).*")) {
             return "filosofia";
         }
         
-        // nutricion y dietetica (blanco)
         if (category.matches(".*(nutricion y dietetica).*")) {
             return "nutricion y dietetica";
         }
         
-        // ciencias economicas (violeta)
         if (category.matches(".*(econom[i|í]a|empresariales|administrativas|negocios|finanzas).*")) {
             return "ciencias economicas";
         }
 
-        // direccion de internacionalizacion (marron)
         if (category.matches(".*(direccion de internacionalizacion).*")) {
             return "direccion de internacionalizacion";
         }
         
-        // Si ninguno de los anteriores coincide, devuelve "none"
         return "none";
     }
 }

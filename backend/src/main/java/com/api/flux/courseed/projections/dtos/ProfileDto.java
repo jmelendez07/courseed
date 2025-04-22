@@ -11,11 +11,11 @@ public class ProfileDto implements Serializable {
     private Double budget;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-    private CategoryDto interest;
+    private String interest;
 
     public ProfileDto() {}
 
-    public ProfileDto(String id, String knowledgeLevel, int availableHoursTime, String platformPrefered, Double budget, CategoryDto interest, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public ProfileDto(String id, String knowledgeLevel, int availableHoursTime, String platformPrefered, Double budget, String interest, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
         this.knowledgeLevel = knowledgeLevel;
         this.availableHoursTime = availableHoursTime;
@@ -78,11 +78,11 @@ public class ProfileDto implements Serializable {
         return id;
     }
 
-    public CategoryDto getInterest() {
+    public String getInterest() {
         return interest;
     }
 
-    public void setInterest(CategoryDto interest) {
+    public void setInterest(String interest) {
         this.interest = interest;
     }
 

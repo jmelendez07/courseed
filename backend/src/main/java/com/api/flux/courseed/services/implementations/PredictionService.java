@@ -308,14 +308,14 @@ public class PredictionService implements InterfacePredictionService {
                                             try {
                                                 Instance instance = new DenseInstance(13);
                                                 instance.setDataset(dataStructure);
-                                                instance.setValue(0, interest.getName());
+                                                instance.setValue(0, categoryService.standarizeCategory(interest.getName()));
                                                 instance.setValue(1, profile.getAvailableHoursTime());
                                                 instance.setValue(2, profile.getBudget());
-                                                instance.setValue(3, profile.getPlatformPrefered());
-                                                instance.setValue(4, course.getModality());
-                                                instance.setValue(5, course.getDuration());
-                                                instance.setValue(6, course.getPrice());
-                                                instance.setValue(7, category.getName());
+                                                instance.setValue(3, courseService.standarizeModality(profile.getPlatformPrefered()));
+                                                instance.setValue(4, courseService.standarizeModality(course.getModality()));
+                                                instance.setValue(5, courseService.standarizeDuration(course.getDuration()));
+                                                instance.setValue(6, course.getPrice() == null ? 0 : course.getPrice());
+                                                instance.setValue(7, categoryService.standarizeCategory(category.getName()));
                                                 instance.setValue(8, ratingAvg);
                                                 instance.setValue(9, maxReaction);
                                                 instance.setValue(10, viewsCount.intValue());
@@ -352,6 +352,7 @@ public class PredictionService implements InterfacePredictionService {
                             .flatMap(course -> categoryRepository.findById(course.getCategoryId())
                                 .flatMap(category -> institutionRepository.findById(course.getInstitutionId())
                                     .flatMap(institution -> {
+
                                         Mono<Double> ratingAvgMono = reviewRepository.getAverageRatingByCourseId(course.getId())
                                             .defaultIfEmpty(0.0);
                                         

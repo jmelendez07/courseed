@@ -36,7 +36,9 @@ export function NavUser() {
 							size="lg"
 							className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
 						>
-							<AvatarProfile imageUrl={auth?.user?.image} name={auth?.getName() ?? ""} className="shadow-lg" />
+							<div className="size-8 relative shrink-0">	
+								<AvatarProfile imageUrl={auth?.user?.image} name={auth?.getName() ?? ""} className="shadow-lg shrink-0" />
+							</div>
 							<div className="grid flex-1 text-left text-sm leading-tight">
 								<span className="truncate font-semibold">{auth?.getName()}</span>
 								<span className="truncate text-xs">{auth?.user?.email}</span>
