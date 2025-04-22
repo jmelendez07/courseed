@@ -25,6 +25,7 @@ import Subscriptions from "@/pages/auth/subscriptor/Subscriptions";
 import Prediction from "@/pages/prediction";
 import SearchHistory from "@/pages/auth/user/SearchHistory";
 import ProgramsViewed from "@/pages/auth/user/ProgramsViewed";
+import ProfileInterestForm from "@/pages/ProfileInterestForm";
 
 function Routes() {
 
@@ -75,6 +76,10 @@ function Routes() {
                 {
                     path: '/perfil',
                     element: <Profile />
+                },
+                {
+                    path: '/formulario-perfil',
+                    element: <ProfileInterestForm />
                 }
             ]
         }

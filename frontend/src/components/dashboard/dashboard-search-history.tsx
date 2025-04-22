@@ -1,4 +1,4 @@
-import { ArrowDown, ExternalLink, LayoutGrid, List, MoreVertical, Search, SearchX } from "lucide-react"
+import { ArrowDown, ExternalLink, LayoutGrid, List, LoaderCircle, MoreVertical, Search, SearchX } from "lucide-react"
 import { Button } from "../ui/button"
 import { Card, CardContent } from "../ui/card"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../ui/dropdown-menu"
@@ -201,13 +201,13 @@ function DashboardSearchHistory() {
     const searchHistoriesByDay = React.useMemo(() => groupSearchHistoriesByDay(historiesHook.searchHistories), [historiesHook.searchHistories]);
 
     return (
-        <div className="space-y-4 grid grid-cols-1">
+        <div className="space-y-4 grid grid-cols-1 grid-rows-[auto_1fr_auto] content-start h-full">
             <div>
                 <h1 className="text-3xl font-bold tracking-tight">Historial de Busqueda</h1>
                 <p className="text-muted-foreground">Consulta aquí las búsquedas recientes realizadas para encontrar programas.</p>
             </div>
 
-            <Tabs defaultValue="grupo" value={activeTab} onValueChange={setActiveTab}>
+            <Tabs defaultValue="grupo" className="grid grid-cols-1 grid-rows-[auto_1fr] content-start" value={activeTab} onValueChange={setActiveTab}>
                 <div className="flex flex-col sm:flex-row sm:items-center gap-4">
                     <div className="relative w-full">
                         { selectedItems.size > 0 ? (
@@ -226,7 +226,10 @@ function DashboardSearchHistory() {
                                     placeholder="Buscar historial"
                                     className="pl-10 w-full"
                                     value={historiesHook.search}
-                                    onChange={(e) => historiesHook.setSearch(e.target.value)}
+                                    onChange={(e) => {
+                                        historiesHook.setParams({ ...historiesHook.params, pageNumber: 0 });
+                                        historiesHook.setSearch(e.target.value);
+                                    }}
                                 />
                             </>
                         )}
@@ -242,27 +245,35 @@ function DashboardSearchHistory() {
                         </TabsTrigger>
                     </TabsList>
                 </div>
+                
+                {historiesHook.loading ? (
+                    <div className="w-full h-full grid place-items-center">
+                        <LoaderCircle className="size-5 animate-spin" />
+                    </div>
+                ) : (
+                    <>
+                        <TabsContent value="fecha" className="mt-4">
+                            {searchHistoriesByDay.map((dayGroup) => (
+                                <SearchDayCard 
+                                    key={dayGroup.date.toISOString()} 
+                                    day={dayGroup} 
+                                    selectedItems={selectedItems}
+                                    onDelete={historiesHook.handleDeleteSearchHistory} 
+                                    setSelectedItems={setSelectedItems}
+                                />
+                            ))}
+                        </TabsContent>
 
-                <TabsContent value="fecha" className="mt-4">
-                    {searchHistoriesByDay.map((dayGroup) => (
-                        <SearchDayCard 
-                            key={dayGroup.date.toISOString()} 
-                            day={dayGroup} 
-                            selectedItems={selectedItems}
-                            onDelete={historiesHook.handleDeleteSearchHistory} 
-                            setSelectedItems={setSelectedItems}
-                        />
-                    ))}
-                </TabsContent>
-
-                <TabsContent value="grupo" className="mt-4">
-                    {historiesHook.searchHistories.map((group) => (
-                        <SearchGroupCard key={group.id} group={group} onDelete={historiesHook.handleDeleteSearchHistory} />
-                    ))}
-                </TabsContent>
+                        <TabsContent value="grupo" className="mt-4">
+                            {historiesHook.searchHistories.map((group) => (
+                                <SearchGroupCard key={group.id} group={group} onDelete={historiesHook.handleDeleteSearchHistory} />
+                            ))}
+                        </TabsContent>
+                    </>
+                )}
             </Tabs>
 
-            {!historiesHook.isLastPage && (
+            {(!historiesHook.loading && !historiesHook.isLastPage) && (
                 <div className="grid place-items-center py-6">
                     <Button onClick={() => historiesHook.setParams({ pageNumber: historiesHook.params.pageNumber + 1 })} variant="outline" type="button" className="flex items-center gap-2">
                         <span className="">Ver más resultados</span>

@@ -138,7 +138,7 @@ function useRegister() {
                 if (response.data && Array.isArray(response.data.roles)) {
                     navigate(response.data.roles.some(role => role === ROLES.ADMIN)
                             ? "/administrador"
-                            : "/usuario",
+                            : "/formulario-perfil",
                         { replace: true }
                     );
                 } else {

@@ -21,54 +21,57 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Theme from "@/components/ui/theme";
 import HeadProvider from "@/providers/HeadProvider";
+import ProfileFormProvider from "@/providers/ProfileFormProvider";
 
 function Dashboard() {
     return (
-        <SidebarProvider>
-            <AppSidebar />
-            <HeadProvider title="Usuario" />
-            <SidebarInset>
-                <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12 justify-between">
-                    <div className="flex items-center gap-2 px-4">
-                        <SidebarTrigger className="-ml-1" />
-                        <Separator orientation="vertical" className="mr-2 h-4" />
-                        <Breadcrumb>
-                            <BreadcrumbList>
-                                <BreadcrumbItem className="hidden md:block">
-                                    <BreadcrumbLink href="#">
-                                        Usuario
-                                    </BreadcrumbLink>
-                                </BreadcrumbItem>
-                                <BreadcrumbSeparator className="hidden md:block" />
-                                <BreadcrumbItem>
-                                    <BreadcrumbPage>Inicio</BreadcrumbPage>
-                                </BreadcrumbItem>
-                            </BreadcrumbList>
-                        </Breadcrumb>
+        <ProfileFormProvider>
+            <SidebarProvider>
+                <AppSidebar />
+                <HeadProvider title="Usuario" />
+                <SidebarInset>
+                    <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12 justify-between">
+                        <div className="flex items-center gap-2 px-4">
+                            <SidebarTrigger className="-ml-1" />
+                            <Separator orientation="vertical" className="mr-2 h-4" />
+                            <Breadcrumb>
+                                <BreadcrumbList>
+                                    <BreadcrumbItem className="hidden md:block">
+                                        <BreadcrumbLink href="#">
+                                            Usuario
+                                        </BreadcrumbLink>
+                                    </BreadcrumbItem>
+                                    <BreadcrumbSeparator className="hidden md:block" />
+                                    <BreadcrumbItem>
+                                        <BreadcrumbPage>Inicio</BreadcrumbPage>
+                                    </BreadcrumbItem>
+                                </BreadcrumbList>
+                            </Breadcrumb>
+                        </div>
+                        <div className="flex items-center gap-2 px-4">
+                            <Color />
+                            <Theme />
+                        </div>
+                    </header>
+                    <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
+                        <WelcomeBanner />
+                        <Tabs defaultValue="recomendados" className="flex-1 flex flex-col items-start">
+                            <TabsList className="mb-4">
+                                <TabsTrigger value="recomendados">Recomendados</TabsTrigger>
+                                <TabsTrigger value="historial">Historial</TabsTrigger>
+                            </TabsList>
+                            <TabsContent value="recomendados" className="space-y-4 h-full">
+                                <DashboardRecomendedCourses />
+                            </TabsContent>
+                            <TabsContent value="historial" className="space-y-4 w-full h-full overflow-hidden">
+                                <DashboardSearchHistories />
+                            </TabsContent>
+                        </Tabs>
+                        <RecommendedProgramsBanner />
                     </div>
-                    <div className="flex items-center gap-2 px-4">
-                        <Color />
-                        <Theme />
-                    </div>
-                </header>
-                <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
-                    <WelcomeBanner />
-                    <Tabs defaultValue="recomendados" className="flex-1 flex flex-col items-start">
-                        <TabsList className="mb-4">
-                            <TabsTrigger value="recomendados">Recomendados</TabsTrigger>
-                            <TabsTrigger value="historial">Historial</TabsTrigger>
-                        </TabsList>
-                        <TabsContent value="recomendados" className="space-y-4 h-full">
-                            <DashboardRecomendedCourses />
-                        </TabsContent>
-                        <TabsContent value="historial" className="space-y-4 w-full h-full overflow-hidden">
-                            <DashboardSearchHistories />
-                        </TabsContent>
-                    </Tabs>
-                    <RecommendedProgramsBanner />
-                </div>
-            </SidebarInset>
-        </SidebarProvider>
+                </SidebarInset>
+            </SidebarProvider>
+        </ProfileFormProvider>
     );
 }
 

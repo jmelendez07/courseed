@@ -22,6 +22,7 @@ public interface ViewRepository extends ReactiveMongoRepository<View, String> {
     Mono<View> findByCourseIdAndUserId(String courseId, String userId);
     Flux<View> findByUserId(String userId);
     Flux<View> findByUserId(String userId, Pageable pageable);
+    Mono<Long> countByUserId(String userId);
 
     @Aggregation(pipeline = {
         "{ $match: { createdAt: { $gte: { $dateFromParts: { 'epochSecond': ?0 } } } } }",

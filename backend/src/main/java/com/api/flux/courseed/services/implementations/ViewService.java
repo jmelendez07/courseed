@@ -139,38 +139,56 @@ public class ViewService implements InterfaceViewService {
     }
 
     @Override
-    public Mono<Page<ViewDto>> findViewsByAuthUser(Principal principal, int page, int size) {
+    public Mono<Page<ViewDto>> findViewsByAuthUser(Principal principal, int page, int size, String search) {
         Pageable pageable = PageRequest.of(page, size);
+    
+    return userRepository.findByEmail(principal.getName())
+        .flatMap(user -> {
+            // Si search está vacío, obtenemos todas las vistas del usuario
+            if (search == null || search.trim().isEmpty()) {
+                return viewRepository.findByUserId(user.getId(), pageable)
+                    .flatMap(this::enrichViewWithCourseData)
+                    .collectList()
+                    .zipWith(viewRepository.countByUserId(user.getId()))
+                    .map(p -> new PageImpl<>(p.getT1(), pageable, p.getT2()));
+            } else {
+                String searchPattern = search.toLowerCase();
+                return courseRepository.findByTitleContainingIgnoreCase(searchPattern)
+                    .flatMap(course -> viewRepository.findByCourseIdAndUserId(course.getId(), user.getId())
+                        .flatMap(this::enrichViewWithCourseData))
+                    .collectList()
+                    .map(filteredViews -> {
+                        // Paginamos manualmente la lista filtrada
+                        int start = (int) pageable.getOffset();
+                        int end = Math.min((start + pageable.getPageSize()), filteredViews.size());
+                        
+                        List<ViewDto> pageContent = start >= filteredViews.size() ? 
+                            List.of() : filteredViews.subList(start, end);
+                            
+                        return new PageImpl<>(pageContent, pageable, filteredViews.size());
+                    });
+            }
+        });
+    }
 
-        return userRepository.findByEmail(principal.getName())
-            .flatMap(user -> viewRepository.findByUserId(user.getId(), pageable)
-                .flatMap(view -> {
-                    Mono<CourseDto> courseMono = courseRepository.findById(view.getCourseId())
-                        .flatMap(course -> {
-                            Mono<Category> categoryMono = categoryRepository.findById(course.getCategoryId());
-                            Mono<Institution> institutionMono = institutionRepository.findById(course.getInstitutionId());
-
-                            return Mono.zip(categoryMono, institutionMono)
-                                .map(tuple -> {
-                                    CourseDto courseDto = courseMapper.toCourseDto(course);
-                                    courseDto.setCategory(categoryMapper.toCategoryDto(tuple.getT1()));
-                                    courseDto.setInstitution(institutionMapper.toInstitutionDto(tuple.getT2()));
-
-                                    return courseDto;
-                                });
-                        });
-                    
-                    return courseMono.map(courseDto -> {
+    private Mono<ViewDto> enrichViewWithCourseData(View view) {
+        return courseRepository.findById(view.getCourseId())
+            .flatMap(course -> {
+                Mono<Category> categoryMono = categoryRepository.findById(course.getCategoryId());
+                Mono<Institution> institutionMono = institutionRepository.findById(course.getInstitutionId());
+    
+                return Mono.zip(categoryMono, institutionMono)
+                    .map(tuple -> {
+                        CourseDto courseDto = courseMapper.toCourseDto(course);
+                        courseDto.setCategory(categoryMapper.toCategoryDto(tuple.getT1()));
+                        courseDto.setInstitution(institutionMapper.toInstitutionDto(tuple.getT2()));
+    
                         ViewDto viewDto = viewMapper.toViewDto(view);
-                        viewDto.setUser(new UserDto(user.getId(), user.getEmail()));
                         viewDto.setCourse(courseDto);
+                        viewDto.setUser(new UserDto(view.getUserId(), null)); // El email se establecerá más tarde
                         return viewDto;
                     });
-                })
-                .collectList()
-                .zipWith(viewRepository.count())
-                .map(p -> new PageImpl<>(p.getT1(), pageable, p.getT2()))
-            );
+            });
     }
 
     @Override

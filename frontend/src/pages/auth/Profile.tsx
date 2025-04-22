@@ -23,56 +23,58 @@ import ROLES from "@/enums/roles";
 import { useAuth } from "@/providers/AuthProvider";
 import DialogProvider from "@/providers/DialogProvider";
 import HeadProvider from "@/providers/HeadProvider";
+import ProfileFormProvider from "@/providers/ProfileFormProvider";
 
 function Profile() {
-
     const authHook = useAuth();
 
     return (
-        <SidebarProvider>
-            <DialogProvider>
-                <AppSidebar />
-                <HeadProvider title="Mi cuenta" />
-                <SidebarInset>
-                    <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12 justify-between">
-                        <div className="flex items-center gap-2 px-4">
-                            <SidebarTrigger className="-ml-1" />
-                            <Separator orientation="vertical" className="mr-2 h-4" />
-                            <Breadcrumb>
-                                <BreadcrumbList>
-                                    <BreadcrumbItem className="hidden md:block">
-                                        <BreadcrumbLink href="#">
-                                            Perfil
-                                        </BreadcrumbLink>
-                                    </BreadcrumbItem>
-                                    <BreadcrumbSeparator className="hidden md:block" />
-                                    <BreadcrumbItem>
-                                        <BreadcrumbPage>Inicio</BreadcrumbPage>
-                                    </BreadcrumbItem>
-                                </BreadcrumbList>
-                            </Breadcrumb>
+        <ProfileFormProvider>
+            <SidebarProvider>
+                <DialogProvider>
+                    <AppSidebar />
+                    <HeadProvider title="Mi cuenta" />
+                    <SidebarInset>
+                        <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12 justify-between">
+                            <div className="flex items-center gap-2 px-4">
+                                <SidebarTrigger className="-ml-1" />
+                                <Separator orientation="vertical" className="mr-2 h-4" />
+                                <Breadcrumb>
+                                    <BreadcrumbList>
+                                        <BreadcrumbItem className="hidden md:block">
+                                            <BreadcrumbLink href="#">
+                                                Perfil
+                                            </BreadcrumbLink>
+                                        </BreadcrumbItem>
+                                        <BreadcrumbSeparator className="hidden md:block" />
+                                        <BreadcrumbItem>
+                                            <BreadcrumbPage>Inicio</BreadcrumbPage>
+                                        </BreadcrumbItem>
+                                    </BreadcrumbList>
+                                </Breadcrumb>
+                            </div>
+                            <div className="flex items-center gap-2 px-4">
+                                <Color />
+                                <Theme />
+                            </div>
+                        </header>
+                        <div className="flex flex-col gap-8 p-8">
+                            <DashboardContentProfile />
+                            {authHook?.user?.roles?.some((role: string) => role === ROLES.SUBSCRIBER) && (
+                                <>
+                                    <Separator className="my-4" />
+                                    <DashboardInstitutionProfile />
+                                </>
+                            )}
+                            <Separator className="my-4" />
+                            <ProfileCards />
+                            <Separator className="my-4" />
+                            <DashboardStatsProfile />
                         </div>
-                        <div className="flex items-center gap-2 px-4">
-                            <Color />
-                            <Theme />
-                        </div>
-                    </header>
-                    <div className="flex flex-col gap-8 p-8">
-                        <DashboardContentProfile />
-                        { authHook?.user?.roles?.some((role: string) => role === ROLES.SUBSCRIBER) && (
-                            <>
-                                <Separator className="my-4" />
-                                <DashboardInstitutionProfile /> 
-                            </>
-                        ) }
-                        <Separator className="my-4" />
-                        <ProfileCards />
-                        <Separator className="my-4" />
-                        <DashboardStatsProfile />
-                    </div>
-                </SidebarInset>
-            </DialogProvider>
-        </SidebarProvider>
+                    </SidebarInset>
+                </DialogProvider>
+            </SidebarProvider>
+        </ProfileFormProvider>
     );
 }
 

@@ -23,6 +23,7 @@ function DashboardRecomendedCourses() {
         axios.get(APIS.USER_COURSES_RECOMENDED)
             .then((response: AxiosResponse<DashboardRecomendedCoursesResponseProps>) => {
                 setCourses(response.data.content);
+                console.log(response);
             })
             .catch((error) => {
                 console.error("Error fetching recommended courses 2:", error);
