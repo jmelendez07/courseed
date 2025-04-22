@@ -12,6 +12,7 @@ enum APIS {
     USER_DELETE = 'api/users/',
     USER_COURSES_RECOMENDED_COUNT = 'api/predictions/total-courses-recomended',
     USER_COURSES_RECOMENDED = 'api/predictions/courses-recomended/auth',
+    USER_COURSES_RECOMENDED_BY_HISTORY = 'api/predictions/courses-recomended/history/auth',
     LOGIN = 'api/auth/login',
     REGISTER = 'api/auth/register',
     COURSES = 'api/courses',

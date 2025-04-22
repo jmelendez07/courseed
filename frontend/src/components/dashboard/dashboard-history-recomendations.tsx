@@ -4,8 +4,6 @@ import React from "react";
 import axios, { AxiosResponse } from "axios";
 import APIS from "@/enums/apis";
 import CourseInterface from "@/interfaces/course";
-import { useAuth } from "@/providers/AuthProvider";
-import { ColorContext } from "@/providers/ColorProvider";
 import CourseSkeleton from "../skeleton/course-skeleton";
 
 interface DashboardRecomendedCoursesResponseProps {
@@ -15,15 +13,12 @@ interface DashboardRecomendedCoursesResponseProps {
 function DashboardHistoryRecomendations() {
     const [courses, setCourses] = React.useState<CourseInterface[]>([]);
     const [loading, setLoading] = React.useState<boolean>(true);
-    const authHook = useAuth();
-    const colorContext = React.useContext(ColorContext);
 
     React.useEffect(() => {
         setLoading(true);
-        axios.get(APIS.USER_COURSES_RECOMENDED)
+        axios.get(APIS.USER_COURSES_RECOMENDED_BY_HISTORY)
             .then((response: AxiosResponse<DashboardRecomendedCoursesResponseProps>) => {
                 setCourses(response.data.content);
-                console.log(response);
             })
             .catch((error) => {
                 console.error("Error fetching recommended courses 2:", error);
