@@ -6,8 +6,12 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageImpl;
 
 import com.api.flux.courseed.persistence.documents.UserCourseRecomended;
 import com.api.flux.courseed.persistence.repositories.CategoryRepository;
@@ -24,6 +28,9 @@ import com.api.flux.courseed.projections.dtos.CourseDto;
 import com.api.flux.courseed.projections.dtos.FormPredictionDto;
 import com.api.flux.courseed.projections.dtos.MostCommonReactionDto;
 import com.api.flux.courseed.projections.dtos.RecomendeCourseDto;
+import com.api.flux.courseed.projections.mappers.CategoryMapper;
+import com.api.flux.courseed.projections.mappers.CourseMapper;
+import com.api.flux.courseed.projections.mappers.InstitutionMapper;
 import com.api.flux.courseed.services.interfaces.InterfacePredictionService;
 
 import reactor.core.publisher.Mono;
@@ -65,6 +72,21 @@ public class PredictionService implements InterfacePredictionService {
 
     @Autowired
     private ViewRepository viewRepository;
+
+    @Autowired
+    private CategoryMapper categoryMapper;
+
+    @Autowired
+    private InstitutionMapper institutionMapper;
+
+    @Autowired
+    private CourseMapper courseMapper;
+
+    @Autowired
+    private CourseService courseService;
+
+    @Autowired
+    private CategoryService categoryService;
 
     private Instances dataStructure;
     private Classifier classifier;
@@ -320,6 +342,87 @@ public class PredictionService implements InterfacePredictionService {
     }
 
     public Mono<Page<CourseDto>> getRecomendedCoursesByAuth(Principal principal, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
         
+        return userRepository.findByEmail(principal.getName())
+            .flatMap(user -> profileRepository.findByUserId(user.getId())
+                .flatMap(profile -> userInterestRepository.findByUserProfileId(profile.getId())
+                    .flatMap(userInterest -> categoryRepository.findById(userInterest.getCategoryId())
+                        .flatMapMany(interest -> courseRepository.findAll()
+                            .flatMap(course -> categoryRepository.findById(course.getCategoryId())
+                                .flatMap(category -> institutionRepository.findById(course.getInstitutionId())
+                                    .flatMap(institution -> {
+                                        Mono<Double> ratingAvgMono = reviewRepository.getAverageRatingByCourseId(course.getId())
+                                            .defaultIfEmpty(0.0);
+                                        
+                                        Mono<String> maxReactionMono = reactionRepository.findMostCommonReactionByCourseId(course.getId())
+                                            .map(MostCommonReactionDto::getType)
+                                            .defaultIfEmpty("NONE");
+                                        
+                                        Mono<Long> viewsCountMono = viewRepository.countByCourseId(course.getId())
+                                            .defaultIfEmpty(0L);
+                                        
+                                        Mono<Long> reviewsCountMono = reviewRepository.countByCourseId(course.getId())
+                                            .defaultIfEmpty(0L);
+                                        
+                                        return Mono.zip(ratingAvgMono, maxReactionMono, viewsCountMono, reviewsCountMono)
+                                            .flatMap(tuple -> {
+                                                Double ratingAvg = tuple.getT1();
+                                                String maxReaction = tuple.getT2();
+                                                Long viewsCount = tuple.getT3();
+                                                Long reviewsCount = tuple.getT4();
+                                                
+                                                try {
+                                                    Instance instance = new DenseInstance(13);
+                                                    instance.setDataset(dataStructure);
+                                                    instance.setValue(0, categoryService.standarizeCategory(interest.getName()));
+                                                    instance.setValue(1, profile.getAvailableHoursTime());
+                                                    instance.setValue(2, profile.getBudget());
+                                                    instance.setValue(3, courseService.standarizeModality(profile.getPlatformPrefered()));
+                                                    instance.setValue(4, courseService.standarizeModality(course.getModality()));
+                                                    instance.setValue(5, courseService.standarizeDuration(course.getDuration()));
+                                                    instance.setValue(6, course.getPrice() == null ? 0 : course.getPrice());
+                                                    instance.setValue(7, categoryService.standarizeCategory(category.getName()));
+                                                    instance.setValue(8, ratingAvg);
+                                                    instance.setValue(9, maxReaction);
+                                                    instance.setValue(10, viewsCount.intValue());
+                                                    instance.setValue(11, reviewsCount.intValue());
+    
+                                                    double predictionValue = classifier.classifyInstance(instance);
+                                                    String prediction = dataStructure.classAttribute().value((int) predictionValue);
+    
+                                                    if (prediction.equals("true")) {
+                                                        CourseDto courseDto = courseMapper.toCourseDto(course);
+                                                        courseDto.setCategory(categoryMapper.toCategoryDto(category));
+                                                        courseDto.setInstitution(institutionMapper.toInstitutionDto(institution));
+                                                        
+                                                        return Mono.just(courseDto);
+                                                    } else {
+                                                        return Mono.empty();
+                                                    }
+                                                } catch (Exception e) {
+                                                    e.printStackTrace();
+                                                    return Mono.empty();
+                                                }
+                                            });
+                                    })
+                                )
+                            )
+                        )
+                        .collectList()
+                        .flatMap(courses -> {
+                            List<CourseDto> paginatedCourses = courses.stream()
+                                .filter(c -> c != null)
+                                .skip(page * size)
+                                .limit(size)            
+                                .toList();
+            
+                            Page<CourseDto> pageResult = new PageImpl<>(paginatedCourses, pageable, courses.size());
+                            return Mono.just(pageResult);
+                        })
+                    )
+                )
+            )
+            .defaultIfEmpty(new PageImpl<>(List.of(), pageable, 0));
     }
 }

@@ -1,10 +1,26 @@
-import useCourses from "@/hooks/useCourses";
 import { Carousel, CarouselContent, CarouselItem } from "@/components/ui/carousel";
 import Course from "@/components/ui/course";
+import React from "react";
+import axios, { AxiosResponse } from "axios";
+import APIS from "@/enums/apis";
+import CourseInterface from "@/interfaces/course";
+
+interface DashboardRecomendedCoursesResponseProps {
+    content: CourseInterface[];
+}
 
 function DashboardRecomendedCourses() {
+    const [courses, setCourses] = React.useState<CourseInterface[]>([]);
 
-    const coursesHook = useCourses({ size: 10 });
+    React.useEffect(() => {
+        axios.get(APIS.USER_COURSES_RECOMENDED)
+            .then((response: AxiosResponse<DashboardRecomendedCoursesResponseProps>) => {
+                setCourses(response.data.content);
+            })
+            .catch((error) => {
+                console.error("Error fetching recommended courses 2:", error);
+            })
+    }, []);
 
     return (
         <div className="grid grid-cols-1 overflow-hidden gap-4">
@@ -15,7 +31,7 @@ function DashboardRecomendedCourses() {
                 }}
             >
                 <CarouselContent>
-                    {coursesHook.courses.map(course => (
+                    {courses.map(course => (
                         <CarouselItem key={course.id} className="md:basis-1/2 lg:basis-1/3 2xl:basis-1/4">
                             <div className="p-1 h-full">
                                 <Course
