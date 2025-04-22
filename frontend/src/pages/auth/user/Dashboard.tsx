@@ -1,4 +1,5 @@
 import { AppSidebar } from "@/components/app-sidebar";
+import DashboardHistoryRecomendations from "@/components/dashboard/dashboard-history-recomendations";
 import DashboardRecomendedCourses from "@/components/dashboard/dashboard-recomended-courses";
 import DashboardSearchHistories from "@/components/dashboard/dashboard-search-histories";
 import { RecommendedProgramsBanner } from "@/components/dashboard/recommended-programs-banner";
@@ -60,8 +61,9 @@ function Dashboard() {
                                 <TabsTrigger value="recomendados">Recomendados</TabsTrigger>
                                 <TabsTrigger value="historial">Historial</TabsTrigger>
                             </TabsList>
-                            <TabsContent value="recomendados" className="space-y-4 h-full">
+                            <TabsContent value="recomendados" className="space-y-8 h-full">
                                 <DashboardRecomendedCourses />
+                                <DashboardHistoryRecomendations />
                             </TabsContent>
                             <TabsContent value="historial" className="space-y-4 w-full h-full overflow-hidden">
                                 <DashboardSearchHistories />

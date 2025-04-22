@@ -13,6 +13,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.PageImpl;
 
+import com.api.flux.courseed.persistence.documents.Review;
 import com.api.flux.courseed.persistence.documents.UserCourseRecomended;
 import com.api.flux.courseed.persistence.repositories.CategoryRepository;
 import com.api.flux.courseed.persistence.repositories.CourseRepository;
@@ -31,8 +32,10 @@ import com.api.flux.courseed.projections.dtos.RecomendeCourseDto;
 import com.api.flux.courseed.projections.mappers.CategoryMapper;
 import com.api.flux.courseed.projections.mappers.CourseMapper;
 import com.api.flux.courseed.projections.mappers.InstitutionMapper;
+import com.api.flux.courseed.projections.mappers.ReviewMapper;
 import com.api.flux.courseed.services.interfaces.InterfacePredictionService;
 
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import weka.core.Instances;
 import weka.core.converters.ConverterUtils.DataSource;
@@ -81,6 +84,9 @@ public class PredictionService implements InterfacePredictionService {
 
     @Autowired
     private CourseMapper courseMapper;
+
+    @Autowired
+    private ReviewMapper reviewMapper;
 
     @Autowired
     private CourseService courseService;
@@ -360,8 +366,10 @@ public class PredictionService implements InterfacePredictionService {
                                 
                                 Mono<Long> reviewsCountMono = reviewRepository.countByCourseId(course.getId())
                                     .defaultIfEmpty(0L);
+
+                                Flux<Review> reviewFlux = reviewRepository.findByCourseId(course.getId());
                                 
-                                return Mono.zip(ratingAvgMono, maxReactionMono, viewsCountMono, reviewsCountMono)
+                                return Mono.zip(ratingAvgMono, maxReactionMono, viewsCountMono, reviewsCountMono, reviewFlux.collectList())
                                     .flatMap(tuple -> {
                                         Double ratingAvg = tuple.getT1();
                                         String maxReaction = tuple.getT2();
@@ -391,6 +399,10 @@ public class PredictionService implements InterfacePredictionService {
                                                 CourseDto courseDto = courseMapper.toCourseDto(course);
                                                 courseDto.setCategory(categoryMapper.toCategoryDto(category));
                                                 courseDto.setInstitution(institutionMapper.toInstitutionDto(institution));
+                                                courseDto.setReviews(tuple.getT5().stream()
+                                                    .map(reviewMapper::toReviewDto)
+                                                    .toList()
+                                                );
                                                 
                                                 return Mono.just(courseDto);
                                             } else {
