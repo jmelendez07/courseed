@@ -52,6 +52,7 @@ enum APIS {
     SEARCH_HISTORIES_BY_AUTH_USER = 'api/search-histories/auth',
     SEARCH_HISTORY_CREATE = 'api/search-histories/create',
     SEARCH_HISTORY_DELETE = 'api/search-histories/',
+    SEARCH_HISTORIES_DELETE = 'api/search-histories/delete-by-ids',
     SUBSCRIBE = 'api/auth/subscribe',
     REGISTER_SUSCRIPTOR = 'api/auth/register/subscriptor',
     SUBSCRIPTIONS_BY_AUTH_USER = 'api/subscriptions/auth',

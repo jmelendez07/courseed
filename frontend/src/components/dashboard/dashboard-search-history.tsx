@@ -18,6 +18,13 @@ interface SearchDayInterface {
     items: SearchHistoryInterface[];
 }
 
+interface SearchDayCardProps { 
+    day: SearchDayInterface,
+    selectedItems: Set<string>,
+    onDelete: (id: string) => void,
+    setSelectedItems: React.Dispatch<React.SetStateAction<Set<string>>>;
+}
+
 function formatDayHeader(date: Date) {
     const today = new Date();
     const yesterday = new Date(today);
@@ -58,9 +65,8 @@ function groupSearchHistoriesByDay(histories: SearchHistoryInterface[]): SearchD
 }
 
 function SearchGroupCard({ group, onDelete }: { group: SearchHistoryInterface, onDelete: (id: string) => void }) {
-
     return (
-        <Card className="mb-4 shadow-sm">
+        <Card className="mb-4 shadow-sm hover:shadow-lg transition-all duration-200 ease-in-out">
             <CardContent className="p-0">
                 <div className="p-4 flex justify-between items-center">
                     <h3 className="text-lg font-medium">"{group.search}"</h3>
@@ -97,12 +103,12 @@ function SearchGroupCard({ group, onDelete }: { group: SearchHistoryInterface, o
                         <div className="py-2">
                             {group.courses.map((item) => (
                                 <Link to={item.url} key={item.id} target="_blank" className="flex items-center group justify-between gap-3 px-4 py-2 hover:bg-gray-50 dark:hover:bg-zinc-900">
-                                    <div className="flex items-center gap-3">
-                                        <div className="relative size-8">
+                                    <div className="grid items-center grid-cols-[auto_1fr] gap-3 overflow-hidden">
+                                        <div className="relative size-8 shrink-0">
                                             <LazyImage src={item.image ?? ""} width={50} height={50} className="size-8 rounded object-cover" />
                                         </div>
-                                        <div className="flex-1 min-w-0">
-                                            <p className="font-medium text-sm">{item.title}</p>
+                                        <div className="overflow-hidden">
+                                            <p className="font-medium text-sm line-clamp-2">{item.title}</p>
                                             <p className="text-xs text-gray-500 truncate">{item.url}</p>
                                         </div>
                                     </div>
@@ -117,8 +123,7 @@ function SearchGroupCard({ group, onDelete }: { group: SearchHistoryInterface, o
     )
 }
 
-function SearchDayCard({ day, onDelete }: { day: SearchDayInterface, onDelete: (id: string) => void }) {
-    const [selectedItems, setSelectedItems] = React.useState<Set<string>>(new Set());
+function SearchDayCard({ day, onDelete, selectedItems, setSelectedItems }: SearchDayCardProps) {
 
     const toggleItemSelection = (id: string) => {
         const newSelectedItems = new Set(selectedItems);
@@ -131,7 +136,7 @@ function SearchDayCard({ day, onDelete }: { day: SearchDayInterface, onDelete: (
     };
 
     return (
-        <div className="border rounded-md mb-4">
+        <div className="border dark:border-zinc-800 overflow-hidden rounded-md mb-4 shadow-sm hover:shadow-lg transition-all duration-200 ease-in-out">
             <h3 className="px-4 py-2 font-medium bg-gray-50 dark:bg-zinc-900">{formatDayHeader(day.date)}</h3>
             <div className="divide-y">
                 {day.items.map((item) => (
@@ -152,8 +157,10 @@ function SearchDayCard({ day, onDelete }: { day: SearchDayInterface, onDelete: (
                             <p className="text-sm font-medium truncate">"{item.search}"</p>
                             {item.courses && item.courses.length > 0 && (
                                 <p className="text-xs text-gray-500 truncate">
-                                    <Link target="_blank" className="text-gray-900 hover:underline" to={item.courses[0].url}>{item.courses[0].url}</Link>{" "}
-                                    y {item.courses.length - 1} programas mas encontrados
+                                    <Link target="_blank" className="text-gray-900 dark:text-gray-400 hover:underline" to={item.courses[0].url}>{item.courses[0].url}</Link>
+                                    { item.courses.length > 1 && ( 
+                                        <>{" "} y {item.courses.length - 1} programas mas encontrados</>
+                                    ) }
                                 </p>
                             )}
                         </div>
@@ -188,12 +195,13 @@ function SearchDayCard({ day, onDelete }: { day: SearchDayInterface, onDelete: (
 
 function DashboardSearchHistory() {
     const [activeTab, setActiveTab] = React.useState<string>("grupo")
+    const [selectedItems, setSelectedItems] = React.useState<Set<string>>(new Set());
     const historiesHook = useSearchHistories({ size: 4 });
 
     const searchHistoriesByDay = React.useMemo(() => groupSearchHistoriesByDay(historiesHook.searchHistories), [historiesHook.searchHistories]);
 
     return (
-        <div className="space-y-4">
+        <div className="space-y-4 grid grid-cols-1">
             <div>
                 <h1 className="text-3xl font-bold tracking-tight">Historial de Busqueda</h1>
                 <p className="text-muted-foreground">Consulta aquí las búsquedas recientes realizadas para encontrar programas.</p>
@@ -202,14 +210,26 @@ function DashboardSearchHistory() {
             <Tabs defaultValue="grupo" value={activeTab} onValueChange={setActiveTab}>
                 <div className="flex flex-col sm:flex-row sm:items-center gap-4">
                     <div className="relative w-full">
-                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-                        <Input
-                            type="search"
-                            placeholder="Buscar historial"
-                            className="pl-10 w-full"
-                            value={historiesHook.search}
-                            onChange={(e) => historiesHook.setSearch(e.target.value)}
-                        />
+                        { selectedItems.size > 0 ? (
+                            <Button variant="destructive" onClick={async () => {
+                                if (await historiesHook.handleDeleteSearchHistories(Array.from(selectedItems))) {
+                                    setSelectedItems(new Set());
+                                }
+                            }}>
+                                Eliminar {selectedItems.size} seleccionados
+                            </Button>
+                        ) : (
+                            <>
+                                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                                <Input
+                                    type="search"
+                                    placeholder="Buscar historial"
+                                    className="pl-10 w-full"
+                                    value={historiesHook.search}
+                                    onChange={(e) => historiesHook.setSearch(e.target.value)}
+                                />
+                            </>
+                        )}
                     </div>
                     <TabsList className="grid w-full grid-cols-2 max-w-[250px]">
                         <TabsTrigger value="fecha" className="flex items-center gap-2">
@@ -228,7 +248,9 @@ function DashboardSearchHistory() {
                         <SearchDayCard 
                             key={dayGroup.date.toISOString()} 
                             day={dayGroup} 
+                            selectedItems={selectedItems}
                             onDelete={historiesHook.handleDeleteSearchHistory} 
+                            setSelectedItems={setSelectedItems}
                         />
                     ))}
                 </TabsContent>

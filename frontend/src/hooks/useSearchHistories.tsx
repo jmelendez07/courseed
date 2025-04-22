@@ -51,6 +51,24 @@ function useSearchHistories({ size }: useSearchHistoriesProps) {
             })
     }, []);
 
+    const handleDeleteSearchHistories = React.useCallback(async (ids: string[]): Promise<boolean> => {
+        try {
+            const response = await axios.delete(APIS.SEARCH_HISTORIES_DELETE, {
+                data: {
+                    searchHistories: ids
+                }
+            });
+            if (response.data) {
+                setSearchHistories(current => current.filter(item => !ids.includes(item.id)));
+                return true;
+            } else {
+                return false;
+            }
+        } catch (error) {
+            return false;    
+        }
+    }, []);
+
     return {
         searchHistories,
         setSearchHistories,
@@ -62,7 +80,8 @@ function useSearchHistories({ size }: useSearchHistoriesProps) {
         setParams,
         handleDeleteSearchHistory,
         search,
-        setSearch
+        setSearch,
+        handleDeleteSearchHistories
     }
 }
 

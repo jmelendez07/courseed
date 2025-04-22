@@ -1,6 +1,7 @@
 package com.api.flux.courseed.services.implementations;
 
 import java.security.Principal;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -84,5 +85,22 @@ public class SearchHistoryService implements InterfaceSearchHistoryService {
                 .flatMap(searchHistory -> searchHistoryRepository.delete(searchHistory).thenReturn(true))
                 .defaultIfEmpty(false)
             );
+    }
+
+    @Override
+    public Mono<Boolean> deleteSearchHistories(Principal principal, List<String> ids) {
+        return userRepository.findByEmail(principal.getName())
+        .flatMap(user -> searchHistoryRepository.findAllById(ids)
+            .filter(searchHistory -> searchHistory.getUserId().equals(user.getId()))
+            .collectList()
+            .flatMap(searchHistories -> {
+                if (searchHistories.size() != ids.size()) {
+                    return Mono.just(false);
+                }
+                return searchHistoryRepository.deleteAll(searchHistories)
+                    .thenReturn(true);
+            })
+        )
+        .defaultIfEmpty(false);
     }
 }
