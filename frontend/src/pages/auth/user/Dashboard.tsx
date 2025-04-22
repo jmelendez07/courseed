@@ -21,10 +21,13 @@ import {
 } from "@/components/ui/sidebar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Theme from "@/components/ui/theme";
+import { useAuth } from "@/providers/AuthProvider";
 import HeadProvider from "@/providers/HeadProvider";
 import ProfileFormProvider from "@/providers/ProfileFormProvider";
 
 function Dashboard() {
+    const authHook = useAuth();
+
     return (
         <ProfileFormProvider>
             <SidebarProvider>
@@ -63,7 +66,9 @@ function Dashboard() {
                             </TabsList>
                             <TabsContent value="recomendados" className="space-y-8 h-full">
                                 <DashboardRecomendedCourses />
-                                <DashboardHistoryRecomendations />
+                                {(authHook?.user?.views !== undefined && authHook.user.views > 0)  && (
+                                    <DashboardHistoryRecomendations />
+                                )}
                             </TabsContent>
                             <TabsContent value="historial" className="space-y-4 w-full h-full overflow-hidden">
                                 <DashboardSearchHistories />

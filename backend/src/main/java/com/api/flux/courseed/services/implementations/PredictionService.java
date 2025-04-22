@@ -431,4 +431,8 @@ public class PredictionService implements InterfacePredictionService {
             )
             .defaultIfEmpty(new PageImpl<>(List.of(), pageable, 0));
     }
+
+    public Mono<Page<CourseDto>> getRecomendedCoursesByHistoryAndAuth(Principal principal, int page, int size) {
+        
+    }
 }

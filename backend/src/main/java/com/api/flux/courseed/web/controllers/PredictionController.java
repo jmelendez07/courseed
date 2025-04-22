@@ -66,4 +66,15 @@ public class PredictionController {
                 .flatMap(courses -> ServerResponse.ok().bodyValue(courses))
                 .switchIfEmpty(ServerResponse.notFound().build());
     }
+
+    public Mono<ServerResponse> getRecomendedCoursesByHistoryAndAuth(ServerRequest serverRequest) {
+        return serverRequest.principal()
+            .flatMap(principal -> predictionService.getRecomendedCoursesByHistoryAndAuth(
+                principal, 
+                Integer.parseInt(serverRequest.queryParam("page").orElse("0")), 
+                Integer.parseInt(serverRequest.queryParam("size").orElse("10"))
+            ))
+                .flatMap(courses -> ServerResponse.ok().bodyValue(courses))
+                .switchIfEmpty(ServerResponse.notFound().build());
+    }
 }
