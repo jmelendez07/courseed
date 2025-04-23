@@ -22,6 +22,7 @@ interface AuthContextProps {
     getRoleName: () => string;
     setImage: (image: string) => void;
     setProfile: (profile: ProfileInterface) => void;
+    addViewCount: () => void;
 }
 
 const AuthContext = React.createContext<AuthContextProps | null>(null);
@@ -76,6 +77,12 @@ function AuthProvider({ children }: ChildrenProps) {
         }
     }, [user]);
 
+    const addViewCount = React.useCallback(() => {
+        if (user) {
+            setUser({ ...user, views: (user.views ?? 0) + 1 });
+        }
+    }, [user]);
+
     React.useEffect(() => {
         if (token) {
             axios.defaults.headers.common['Authorization'] = `${TOKEN.PREFIX} ${token}`;
@@ -100,7 +107,8 @@ function AuthProvider({ children }: ChildrenProps) {
           getName,
           getRoleName,
           setImage,
-          setProfile
+          setProfile,
+          addViewCount
         }),
         [token, user, loading]
     );
