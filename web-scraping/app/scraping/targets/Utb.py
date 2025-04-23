@@ -15,7 +15,7 @@ import re
 
 class Utb(BaseScraper):
 
-    INSTITUTION: str = "Universidad Tecnológica de Bolívar"
+    INSTITUTION: str = "universidad tecnológica de bolívar"
 
     def getCourses(self) -> list[CourseInteface]:
         courses: list[CourseInteface] = []
@@ -29,7 +29,7 @@ class Utb(BaseScraper):
             categories = [
                 {
                     "url": f"{self.driver.current_url}/?_sft_facultad={option.get_attribute("value")}",
-                    "name": self.cleanText(option.text).lower()
+                    "name": self.normalize_string(self.cleanText(option.text))
                 }
                 for option in select.options if option.get_attribute("value")
             ]
@@ -128,6 +128,16 @@ class Utb(BaseScraper):
                 contents = [self.cleanText(li.text) for li in contentElements if self.cleanText(li.text) != ""]
             except Exception as e:
                 pass
+
+            type = None
+            if "diplomado" in title.lower():
+                type = "diplomado"
+            elif "seminario" in title.lower(): 
+                type = "seminario"
+            elif "taller" in title.lower():
+                type = "taller"
+            else: 
+                type = "curso"
             
             course = CourseInteface(
                 url=courseUrl,
@@ -138,6 +148,7 @@ class Utb(BaseScraper):
                 price=price,
                 duration=duration,
                 modality=modality,
+                type=type,
                 institution=self.INSTITUTION,
                 category=categoryName,
                 contents=contents
@@ -160,6 +171,27 @@ class Utb(BaseScraper):
     def cleanText(self, text: str) -> str:
         cleanedText = re.sub(r'[\t\n\xa0]', ' ', text).strip()
         return cleanedText
+    
+    def normalize_string(self, text: str) -> str:
+        text = text.lower()
+        resultado = []
+        alphabet = "abcdefghijklmnñopqrstuvwxyz"
+        replaces = {
+            'á': 'a', 'é': 'e', 'í': 'i', 'ó': 'o', 'ú': 'u',
+            'à': 'a', 'è': 'e', 'ì': 'i', 'ò': 'o', 'ù': 'u',
+            'ä': 'a', 'ë': 'e', 'ï': 'i', 'ö': 'o', 'ü': 'u',
+            'â': 'a', 'ê': 'e', 'î': 'i', 'ô': 'o', 'û': 'u'
+        }
+
+        for character in text:
+            if character in replaces:
+                resultado.append(replaces[character])
+            elif character in alphabet:
+                resultado.append(character)
+            elif character.isspace():
+                resultado.append(character)
+        
+        return ''.join(resultado)
 
     def saveToDatabase(self, courses: list[CourseInteface]):
         for course in courses:

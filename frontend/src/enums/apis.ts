@@ -10,6 +10,9 @@ enum APIS {
     USER_UPDATE_PASSWORD = 'api/users/password/',
     USER_UPDATE_ROLES = 'api/users/roles/',
     USER_DELETE = 'api/users/',
+    USER_COURSES_RECOMENDED_COUNT = 'api/predictions/total-courses-recomended',
+    USER_COURSES_RECOMENDED = 'api/predictions/courses-recomended/auth',
+    USER_COURSES_RECOMENDED_BY_HISTORY = 'api/predictions/courses-recomended/history/auth',
     LOGIN = 'api/auth/login',
     REGISTER = 'api/auth/register',
     COURSES = 'api/courses',
@@ -24,7 +27,10 @@ enum APIS {
     COURSES_UPDATE = 'api/courses/',
     COURSES_DELETE = 'api/courses/',
     INSTITUTIONS = 'api/institutions',
+    INSTITUTION_BY_AUTH = 'api/institutions/auth',
     INSTITUTIONS_COURSES_COUNT = 'api/institutions/courses/count',
+    INSTITUTION_CREATE = 'api/institutions',
+    INSTITUTION_UPDATE = 'api/institutions/',
     REVIEWS = 'api/reviews',
     REVIEWS_TOTAL = 'api/reviews/total/this-month',
     REVIEWS_TOTAL_NEGATIVE = 'api/reviews/total/negative',
@@ -46,10 +52,13 @@ enum APIS {
     VIEWS_COURSES_DECREASING = 'api/views/courses/this-month/decreasing',
     SEARCH_HISTORIES_BY_AUTH_USER = 'api/search-histories/auth',
     SEARCH_HISTORY_CREATE = 'api/search-histories/create',
+    SEARCH_HISTORY_DELETE = 'api/search-histories/',
+    SEARCH_HISTORIES_DELETE = 'api/search-histories/delete-by-ids',
     SUBSCRIBE = 'api/auth/subscribe',
     REGISTER_SUSCRIPTOR = 'api/auth/register/subscriptor',
     SUBSCRIPTIONS_BY_AUTH_USER = 'api/subscriptions/auth',
     CREATE_PROFILE = 'api/profiles/create',
+    UPLOAD_AVATAR = 'api/auth/upload-avatar'
 }
 
 export default APIS;

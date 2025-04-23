@@ -1,9 +1,11 @@
 import {
 	CreditCard,
+	Drama,
 	GraduationCap,
 	LayoutPanelLeft,
 	MessageSquareText,
-	ThumbsUp,
+	ScanEye,
+	TextSearch,
 	UserPlus,
 	Users,
 } from "lucide-react";
@@ -24,6 +26,7 @@ import CreateUserForm from "@/components/form/create-user-form";
 import CourseForm from "@/components/form/course-form";
 import { useAuth } from "@/providers/AuthProvider";
 import ROLES from "@/enums/roles";
+import { NavRecords } from "./nav-record";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
@@ -132,9 +135,21 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 			},
 			{
 				title: "Reacciones",
-				icon: ThumbsUp,
+				icon: Drama,
 				url: "/usuario/reacciones"
 			},
+		],
+		navRecord: [
+			{
+				name: "Historial de Busqueda",
+				icon: TextSearch,
+				url: "/usuario/historial-busqueda",
+			},
+			{
+				name: "Programas visualizados",
+				icon: ScanEye,
+				url: "/usuario/programas-visualizados",
+			}
 		]
 	}
 
@@ -155,20 +170,23 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 				title: "Suscripciones",
 				icon: CreditCard,
 				url: "/suscriptor/suscripciones"
-			}
+			},
 		]
 	}
 
 	return (
 		<Sidebar collapsible="icon" {...props}>
 			<SidebarHeader>
-				<TeamSwitcher 
-					teams={isAdmin() ? dataAdmin.actions : dataUser.actions} 
+				<TeamSwitcher
+					teams={isAdmin() ? dataAdmin.actions : dataUser.actions}
 					role={authHook?.getRoleName() ? authHook.getRoleName() : ""}
 				/>
 			</SidebarHeader>
 			<SidebarContent>
 				<NavMain items={getNavMain()} />
+				{ authHook?.user?.roles?.some(r => r === ROLES.USER) && (
+					<NavRecords records={dataUser.navRecord} />
+				) }
 			</SidebarContent>
 			<SidebarFooter>
 				<NavUser />

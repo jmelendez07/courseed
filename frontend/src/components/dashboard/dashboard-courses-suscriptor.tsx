@@ -66,14 +66,13 @@ function DashboardCoursesSuscriptor() {
             <div className="flex flex-col lg:flex-row lg:items-end gap-4 justify-between">
                 <div>
                     <h1 className="text-3xl font-bold tracking-tight">Mis Programas</h1>
-                    <p className="text-muted-foreground">Administra tus programas y crea nuevos</p>
                 </div>
                 <div className="flex md:flex-row flex-col gap-4">
                     <div className="relative">
                         <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                         <Input
                             type="search"
-                            placeholder="Buscar cursos..."
+                            placeholder="Buscar programas..."
                             className="w-full md:w-[300px] pl-8"
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
@@ -90,7 +89,7 @@ function DashboardCoursesSuscriptor() {
                         })}
                     >
                         <Plus className="h-4 w-4" />
-                        Crear Programa
+                        Crear
                     </Button>
                 </div>
             </div>

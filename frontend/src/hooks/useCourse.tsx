@@ -3,6 +3,7 @@ import CourseInterface from "@/interfaces/course";
 import ReactionInterface from "@/interfaces/reaction";
 import ReviewInterface from "@/interfaces/review";
 import ViewInterface from "@/interfaces/view";
+import { useAuth } from "@/providers/AuthProvider";
 import axios, { AxiosError, AxiosResponse } from "axios";
 import React from "react";
 
@@ -13,6 +14,9 @@ interface useCourseProps {
 function useCourse({ id }: useCourseProps) {
     const [course, setCourse] = React.useState<CourseInterface | null | undefined>(undefined);
     const [loading, setLoading] = React.useState(false);
+    const authHook = useAuth();
+
+    console.log(authHook);
 
     React.useEffect(() => {
         setLoading(true)
@@ -81,6 +85,7 @@ function useCourse({ id }: useCourseProps) {
             ...course,
             views: [ newView, ...course.views ]
         });
+        authHook?.addViewCount();
     }
 
     return {

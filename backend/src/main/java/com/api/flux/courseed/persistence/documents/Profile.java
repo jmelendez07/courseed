@@ -33,6 +33,22 @@ public class Profile {
         this.id = id;
     }
 
+    public String getPlatformPreference() {
+        return platformPreference;
+    }
+
+    public void setPlatformPreference(String platformPreference) {
+        this.platformPreference = platformPreference;
+    }
+
+    public String getInterest() {
+        return interest;
+    }
+
+    public void setInterest(String interest) {
+        this.interest = interest;
+    }
+
     public String getUserId() {
         return userId;
     }
@@ -87,13 +103,5 @@ public class Profile {
 
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
-    }
-
-    public String getInterest() {
-        return interest;
-    }
-
-    public void setInterest(String interest) {
-        this.interest = interest;
     }
 }

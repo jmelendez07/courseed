@@ -16,6 +16,6 @@ public interface InterfaceViewService {
     Mono<TotalViewsDto> getTotalViews();
     Mono<List<CourseViewsStatsDto>> findCoursesWithDecreasingViews();
     Mono<Page<ViewDto>> findViewsByCourseId(String courseId, int page, int size);
-    Mono<Page<ViewDto>> findViewsByAuthUser(Principal principal, int page, int size);
+    Mono<Page<ViewDto>> findViewsByAuthUser(Principal principal, int page, int size, String search);
     Mono<Object> createView(Principal principal, SaveViewDto saveViewDto);
 }

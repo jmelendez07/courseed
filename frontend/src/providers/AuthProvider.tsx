@@ -4,6 +4,7 @@ import APIS from "@/enums/apis";
 import TOKEN from "@/enums/token";
 import ROLES from "@/enums/roles";
 import UserInterface from "@/interfaces/user";
+import ProfileInterface from "@/interfaces/profile";
 
 interface ChildrenProps {
     children: React.ReactNode
@@ -19,6 +20,9 @@ interface AuthContextProps {
     setLoading: React.Dispatch<React.SetStateAction<boolean>>;
     getName: () => string;
     getRoleName: () => string;
+    setImage: (image: string) => void;
+    setProfile: (profile: ProfileInterface) => void;
+    addViewCount: () => void;
 }
 
 const AuthContext = React.createContext<AuthContextProps | null>(null);
@@ -61,6 +65,24 @@ function AuthProvider({ children }: ChildrenProps) {
         }
     }, [user?.roles]);
 
+    const setImage = React.useCallback((image: string) => {
+        if (user) {
+            setUser({ ...user, image: image });
+        }
+    }, [user]);
+
+    const setProfile = React.useCallback((profile: ProfileInterface) => {
+        if (user) {
+            setUser({ ...user, profile: profile });
+        }
+    }, [user]);
+
+    const addViewCount = React.useCallback(() => {
+        if (user) {
+            setUser({ ...user, views: (user.views ?? 0) + 1 });
+        }
+    }, [user]);
+
     React.useEffect(() => {
         if (token) {
             axios.defaults.headers.common['Authorization'] = `${TOKEN.PREFIX} ${token}`;
@@ -83,7 +105,10 @@ function AuthProvider({ children }: ChildrenProps) {
           setUser,
           setLoading,
           getName,
-          getRoleName
+          getRoleName,
+          setImage,
+          setProfile,
+          addViewCount
         }),
         [token, user, loading]
     );

@@ -17,6 +17,7 @@ public class UserDto implements Serializable {
     private int reviews;
     private int views;
     private ProfileDto profile;
+    private String image;
 
     public UserDto() {}
 
@@ -126,5 +127,13 @@ public class UserDto implements Serializable {
     
     public void setProfile(ProfileDto profile) {
         this.profile = profile;
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
     }
 }

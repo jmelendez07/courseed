@@ -56,5 +56,5 @@ class BaseScraper:
             if courses is not None:
                 self.saveToDatabase(courses)
 
-        self.driver.quit()
-        self.logger.close()
+            self.driver.quit()
+            self.logger.close()

@@ -10,7 +10,7 @@ from selenium.webdriver.support import expected_conditions as EC
 import re
 
 class UniTecnar(BaseScraper):
-    INSTITUTION: str = "Fundación Universitaria Antonio de Arévalo"
+    INSTITUTION: str = "fundación universitaria antonio de arévalo"
 
     def getCourses(self) -> list[CourseInteface]:
         courses: list[CourseInteface] = []
@@ -102,6 +102,16 @@ class UniTecnar(BaseScraper):
             except Exception as e:
                 self.logger.error(f"Failed to get data for course URL: {courseUrl}. Exception: {str(e)}")
 
+            type = None
+            if "diplomado" in title.lower():
+                type = "diplomado"
+            elif "seminario" in title.lower(): 
+                type = "seminario"
+            elif "taller" in title.lower():
+                type = "taller"
+            else: 
+                type = "curso"
+
             course = CourseInteface(
                 url=courseUrl,
                 title=title,
@@ -111,8 +121,9 @@ class UniTecnar(BaseScraper):
                 price=price,
                 duration=duration,
                 modality=modality,
+                type=type,
                 institution=self.INSTITUTION,
-                category=category,
+                category=self.normalize_string(category),
                 contents=contents
             )
 
@@ -128,6 +139,27 @@ class UniTecnar(BaseScraper):
     def cleanText(self, text: str) -> str:
         cleanedText = re.sub(r'[\t\n\xa0]', ' ', text).strip()
         return cleanedText
+    
+    def normalize_string(self, text: str) -> str:
+        text = text.lower()
+        resultado = []
+        alphabet = "abcdefghijklmnñopqrstuvwxyz"
+        replaces = {
+            'á': 'a', 'é': 'e', 'í': 'i', 'ó': 'o', 'ú': 'u',
+            'à': 'a', 'è': 'e', 'ì': 'i', 'ò': 'o', 'ù': 'u',
+            'ä': 'a', 'ë': 'e', 'ï': 'i', 'ö': 'o', 'ü': 'u',
+            'â': 'a', 'ê': 'e', 'î': 'i', 'ô': 'o', 'û': 'u'
+        }
+
+        for character in text:
+            if character in replaces:
+                resultado.append(replaces[character])
+            elif character in alphabet:
+                resultado.append(character)
+            elif character.isspace():
+                resultado.append(character)
+        
+        return ''.join(resultado)
 
     def saveToDatabase(self, courses: list[CourseInteface]):
         for course in courses:

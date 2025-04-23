@@ -1,9 +1,14 @@
 package com.api.flux.courseed.services.implementations;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.Principal;
 import java.util.Arrays;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.security.authentication.ReactiveAuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -13,7 +18,6 @@ import com.api.flux.courseed.persistence.documents.Reaction;
 import com.api.flux.courseed.persistence.documents.Review;
 import com.api.flux.courseed.persistence.documents.User;
 import com.api.flux.courseed.persistence.documents.View;
-import com.api.flux.courseed.persistence.repositories.CategoryRepository;
 import com.api.flux.courseed.persistence.repositories.ProfileRepository;
 import com.api.flux.courseed.persistence.repositories.ReactionRepository;
 import com.api.flux.courseed.persistence.repositories.ReviewRepository;
@@ -27,7 +31,6 @@ import com.api.flux.courseed.projections.dtos.TokenDto;
 import com.api.flux.courseed.projections.dtos.UpdateAuthPasswordDto;
 import com.api.flux.courseed.projections.dtos.UpdateProfileDto;
 import com.api.flux.courseed.projections.dtos.UserDto;
-import com.api.flux.courseed.projections.mappers.CategoryMapper;
 import com.api.flux.courseed.projections.mappers.ProfileMapper;
 import com.api.flux.courseed.projections.mappers.UserMapper;
 import com.api.flux.courseed.services.interfaces.InterfaceAuthService;
@@ -54,9 +57,6 @@ public class AuthService implements InterfaceAuthService {
     private ProfileMapper profileMapper;
 
     @Autowired
-    private CategoryMapper categoryMapper;
-
-    @Autowired
     private ReactionRepository reactionRepository;
 
     @Autowired
@@ -64,9 +64,6 @@ public class AuthService implements InterfaceAuthService {
 
     @Autowired
     private ProfileRepository profileRepository;
-
-    @Autowired
-    private CategoryRepository categoryRepository;
 
     @Autowired
     private ReactiveAuthenticationManager reactiveAuthenticationManager;
@@ -77,6 +74,8 @@ public class AuthService implements InterfaceAuthService {
     @Autowired    
     private PasswordEncoder passwordEncoder;
 
+    private String uploadPath = "uploads/avatars";
+
     @Override
     public Mono<UserDto> getAuthUser(Principal principal) {
         return userRepository.findByEmail(principal.getName())
@@ -85,15 +84,7 @@ public class AuthService implements InterfaceAuthService {
                 Flux<Reaction> reactionFlux = reactionRepository.findByUserId(user.getId());
                 Flux<View> viewFlux = viewRepository.findByUserId(user.getId());
                 Mono<ProfileDto> profileMono = profileRepository.findByUserId(user.getId())
-                    .flatMap(profile -> categoryRepository.findById(profile.getInterest()) 
-                        .map(categoryMapper::toCategoryDto)
-                        .map(category -> {
-                            ProfileDto profileDto = profileMapper.toProfileDto(profile);
-                            profileDto.setInterest(category);
-                            return profileDto;
-                        })
-                        .defaultIfEmpty(profileMapper.toProfileDto(profile))
-                    )
+                    .map(profileMapper::toProfileDto)
                     .defaultIfEmpty(new ProfileDto());
 
                 return Mono.zip(reviewFlux.collectList(), reactionFlux.collectList(), viewFlux.collectList(), profileMono)
@@ -275,5 +266,42 @@ public class AuthService implements InterfaceAuthService {
                             .map(auth -> new TokenDto(jwtUtil.create(auth)));
                     });
             }));
+    }
+
+    @Override
+    public Mono<UserDto> updloadAvatar(Principal principal, FilePart image, String baseUrl) {
+       return userRepository.findByEmail(principal.getName())
+            .flatMap(user -> {
+                String filename = UUID.randomUUID() + "-" + image.filename();
+                Path uploadDir = Paths.get(uploadPath).toAbsolutePath().normalize();
+                Path filePath = uploadDir.resolve(filename);
+
+                if (user.getImage() != null) {
+                    Path oldFilePath = Paths.get(uploadDir.toString(), user.getImage().substring(user.getImage().lastIndexOf("/") + 1));
+                    try {
+                        Files.deleteIfExists(oldFilePath);
+                    } catch (Exception e) {
+                        return Mono.error(new RuntimeException("Error al eliminar la imagen antigua: " + e.getMessage()));
+                    }
+                }
+
+                return Mono.fromCallable(() -> {
+                    Files.createDirectories(uploadDir);
+                    return filePath;
+                })
+                    .flatMap(path -> image.transferTo(path))
+                    .then(Mono.defer(() -> {
+                        user.setImage(baseUrl + "/" + uploadPath + "/" + filename);
+                        return userRepository.save(user)
+                            .map(userMapper::toUserDto);
+                    }));
+            })
+            .switchIfEmpty(Mono.error(
+                new CustomWebExchangeBindException(
+                    principal.getName(), 
+                    "auth", 
+                    "Parece que el usuario autenticado no se encuentra en el sistema. Te recomendamos cerrar sesión y volver a ingresar."
+                ).getWebExchangeBindException()
+            ));
     }
 }

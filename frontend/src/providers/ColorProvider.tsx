@@ -31,6 +31,7 @@ export const colors: { value: ColorType; label: string; }[] = [
 interface ColorProps {
     color: ColorType | string;
     setColor: (theme: ColorType) => void;
+    getReverseColor: () => ColorType;
 }
 
 export const ColorContext = React.createContext<ColorProps | null>(null);
@@ -40,11 +41,41 @@ function ColorProvider({ children }: { children: React.ReactNode }) {
 
     React.useEffect(() => localStorage.setItem("color", color), [color]);
 
+    /**
+     * Obtiene el color complementario según el círculo cromático
+     * @returns El color complementario del color actual según el círculo cromático
+     */
+    const getReverseColor = React.useCallback((): ColorType => {
+        // Mapa de colores complementarios basado en el círculo cromático
+        const complementaryColors: Record<ColorType, ColorType> = {
+            'red': 'cyan',      // Rojo - Cian
+            'orange': 'sky',    // Naranja - Azul cielo
+            'amber': 'blue',    // Ámbar - Azul
+            'yellow': 'blue',   // Amarillo - Azul
+            'lime': 'teal',     // Lima - Verde azulado
+            'green': 'red',     // Verde - Rojo
+            'emerald': 'red',   // Esmeralda - Rojo
+            'teal': 'orange',   // Verde azulado - Naranja
+            'cyan': 'red',      // Cian - Rojo
+            'sky': 'orange',    // Azul cielo - Naranja
+            'blue': 'yellow',   // Azul - Amarillo
+        };
+        
+        // Si el color está en nuestra lista, devuelve su complementario
+        if (color in complementaryColors) {
+            return complementaryColors[color as ColorType];
+        }
+        
+        // Color por defecto si no se encuentra
+        return 'blue';
+    }, [color]); // Dependencia del color actual
+
     const contextValue: ColorProps = React.useMemo(
         () => ({
             color,
-            setColor
-        }), [color]
+            setColor,
+            getReverseColor
+        }), [color, getReverseColor]
     );
 
     return (

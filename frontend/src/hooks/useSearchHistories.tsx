@@ -15,6 +15,7 @@ interface useSearchHistoriesProps {
 
 function useSearchHistories({ size }: useSearchHistoriesProps) {
     const [searchHistories, setSearchHistories] = React.useState<SearchHistoryInterface[]>([]);
+    const [search, setSearch] = React.useState<string>("");
     const [loading, setLoading] = React.useState<boolean>(true);
     const [isLastPage, setIsLastPage] = React.useState<boolean>(false);
     const pageSize = size ?? 12;
@@ -28,7 +29,8 @@ function useSearchHistories({ size }: useSearchHistoriesProps) {
         axios.get(APIS.SEARCH_HISTORIES_BY_AUTH_USER, {
             params: {
                 page: params.pageNumber,
-                size: pageSize
+                size: pageSize,
+                search: search
             }
         })
             .then((response: AxiosResponse<ResponseProps>) => {
@@ -40,7 +42,32 @@ function useSearchHistories({ size }: useSearchHistoriesProps) {
             })
             .catch(() => setIsLastPage(true))
             .finally(() => setLoading(false))
-    }, [pageSize, params.pageNumber]);
+    }, [pageSize, params.pageNumber, search]);
+
+    const handleDeleteSearchHistory = React.useCallback((id: string) => {
+        axios.delete(APIS.SEARCH_HISTORY_DELETE + id)
+            .then((response) => {
+                if (response.data) setSearchHistories(current => current.filter(item => item.id !== id));
+            })
+    }, []);
+
+    const handleDeleteSearchHistories = React.useCallback(async (ids: string[]): Promise<boolean> => {
+        try {
+            const response = await axios.delete(APIS.SEARCH_HISTORIES_DELETE, {
+                data: {
+                    searchHistories: ids
+                }
+            });
+            if (response.data) {
+                setSearchHistories(current => current.filter(item => !ids.includes(item.id)));
+                return true;
+            } else {
+                return false;
+            }
+        } catch (error) {
+            return false;    
+        }
+    }, []);
 
     return {
         searchHistories,
@@ -50,7 +77,11 @@ function useSearchHistories({ size }: useSearchHistoriesProps) {
         isLastPage,
         setIsLastPage,
         params,
-        setParams
+        setParams,
+        handleDeleteSearchHistory,
+        search,
+        setSearch,
+        handleDeleteSearchHistories
     }
 }
 

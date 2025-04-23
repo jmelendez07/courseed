@@ -11,6 +11,7 @@ import reactor.core.publisher.Mono;
 
 @Repository
 public interface CategoryRepository extends ReactiveMongoRepository<Category, String> {
-    Flux<Category> findAllBy(Pageable pageable); 
+    Flux<Category> findAllBy(Pageable pageable);
+    Flux<Category> findAllByNameContainingIgnoreCase(String name, Pageable pageable);
     Mono<Category> findByName(String name);
 }

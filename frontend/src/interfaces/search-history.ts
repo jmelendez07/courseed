@@ -1,3 +1,4 @@
+import CourseInterface from "./course";
 import UserInterface from "./user";
 
 interface SearchHistoryInterface {
@@ -5,6 +6,7 @@ interface SearchHistoryInterface {
     search: string;
     user: UserInterface;
     createdAt: string;
+    courses?: CourseInterface[]; 
 }
 
 export default SearchHistoryInterface;

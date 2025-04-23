@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 
+import com.api.flux.courseed.projections.dtos.DeleteSearchHistoriesDto;
 import com.api.flux.courseed.projections.dtos.SaveSearchHistoryDto;
 import com.api.flux.courseed.services.implementations.SearchHistoryService;
 import com.api.flux.courseed.services.implementations.ValidationService;
@@ -21,7 +22,8 @@ public class SearchHistoryController {
     public Mono<ServerResponse> findByAuthUser(ServerRequest serverRequest) {
         return serverRequest.principal()
             .flatMap(principal -> searchHistoryService.findByAuthUser(
-                principal, 
+                principal,
+                serverRequest.queryParam("search").orElse(""),
                 Integer.parseInt(serverRequest.queryParam("page").orElse("0")), 
                 Integer.parseInt(serverRequest.queryParam("size").orElse("10"))
             ))
@@ -39,5 +41,26 @@ public class SearchHistoryController {
                     .switchIfEmpty(ServerResponse.notFound().build())
                 )
             );
+    }
+
+    public Mono<ServerResponse> deleteSearchHistory(ServerRequest serverRequest) {
+        return serverRequest.principal()
+            .flatMap(principal -> searchHistoryService.deleteSearchHistory(
+                principal, 
+                serverRequest.pathVariable("id")
+            ))
+                .flatMap(searchHistories -> ServerResponse.ok().bodyValue(searchHistories))
+                .switchIfEmpty(ServerResponse.notFound().build());
+    }
+
+    public Mono<ServerResponse> deleteSearchHistories(ServerRequest serverRequest) {
+        return serverRequest.principal()
+        .flatMap(principal -> serverRequest.bodyToMono(DeleteSearchHistoriesDto.class)
+            .doOnNext(validationService::validate)
+            .flatMap(deleteSearchHistoriesDto -> searchHistoryService.deleteSearchHistories(principal, deleteSearchHistoriesDto.getSearchHistories())
+                .flatMap(deleted -> ServerResponse.ok().bodyValue(deleted))
+                .switchIfEmpty(ServerResponse.notFound().build())
+            )
+        );
     }
 }

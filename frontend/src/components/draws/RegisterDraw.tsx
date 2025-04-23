@@ -2,7 +2,6 @@ import { ColorContext } from "@/providers/ColorProvider";
 import React from "react";
 
 function RegisterDraw() {
-
     const colorContext = React.useContext(ColorContext);
 
     return (

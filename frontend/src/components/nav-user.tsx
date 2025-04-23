@@ -5,10 +5,6 @@ import {
 } from "lucide-react";
 
 import {
-	Avatar,
-	AvatarFallback,
-} from "@/components/ui/avatar";
-import {
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuGroup,
@@ -25,19 +21,11 @@ import {
 } from "@/components/ui/sidebar";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/providers/AuthProvider";
-import React from "react";
+import AvatarProfile from "./ui/avatar-profile";
 
 export function NavUser() {
 	const { isMobile } = useSidebar();
 	const auth = useAuth();
-
-	const getName = React.useCallback(() => {
-		const name = auth?.user?.email.split('@')[0];
-		if (name) {
-			return name.charAt(0).toUpperCase() + name.slice(1);
-		}
-		return '';
-	}, [auth?.user?.email]);
 
 	return (
 		<SidebarMenu>
@@ -48,11 +36,11 @@ export function NavUser() {
 							size="lg"
 							className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
 						>
-							<Avatar className="h-8 w-8 rounded-lg">
-								<AvatarFallback className="rounded-lg">{auth?.user?.email.slice(0, 2).toUpperCase()}</AvatarFallback>
-							</Avatar>
+							<div className="size-8 relative shrink-0">	
+								<AvatarProfile imageUrl={auth?.user?.image} name={auth?.getName() ?? ""} className="shadow-lg shrink-0" />
+							</div>
 							<div className="grid flex-1 text-left text-sm leading-tight">
-								<span className="truncate font-semibold">{getName()}</span>
+								<span className="truncate font-semibold">{auth?.getName()}</span>
 								<span className="truncate text-xs">{auth?.user?.email}</span>
 							</div>
 							<ChevronsUpDown className="ml-auto size-4" />
@@ -66,11 +54,9 @@ export function NavUser() {
 					>
 						<DropdownMenuLabel className="p-0 font-normal">
 							<div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
-								<Avatar className="h-8 w-8 rounded-lg">
-									<AvatarFallback className="rounded-lg">{auth?.user?.email.slice(0, 2).toUpperCase()}</AvatarFallback>
-								</Avatar>
+								<AvatarProfile imageUrl={auth?.user?.image} name={auth?.getName() ?? ""} className="shadow-lg" />
 								<div className="grid flex-1 text-left text-sm leading-tight">
-									<span className="truncate font-semibold">{getName()}</span>
+									<span className="truncate font-semibold">{auth?.getName()}</span>
 									<span className="truncate text-xs">{auth?.user?.email}</span>
 								</div>
 							</div>

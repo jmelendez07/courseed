@@ -88,7 +88,7 @@ export function NavMain({
 							) : (
 								<SidebarMenuButton 
 									asChild 
-									tooltip={item.title} 
+									tooltip={item.title}
 									className={decodeURIComponent(location.pathname) === item.url 
 										? `bg-${colorContext?.color}-600 text-white hover:bg-${colorContext?.color}-700 hover:text-white` 
 										: ""

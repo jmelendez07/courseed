@@ -1,6 +1,7 @@
 package com.api.flux.courseed.web.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 
@@ -8,6 +9,8 @@ import com.api.flux.courseed.projections.dtos.FormPredictionDto;
 import com.api.flux.courseed.services.implementations.PredictionService;
 
 import reactor.core.publisher.Mono;
+
+import java.util.Map;
 
 public class PredictionController {
 
@@ -40,5 +43,38 @@ public class PredictionController {
                 return ServerResponse.badRequest()
                     .bodyValue("Error al procesar la predicción: " + error.getMessage());
             });
+    }
+
+    public Mono<ServerResponse> getTotalCoursesRecomended(ServerRequest serverRequest) {
+        // Extract principal from the request
+        return serverRequest.principal()
+            .flatMap(principal -> predictionService.getTotalCoursesRecomended(principal)
+                .flatMap(totalCourses -> ServerResponse.ok()
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue(Map.of("totalCourses", totalCourses))
+                )
+            );
+    }
+
+    public Mono<ServerResponse> getRecomendedCoursesByAuth(ServerRequest serverRequest) {
+        return serverRequest.principal()
+            .flatMap(principal -> predictionService.getRecomendedCoursesByAuth(
+                principal, 
+                Integer.parseInt(serverRequest.queryParam("page").orElse("0")), 
+                Integer.parseInt(serverRequest.queryParam("size").orElse("10"))
+            ))
+                .flatMap(courses -> ServerResponse.ok().bodyValue(courses))
+                .switchIfEmpty(ServerResponse.notFound().build());
+    }
+
+    public Mono<ServerResponse> getRecomendedCoursesByHistoryAndAuth(ServerRequest serverRequest) {
+        return serverRequest.principal()
+            .flatMap(principal -> predictionService.getRecomendedCoursesByHistoryAndAuth(
+                principal, 
+                Integer.parseInt(serverRequest.queryParam("page").orElse("0")), 
+                Integer.parseInt(serverRequest.queryParam("size").orElse("10"))
+            ))
+                .flatMap(courses -> ServerResponse.ok().bodyValue(courses))
+                .switchIfEmpty(ServerResponse.notFound().build());
     }
 }

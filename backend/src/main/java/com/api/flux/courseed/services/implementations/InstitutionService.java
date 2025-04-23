@@ -1,5 +1,6 @@
 package com.api.flux.courseed.services.implementations;
 
+import java.security.Principal;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,14 +10,19 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import com.api.flux.courseed.persistence.documents.Institution;
 import com.api.flux.courseed.persistence.repositories.CourseRepository;
 import com.api.flux.courseed.persistence.repositories.InstitutionRepository;
+import com.api.flux.courseed.persistence.repositories.UserRepository;
 import com.api.flux.courseed.projections.dtos.InstitutionDto;
 import com.api.flux.courseed.projections.dtos.InstitutionWithCoursesCountDto;
 import com.api.flux.courseed.projections.dtos.SaveInstitutionDto;
 import com.api.flux.courseed.projections.mappers.InstitutionMapper;
 import com.api.flux.courseed.services.interfaces.InterfaceInstitutionService;
 import com.api.flux.courseed.web.exceptions.CustomWebExchangeBindException;
+
+import java.util.UUID;
+import java.nio.file.*;
 
 import reactor.core.publisher.Mono;
 
@@ -30,7 +36,12 @@ public class InstitutionService implements InterfaceInstitutionService {
     private CourseRepository courseRepository;
 
     @Autowired
-    private InstitutionMapper institutionMapper;    
+    private InstitutionMapper institutionMapper;
+
+    @Autowired
+    private UserRepository userRepository;
+    
+    private String uploadPath = "uploads/institutions";
 
     @Override
     public Mono<Page<InstitutionDto>> getAllInstitutions(int page, int size) {
@@ -70,6 +81,28 @@ public class InstitutionService implements InterfaceInstitutionService {
     }
 
     @Override
+    public Mono<InstitutionDto> getInstitutionByAuth(Principal principal) {
+        return userRepository.findByEmail(principal.getName())
+            .flatMap(user -> institutionRepository.findByUserId(user.getId())
+                .map(institutionMapper::toInstitutionDto)
+                .switchIfEmpty(Mono.error(
+                    new CustomWebExchangeBindException(
+                        principal.getName(), 
+                        "userId", 
+                        "No hemos podido encontrar la institución asociada al usuario indicado. Te sugerimos que verifiques la información y lo intentes de nuevo."
+                    ).getWebExchangeBindException()
+                ))
+            )
+            .switchIfEmpty(Mono.error(
+                new CustomWebExchangeBindException(
+                    principal.getName(), 
+                    "userId", 
+                    "No hemos podido encontrar el usuario indicado. Te sugerimos que verifiques la información y lo intentes de nuevo."
+                ).getWebExchangeBindException()
+            ));
+    }
+
+    @Override
     public Mono<List<InstitutionWithCoursesCountDto>> getInstitutionsWithCoursesCount(int page, int size) {
         return institutionRepository.findAll()
             .flatMap(institution -> courseRepository.countByInstitutionId(institution.getId())
@@ -82,44 +115,104 @@ public class InstitutionService implements InterfaceInstitutionService {
     }
 
     @Override
-    public Mono<Object> createInstitution(SaveInstitutionDto saveInstitutionDto) {
+    public Mono<Object> createInstitution(Principal principal, SaveInstitutionDto saveInstitutionDto, String baseurl) {
         return institutionRepository.findByName(saveInstitutionDto.getName())
-            .flatMap(institution -> Mono.error(
+            .flatMap(existingInstitution -> Mono.error(
                 new CustomWebExchangeBindException(
-                    saveInstitutionDto.getName(), 
-                    "name", 
+                    saveInstitutionDto.getName(),
+                    "name",
                     "La institución que has mencionado ya está registrada. Asegúrate de elegir un nombre diferente e intenta nuevamente."
                 ).getWebExchangeBindException()
             ))
-            .switchIfEmpty(institutionRepository.save(institutionMapper.toInstitution(saveInstitutionDto))
-                .map(institutionMapper::toInstitutionDto)
+            .switchIfEmpty(
+                userRepository.findByEmail(principal.getName())
+                .switchIfEmpty(Mono.error(
+                    new CustomWebExchangeBindException(
+                        principal.getName(),
+                        "userId",
+                        "No se pudo encontrar el usuario asociado al creador de la institución."
+                    ).getWebExchangeBindException()
+                ))
+                .flatMap(user -> {
+                    Institution institution = institutionMapper.toInstitution(saveInstitutionDto);
+                    institution.setUserId(user.getId());
+    
+                    if (saveInstitutionDto.getImage() != null) {
+                        String filename = UUID.randomUUID() + "-" + saveInstitutionDto.getImage().filename();
+                        Path uploadDir = Paths.get(uploadPath).toAbsolutePath().normalize();
+                        Path filePath = uploadDir.resolve(filename);
+    
+                        return Mono.fromCallable(() -> {
+                            Files.createDirectories(uploadDir);
+                            return filePath;
+                        })
+                        .flatMap(path -> saveInstitutionDto.getImage().transferTo(path))
+                        .then(Mono.defer(() -> {
+                            institution.setImage(baseurl + "/" + uploadPath + "/" + filename);
+                            return institutionRepository.save(institution)
+                                .map(institutionMapper::toInstitutionDto);
+                        }));
+                    } else {
+                        return institutionRepository.save(institution)
+                            .map(institutionMapper::toInstitutionDto);
+                    }
+                })
             );
     }
 
     @Override
-    public Mono<Object> updateInstitution(String id, SaveInstitutionDto saveInstitutionDto) {
-        return institutionRepository.findByName(saveInstitutionDto.getName())
-            .flatMap(institutionByName -> Mono.error(
+    public Mono<Object> updateInstitution(String id, Principal principal, SaveInstitutionDto saveInstitutionDto, String baseUrl) {
+        return institutionRepository.findById(id)
+            .switchIfEmpty(Mono.error(
                 new CustomWebExchangeBindException(
-                    saveInstitutionDto.getName(), 
-                    "name", 
-                    "La institución que has mencionado ya está registrada. Asegúrate de elegir un nombre diferente e intenta nuevamente."
+                    id,
+                    "institutionId",
+                    "No hemos podido encontrar la institución indicada. Te sugerimos que verifiques la información y lo intentes de nuevo."
                 ).getWebExchangeBindException()
             ))
-            .switchIfEmpty(institutionRepository.findById(id)
-                .flatMap(institution -> {
-                    institution.setName(saveInstitutionDto.getName());
+            .flatMap(institution -> {
+                institution.setName(saveInstitutionDto.getName());
+
+                if (saveInstitutionDto.getImage() != null) {
+                    String filename = UUID.randomUUID() + "-" + saveInstitutionDto.getImage().filename();
+                    Path uploadDir = Paths.get(uploadPath).toAbsolutePath().normalize();
+                    Path filePath = uploadDir.resolve(filename);
+
+                    if (institution.getImage() != null) {
+                        Path oldFilePath = Paths.get(uploadDir.toString(), institution.getImage().substring(institution.getImage().lastIndexOf("/") + 1));
+                        try {
+                            Files.deleteIfExists(oldFilePath);
+                        } catch (Exception e) {
+                            return Mono.error(new RuntimeException("Error al eliminar la imagen antigua: " + e.getMessage()));
+                        }
+                    }
+
+                    return Mono.fromCallable(() -> {
+                        Files.createDirectories(uploadDir);
+                        return filePath;
+                    })
+                    .flatMap(path -> saveInstitutionDto.getImage().transferTo(path))
+                    .then(Mono.defer(() -> {
+                        institution.setImage(baseUrl + "/" + uploadPath + "/" + filename);
+                        return institutionRepository.save(institution)
+                            .map(institutionMapper::toInstitutionDto);
+                    }));
+                } else {
+                    if (institution.getImage() != null) {
+                        Path uploadDir = Paths.get(uploadPath).toAbsolutePath().normalize();
+                        Path oldFilePath = Paths.get(uploadDir.toString(), institution.getImage().substring(institution.getImage().lastIndexOf("/") + 1));
+                        try {
+                            Files.deleteIfExists(oldFilePath);
+                        } catch (Exception e) {
+                            return Mono.error(new RuntimeException("Error al eliminar la imagen antigua: " + e.getMessage()));
+                        }
+                    }
+
+                    institution.setImage(null);
                     return institutionRepository.save(institution)
                         .map(institutionMapper::toInstitutionDto);
-                })
-                .switchIfEmpty(Mono.error(
-                    new CustomWebExchangeBindException(
-                        id, 
-                        "institutionId", 
-                        "No hemos podido encontrar la institución indicada. Te sugerimos que verifiques la información y lo intentes de nuevo."
-                    ).getWebExchangeBindException()
-                ))
-            );
+                }
+            });
     }
 
     @Override

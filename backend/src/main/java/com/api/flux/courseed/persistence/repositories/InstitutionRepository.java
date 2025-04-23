@@ -13,4 +13,5 @@ import reactor.core.publisher.Mono;
 public interface InstitutionRepository extends ReactiveMongoRepository<Institution, String> {
     Flux<Institution> findAllBy(Pageable pageable);
     Mono<Institution> findByName(String name);
+    Mono<Institution> findByUserId(String userId);
 }

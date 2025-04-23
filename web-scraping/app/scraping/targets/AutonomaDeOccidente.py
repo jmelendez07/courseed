@@ -11,7 +11,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 import re
 
 class AutonomaDeOccidente(BaseScraper):
-    INSTITUTION: str = "Universidad Autónoma De Occidente"
+    INSTITUTION: str = "universidad autónoma de occidente"
 
     def getCourses(self) -> list[CourseInteface]:
         courses: list[CourseInteface] = []
@@ -33,6 +33,8 @@ class AutonomaDeOccidente(BaseScraper):
 
                 except NoSuchElementException:
                     break
+
+            print(len(courseUrl))
 
             for courseUrl in courseUrls:
                 course = self.getCourse(courseUrl)
@@ -101,7 +103,7 @@ class AutonomaDeOccidente(BaseScraper):
 
             category = None
             try:
-                category = self.cleanText(self.driver.find_element(By.XPATH, '//div[@class="field-of-study"]//p').text).lower()
+                category = self.normalize_string(self.cleanText(self.driver.find_element(By.XPATH, '//div[@class="field-of-study"]//p').text))
             except Exception as e:
                 self.logger.error(f"Failed to get data for course URL: {courseUrl}. Exception: {str(e)}")
 
@@ -115,6 +117,17 @@ class AutonomaDeOccidente(BaseScraper):
             except Exception as e:
                 self.logger.error(f"Failed to get data for course URL: {courseUrl}. Exception: {str(e)}")
 
+            type = None
+
+            if "diplomado" in title.lower():
+                type = "diplomado"
+            elif "seminario" in title.lower(): 
+                type = "seminario"
+            elif "taller" in title.lower():
+                type = "taller"
+            else: 
+                type = "curso"
+
             course = CourseInteface(
                 url=courseUrl,
                 title=title,
@@ -124,6 +137,7 @@ class AutonomaDeOccidente(BaseScraper):
                 price=price,
                 duration=duration,
                 modality=modality,
+                type=type,
                 institution=self.INSTITUTION,
                 category=category,
                 contents=contents
@@ -141,6 +155,27 @@ class AutonomaDeOccidente(BaseScraper):
     def cleanText(self, text: str) -> str:
         cleanedText = re.sub(r'[\t\n\xa0]', ' ', text).strip()
         return cleanedText
+    
+    def normalize_string(self, text: str) -> str:
+        text = text.lower()
+        resultado = []
+        alphabet = "abcdefghijklmnñopqrstuvwxyz"
+        replaces = {
+            'á': 'a', 'é': 'e', 'í': 'i', 'ó': 'o', 'ú': 'u',
+            'à': 'a', 'è': 'e', 'ì': 'i', 'ò': 'o', 'ù': 'u',
+            'ä': 'a', 'ë': 'e', 'ï': 'i', 'ö': 'o', 'ü': 'u',
+            'â': 'a', 'ê': 'e', 'î': 'i', 'ô': 'o', 'û': 'u'
+        }
+
+        for character in text:
+            if character in replaces:
+                resultado.append(replaces[character])
+            elif character in alphabet:
+                resultado.append(character)
+            elif character.isspace():
+                resultado.append(character)
+        
+        return ''.join(resultado)
 
     def saveToDatabase(self, courses: list[CourseInteface]):
         for course in courses:

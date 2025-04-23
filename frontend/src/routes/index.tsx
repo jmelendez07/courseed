@@ -23,6 +23,9 @@ import ProtectedSubscriberRoute from "./ProtectedSubscriberRoute";
 import RegisterSubscribe from "@/pages/auth/RegisterSubscribe";
 import Subscriptions from "@/pages/auth/subscriptor/Subscriptions";
 import Prediction from "@/pages/prediction";
+import SearchHistory from "@/pages/auth/user/SearchHistory";
+import ProgramsViewed from "@/pages/auth/user/ProgramsViewed";
+import ProfileInterestForm from "@/pages/ProfileInterestForm";
 
 function Routes() {
 
@@ -73,6 +76,10 @@ function Routes() {
                 {
                     path: '/perfil',
                     element: <Profile />
+                },
+                {
+                    path: '/formulario-perfil',
+                    element: <ProfileInterestForm />
                 }
             ]
         }
@@ -120,6 +127,14 @@ function Routes() {
                     path: 'reseñas',
                     element: <ReviewsUser />
                 },
+                {
+                    path: 'historial-busqueda',
+                    element: <SearchHistory />
+                },
+                {
+                    path: 'programas-visualizados',
+                    element: <ProgramsViewed />
+                }
             ]
         }
     ]
