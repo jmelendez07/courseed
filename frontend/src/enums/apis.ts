@@ -58,6 +58,7 @@ enum APIS {
     REGISTER_SUSCRIPTOR = 'api/auth/register/subscriptor',
     SUBSCRIPTIONS_BY_AUTH_USER = 'api/subscriptions/auth',
     CREATE_PROFILE = 'api/profiles/create',
+    UPDATE_USER_PROFILE = 'api/profiles/update',
     UPLOAD_AVATAR = 'api/auth/upload-avatar'
 }
 

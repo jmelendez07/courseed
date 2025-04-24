@@ -11,4 +11,5 @@ public interface InterfaceProfileService {
     Mono<ProfileDto> getProfileById(String id);
     Mono<ProfileDto> getProfileByAuth(Principal principal);
     Mono<ProfileDto> createProfile(Principal principal, SaveProfileDto saveProfileDto);
+    Mono<ProfileDto> updateProfile(Principal principal, SaveProfileDto saveProfileDto);
 }

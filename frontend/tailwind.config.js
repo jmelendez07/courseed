@@ -19,6 +19,9 @@ export default {
 		{
 			pattern: /text-(red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue)-(100|200|300|400|500|600|700|800)/,
 		},
+		{
+			pattern: /border-(red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue)-(100|200|300|400|500|600|700|800)/,
+		},
 	],
   theme: {
   	extend: {

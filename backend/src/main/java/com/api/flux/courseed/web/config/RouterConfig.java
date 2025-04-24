@@ -207,6 +207,7 @@ public class RouterConfig {
             .GET("/auth", profileController::getProfileByAuth)
             .GET("/{id}", profileController::getProfileById)
             .POST("/create", profileController::createProfile)
+            .PUT("/update", profileController::updateProfile)
             .build();
     }
 

@@ -73,5 +73,36 @@ public class ProfileService implements InterfaceProfileService {
                 ).getWebExchangeBindException()
             ));
     }
+
+    @Override 
+    public Mono<ProfileDto> updateProfile(Principal principal, SaveProfileDto saveProfileDto) {
+        return userRepository.findByEmail(principal.getName())
+            .flatMap(user -> profileRepository.findByUserId(user.getId())
+                .flatMap(profile -> {
+                    profile.setKnowledgeLevel(saveProfileDto.getKnowledgeLevel());
+                    profile.setAvailableHoursTime(saveProfileDto.getAvailableHoursTime());
+                    profile.setPlatformPrefered(saveProfileDto.getPlatformPrefered());
+                    profile.setBudget(saveProfileDto.getBudget());
+                    profile.setInterest(saveProfileDto.getInterest());
+
+                    return profileRepository.save(profile)
+                        .map(profileMapper::toProfileDto);
+                })
+                .switchIfEmpty(Mono.error(
+                    new CustomWebExchangeBindException(
+                        principal.getName(), 
+                        "profile", 
+                        "No hemos podido encontrar al perfil indicado. Te sugerimos que verifiques la información y lo intentes de nuevo."
+                    ).getWebExchangeBindException()
+                ))
+            )
+            .switchIfEmpty(Mono.error(
+                new CustomWebExchangeBindException(
+                    principal.getName(), 
+                    "auth", 
+                    "No hemos podido encontrar al usuario indicado. Te sugerimos que verifiques la información y lo intentes de nuevo."
+                ).getWebExchangeBindException()
+            ));
+    }
     
 }

@@ -1,5 +1,6 @@
 import { AppSidebar } from "@/components/app-sidebar";
 import DashboardContentProfile from "@/components/dashboard/dashboard-content-profile";
+import DashboardContentUserWithProfile from "@/components/dashboard/dashboard-content-user-with-profile";
 import DashboardInstitutionProfile from "@/components/dashboard/dashboard-institution-profile";
 import DashboardStatsProfile from "@/components/dashboard/dashboard-stats-profile";
 import {
@@ -58,8 +59,12 @@ function Profile() {
                                 <Theme />
                             </div>
                         </header>
-                        <div className="flex flex-col gap-8 p-8">
-                            <DashboardContentProfile />
+                        <div className="flex flex-col gap-2 p-4 pt-0">
+                            { (authHook?.user?.profile) ? (
+                                <DashboardContentUserWithProfile />
+                            ) : (
+                                <DashboardContentProfile />
+                            ) }
                             {authHook?.user?.roles?.some((role: string) => role === ROLES.SUBSCRIBER) && (
                                 <>
                                     <Separator className="my-4" />

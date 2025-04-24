@@ -42,4 +42,15 @@ public class ProfileController {
                 )
             );
     }
+
+    public Mono<ServerResponse> updateProfile(ServerRequest serverRequest) {
+        return serverRequest.bodyToMono(SaveProfileDto.class)
+            .doOnNext(validationService::validate)
+            .flatMap(saveProfile -> serverRequest.principal()
+                .flatMap(principal -> profileService.updateProfile(principal, saveProfile)
+                    .flatMap(profile -> ServerResponse.ok().bodyValue(profile))
+                    .switchIfEmpty(ServerResponse.notFound().build())
+                )
+            );
+    }
 }
