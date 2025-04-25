@@ -2,6 +2,7 @@ import CategoryInterface from "./category";
 import ContentInterface from "./content";
 import InstitutionInterface from "./institution";
 import LikeInterface from "./like";
+import PredictionInterface from "./prediction";
 import ReactionInterface from "./reaction";
 import ReviewInterface from "./review";
 import ViewInterface from "./view";
@@ -23,6 +24,7 @@ interface CourseInterface {
     reactions: ReactionInterface[];
     reviews: ReviewInterface[];
     views: ViewInterface[];
+    prediction?: PredictionInterface;
 }
 
 export default CourseInterface;
