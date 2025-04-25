@@ -28,6 +28,7 @@ import com.api.flux.courseed.persistence.repositories.ViewRepository;
 import com.api.flux.courseed.projections.dtos.CourseDto;
 import com.api.flux.courseed.projections.dtos.FormPredictionDto;
 import com.api.flux.courseed.projections.dtos.MostCommonReactionDto;
+import com.api.flux.courseed.projections.dtos.PredictionDataDto;
 import com.api.flux.courseed.projections.dtos.RecomendeCourseDto;
 import com.api.flux.courseed.projections.mappers.CategoryMapper;
 import com.api.flux.courseed.projections.mappers.CourseMapper;
@@ -395,7 +396,28 @@ public class PredictionService implements InterfacePredictionService {
                                             double predictionValue = classifier.classifyInstance(instance);
                                             String prediction = dataStructure.classAttribute().value((int) predictionValue);
 
+                                            double[] probabilities = classifier.distributionForInstance(instance);
+                                            double confidence = probabilities[(int) predictionValue];
+                                            DecimalFormat df = new DecimalFormat("#.#");
+                                            String confidencePercentage = df.format(confidence * 100) + "%";
+
                                             if (prediction.equals("true")) {
+                                                PredictionDataDto predictionDto = new PredictionDataDto();
+                                                predictionDto.setUserInterest(instance.stringValue(0));
+                                                predictionDto.setUserAvailableTime(instance.value(1));
+                                                predictionDto.setBudget((int) instance.value(2));
+                                                predictionDto.setPlatformPreference(instance.stringValue(3));
+                                                predictionDto.setCourseModality(instance.stringValue(4));
+                                                predictionDto.setCourseDuration((int) instance.value(5));
+                                                predictionDto.setCoursePrice(instance.value(6));
+                                                predictionDto.setCourseCategory(instance.stringValue(7));
+                                                predictionDto.setCourseRatingAvg(instance.value(8));
+                                                predictionDto.setCourseMaxReaction(instance.stringValue(9));
+                                                predictionDto.setCourseVisits((int) instance.value(10));
+                                                predictionDto.setCourseReviewsCount((int) instance.value(11));
+                                                predictionDto.setCourseRecomended(prediction.equals("true"));
+                                                predictionDto.setConfidence(confidencePercentage);
+
                                                 CourseDto courseDto = courseMapper.toCourseDto(course);
                                                 courseDto.setCategory(categoryMapper.toCategoryDto(category));
                                                 courseDto.setInstitution(institutionMapper.toInstitutionDto(institution));
@@ -403,6 +425,7 @@ public class PredictionService implements InterfacePredictionService {
                                                     .map(reviewMapper::toReviewDto)
                                                     .toList()
                                                 );
+                                                courseDto.setPrediction(predictionDto);
                                                 
                                                 return Mono.just(courseDto);
                                             } else {

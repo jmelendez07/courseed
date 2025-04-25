@@ -20,6 +20,7 @@ public class CourseDto implements Serializable {
     private List<ReviewDto> reviews;
     private List<ReactionDto> reactions;
     private List<ViewDto> views;
+    private PredictionDataDto prediction;
 
     public String getId() {
         return id;
@@ -147,5 +148,13 @@ public class CourseDto implements Serializable {
 
     public void setUser(UserDto user) {
         this.user = user;
+    }
+
+    public PredictionDataDto getPrediction() {
+        return prediction;
+    }
+
+    public void setPrediction(PredictionDataDto prediction) {
+        this.prediction = prediction;
     }
 }
