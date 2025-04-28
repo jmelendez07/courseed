@@ -99,7 +99,7 @@ public class PredictionService implements InterfacePredictionService {
     private Classifier classifier;
 
     public PredictionService() throws Exception {
-        ClassPathResource modelResource = new ClassPathResource("j48modelCourseed.model");
+        ClassPathResource modelResource = new ClassPathResource("naiveBayesModelCourseed.model");
         classifier = (Classifier) weka.core.SerializationHelper.read(modelResource.getInputStream());
 
         ClassPathResource arffResource = new ClassPathResource("CourseedUsers.user_course_dataset.arff");
@@ -454,7 +454,6 @@ public class PredictionService implements InterfacePredictionService {
             )
             .defaultIfEmpty(new PageImpl<>(List.of(), pageable, 0));
     }
-
 
     public Mono<Page<CourseDto>> getRecomendedCoursesByHistoryAndAuth(Principal principal, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
