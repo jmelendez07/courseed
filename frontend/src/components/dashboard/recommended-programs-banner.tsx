@@ -12,30 +12,9 @@ export function RecommendedProgramsBanner() {
     const colorContext = React.useContext(ColorContext);
     const [programCount, setProgramCount] = React.useState<number>(0);
     const [loading, setLoading] = React.useState<boolean>(true);
-    const [isVisible, setIsVisible] = React.useState<boolean>(false);
 
-    const ref = React.useRef<HTMLDivElement>(null);
-
-    React.useEffect(() => {
-        const observer = new IntersectionObserver(
-            (entries) => {
-                if (entries[0].isIntersecting) {
-                    setIsVisible(true);
-                    observer.disconnect();
-                }
-            },
-        );
-
-        if (ref.current) {
-            observer.observe(ref.current);
-        }
-
-        return () => observer.disconnect();
-    }, [ref.current]);
      
     React.useEffect(() => {
-        if (!isVisible) return;
-
         setLoading(true);
         axios.get(APIS.USER_COURSES_RECOMENDED_COUNT)
             .then((response) => {
@@ -49,10 +28,10 @@ export function RecommendedProgramsBanner() {
             .finally(() => {
                 setLoading(false);
             });
-    }, [isVisible]);
+    }, []);
 
     return (
-        <div ref={ref} className="relative overflow-hidden rounded-lg">
+        <div className="relative overflow-hidden rounded-lg">
             {/* Fondo con colores y líneas diagonales */}
             <div className={`absolute inset-0 bg-gradient-to-r from-${colorContext?.color}-700 to-${colorContext?.getReverseColor()}-500`}>
                 {/* Líneas diagonales decorativas */}
@@ -81,10 +60,7 @@ export function RecommendedProgramsBanner() {
                     </div>
                     <div>
                         <h3 className="text-xl font-semibold flex items-center">
-                            <SlotCounter 
-                                value={programCount}
-                                startValue={0}
-                            />
+                            {programCount}
                             <span className="ml-1">programas recomendados</span>
                         </h3>
                         <p className="text-white/80 mt-1">
