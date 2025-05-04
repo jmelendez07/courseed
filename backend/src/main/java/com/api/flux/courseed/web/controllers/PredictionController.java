@@ -77,4 +77,14 @@ public class PredictionController {
                 .flatMap(courses -> ServerResponse.ok().bodyValue(courses))
                 .switchIfEmpty(ServerResponse.notFound().build());
     }
+
+    public Mono<ServerResponse> getRecomendedUsersByCourse(ServerRequest serverRequest) {
+        String courseId = serverRequest.pathVariable("courseId");
+        int page = Integer.parseInt(serverRequest.queryParam("page").orElse("0"));
+        int size = Integer.parseInt(serverRequest.queryParam("size").orElse("10"));
+
+        return predictionService.getRecomendedUsersByCourse(courseId, page, size)
+            .flatMap(users -> ServerResponse.ok().bodyValue(users))
+            .switchIfEmpty(ServerResponse.notFound().build());
+    }
 }

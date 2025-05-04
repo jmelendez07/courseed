@@ -17,6 +17,7 @@ import reactor.core.publisher.Mono;
 public interface InterfaceUserService {
     Mono<TotalUsersDto> getTotalUsers();
     Mono<Page<UserDto>> getAllUsers(int page, int size);
+    Mono<Integer> getAllUsersCount();
     Mono<UserDto> getUserById(String id);
     Mono<UserDto> getUserByEmail(String email);
     Mono<List<UserCountByMonth>> getUserCountForLastSixMonths();

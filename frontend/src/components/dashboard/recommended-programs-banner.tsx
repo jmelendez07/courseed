@@ -6,16 +6,12 @@ import React from "react";
 import { ColorContext } from "@/providers/ColorProvider";
 import axios from "axios";
 import APIS from "@/enums/apis";
-import SlotCounter from 'react-slot-counter';
 
 export function RecommendedProgramsBanner() {
     const colorContext = React.useContext(ColorContext);
     const [programCount, setProgramCount] = React.useState<number>(0);
-    const [loading, setLoading] = React.useState<boolean>(true);
-
      
     React.useEffect(() => {
-        setLoading(true);
         axios.get(APIS.USER_COURSES_RECOMENDED_COUNT)
             .then((response) => {
                 if (typeof response.data.totalCourses === "number") {
@@ -24,17 +20,12 @@ export function RecommendedProgramsBanner() {
             })
             .catch((error) => {
                 console.error("Error fetching recommended programs count:", error);
-            })
-            .finally(() => {
-                setLoading(false);
             });
     }, []);
 
     return (
         <div className="relative overflow-hidden rounded-lg">
-            {/* Fondo con colores y líneas diagonales */}
             <div className={`absolute inset-0 bg-gradient-to-r from-${colorContext?.color}-700 to-${colorContext?.getReverseColor()}-500`}>
-                {/* Líneas diagonales decorativas */}
                 <div className="absolute right-0 top-0 h-full w-1/2 overflow-hidden">
                     {Array.from({ length: 8 }).map((_, i) => (
                         <div
@@ -52,7 +43,6 @@ export function RecommendedProgramsBanner() {
                 </div>
             </div>
 
-            {/* Contenido del banner */}
             <div className="relative flex flex-col sm:flex-row items-center justify-between p-6 gap-4 text-white z-10">
                 <div className="text-left flex items-center gap-3">
                     <div className="bg-white/20 p-3 rounded-full">

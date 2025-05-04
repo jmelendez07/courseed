@@ -41,8 +41,8 @@ export function ColorSelector({ color, onChange }: ColorSelectorProps) {
                     <span className="sr-only">Selecciona un color</span>
                 </button>
             </PopoverTrigger>
-            <PopoverContent className="w-[280px] p-3">
-                <div className="grid grid-cols-4 gap-4">
+            <PopoverContent className="w-[240px] p-3">
+                <div className="grid grid-cols-4 gap-2">
                     {colors.map((c) => (
                         <button
                             key={c.value}

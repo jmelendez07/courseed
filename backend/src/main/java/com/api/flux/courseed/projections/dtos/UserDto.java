@@ -18,12 +18,21 @@ public class UserDto implements Serializable {
     private int views;
     private ProfileDto profile;
     private String image;
+    private PredictionDataDto prediction;
 
     public UserDto() {}
 
     public UserDto(String id, String email) {
         this.id = id;
         this.email = email;
+    }
+
+    public PredictionDataDto getPrediction() {
+        return prediction;
+    }
+
+    public void setPrediction(PredictionDataDto prediction) {
+        this.prediction = prediction;
     }
 
     public UserDto(String id, String email, LocalDateTime createdAt, LocalDateTime updatedAt) {

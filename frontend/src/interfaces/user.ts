@@ -1,3 +1,4 @@
+import PredictionInterface from "./prediction";
 import ProfileInterface from "./profile";
 
 interface UserInterface {
@@ -13,6 +14,7 @@ interface UserInterface {
     views?: number;
     profile: ProfileInterface;
     image?: string;
+    prediction?: PredictionInterface;
 }
 
 export default UserInterface;

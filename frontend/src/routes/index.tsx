@@ -26,6 +26,7 @@ import Prediction from "@/pages/prediction";
 import SearchHistory from "@/pages/auth/user/SearchHistory";
 import ProgramsViewed from "@/pages/auth/user/ProgramsViewed";
 import ProfileInterestForm from "@/pages/ProfileInterestForm";
+import CourseRecomendation from "@/pages/auth/admin/CourseRecomendation";
 
 function Routes() {
 
@@ -106,6 +107,10 @@ function Routes() {
                     path: 'reseñas',
                     element: <ReviewsAdmin />
                 },
+                {
+                    path: 'recomendaciones/programas',
+                    element: <CourseRecomendation />
+                }
             ]
         }
     ]

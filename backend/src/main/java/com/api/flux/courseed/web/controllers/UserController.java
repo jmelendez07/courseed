@@ -25,7 +25,7 @@ public class UserController {
         return userService.getTotalUsers()
             .flatMap(user -> ServerResponse.ok().bodyValue(user))
             .switchIfEmpty(ServerResponse.notFound().build());
-    } 
+    }
 
     public Mono<ServerResponse> getAllUsers(ServerRequest serverRequest) {
         return userService
@@ -34,6 +34,12 @@ public class UserController {
                 Integer.parseInt(serverRequest.queryParam("size").orElse("10")) 
             )
             .flatMap(users -> ServerResponse.ok().bodyValue(users))
+            .switchIfEmpty(ServerResponse.notFound().build());
+    }
+
+    public Mono<ServerResponse> getAllUsersCount(ServerRequest serverRequest) {
+        return userService.getAllUsersCount()
+            .flatMap(user -> ServerResponse.ok().bodyValue(user))
             .switchIfEmpty(ServerResponse.notFound().build());
     }
 

@@ -302,7 +302,6 @@ function UserDataTable() {
 				</Button>
 			</div>
 		</div>
-
 	);
 }
 

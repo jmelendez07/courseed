@@ -90,6 +90,12 @@ public class UserService implements InterfaceUserService {
     }
 
     @Override
+    public Mono<Integer> getAllUsersCount() {
+        return userRepository.count()
+            .map(Long::intValue);
+    }
+
+    @Override
     public Mono<UserDto> getUserById(String id) {
         return userRepository.findById(id)
             .map(userMapper::toUserDto)

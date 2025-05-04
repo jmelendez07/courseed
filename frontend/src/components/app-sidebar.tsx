@@ -3,6 +3,7 @@ import {
 	Drama,
 	GraduationCap,
 	LayoutPanelLeft,
+	ListChecks,
 	MessageSquareText,
 	ScanEye,
 	TextSearch,
@@ -27,6 +28,7 @@ import CourseForm from "@/components/form/course-form";
 import { useAuth } from "@/providers/AuthProvider";
 import ROLES from "@/enums/roles";
 import { NavRecords } from "./nav-record";
+import { NavRecomendations } from "./nav-recomendations";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
@@ -118,6 +120,13 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 				url: "/administrador/reseñas"
 			},
 		],
+		navRecomendation: [
+			{
+				name: "Programas",
+				icon: ListChecks,
+				url: "/administrador/recomendaciones/programas",
+			},
+		]
 	};
 
 	const dataUser = {
@@ -184,9 +193,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 			</SidebarHeader>
 			<SidebarContent>
 				<NavMain items={getNavMain()} />
-				{ authHook?.user?.roles?.some(r => r === ROLES.USER) && (
+				{ authHook?.user?.roles?.some(r => r === ROLES.USER) ? (
 					<NavRecords records={dataUser.navRecord} />
-				) }
+				) : authHook?.user?.roles?.some(r => r === ROLES.ADMIN) && (
+					<NavRecomendations recomendations={dataAdmin.navRecomendation} />
+				)}
 			</SidebarContent>
 			<SidebarFooter>
 				<NavUser />

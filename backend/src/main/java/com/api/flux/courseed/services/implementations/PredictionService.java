@@ -30,10 +30,13 @@ import com.api.flux.courseed.projections.dtos.FormPredictionDto;
 import com.api.flux.courseed.projections.dtos.MostCommonReactionDto;
 import com.api.flux.courseed.projections.dtos.PredictionDataDto;
 import com.api.flux.courseed.projections.dtos.RecomendeCourseDto;
+import com.api.flux.courseed.projections.dtos.UserDto;
 import com.api.flux.courseed.projections.mappers.CategoryMapper;
 import com.api.flux.courseed.projections.mappers.CourseMapper;
 import com.api.flux.courseed.projections.mappers.InstitutionMapper;
+import com.api.flux.courseed.projections.mappers.ProfileMapper;
 import com.api.flux.courseed.projections.mappers.ReviewMapper;
+import com.api.flux.courseed.projections.mappers.UserMapper;
 import com.api.flux.courseed.services.interfaces.InterfacePredictionService;
 
 import reactor.core.publisher.Flux;
@@ -88,6 +91,12 @@ public class PredictionService implements InterfacePredictionService {
 
     @Autowired
     private ReviewMapper reviewMapper;
+
+    @Autowired
+    private UserMapper userMapper;
+
+    @Autowired
+    private ProfileMapper profileMapper;
 
     @Autowired
     private CourseService courseService;
@@ -585,6 +594,110 @@ public class PredictionService implements InterfacePredictionService {
                         return Mono.just(pageResult);
                     });
                 })
+            )
+            .defaultIfEmpty(new PageImpl<>(List.of(), pageable, 0));
+    }
+
+    public Mono<Page<UserDto>> getRecomendedUsersByCourse(String courseId, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+
+        return courseRepository.findById(courseId)
+            .flatMap(course -> categoryRepository.findById(course.getCategoryId())
+                .flatMap(category -> institutionRepository.findById(course.getInstitutionId())
+                    .flatMap(institution -> userRepository.findAll()
+                        .flatMap(user -> profileRepository.findByUserId(user.getId())
+                            .flatMap(profile -> {
+                                Mono<Double> ratingAvgMono = reviewRepository.getAverageRatingByCourseId(course.getId())
+                                    .defaultIfEmpty(0.0);
+                                
+                                Mono<String> maxReactionMono = reactionRepository.findMostCommonReactionByCourseId(course.getId())
+                                    .map(MostCommonReactionDto::getType)
+                                    .defaultIfEmpty("NONE");
+                                
+                                Mono<Long> viewsCountMono = viewRepository.countByCourseId(course.getId())
+                                    .defaultIfEmpty(0L);
+                                
+                                Mono<Long> reviewsCountMono = reviewRepository.countByCourseId(course.getId())
+                                    .defaultIfEmpty(0L);
+
+                                Flux<Review> reviewFlux = reviewRepository.findByCourseId(course.getId());
+
+                                return Mono.zip(ratingAvgMono, maxReactionMono, viewsCountMono, reviewsCountMono, reviewFlux.collectList())
+                                    .flatMap(tuple -> {
+                                        Double ratingAvg = tuple.getT1();
+                                        String maxReaction = tuple.getT2();
+                                        Long viewsCount = tuple.getT3();
+                                        Long reviewsCount = tuple.getT4();
+                                        
+                                        try {
+                                            Instance instance = new DenseInstance(13);
+                                            instance.setDataset(dataStructure);
+                                            instance.setValue(0, profile.getInterest());
+                                            instance.setValue(1, profile.getAvailableHoursTime());
+                                            instance.setValue(2, profile.getBudget());
+                                            instance.setValue(3, courseService.standarizeModality(profile.getPlatformPrefered()));
+                                            instance.setValue(4, courseService.standarizeModality(course.getModality()));
+                                            instance.setValue(5, courseService.standarizeDuration(course.getDuration()));
+                                            instance.setValue(6, course.getPrice() == null ? 0 : course.getPrice());
+                                            instance.setValue(7, categoryService.standarizeCategory(category.getName()));
+                                            instance.setValue(8, ratingAvg);
+                                            instance.setValue(9, maxReaction);
+                                            instance.setValue(10, viewsCount.intValue());
+                                            instance.setValue(11, reviewsCount.intValue());
+
+                                            double predictionValue = classifier.classifyInstance(instance);
+                                            String prediction = dataStructure.classAttribute().value((int) predictionValue);
+
+                                            double[] probabilities = classifier.distributionForInstance(instance);
+                                            double confidence = probabilities[(int) predictionValue];
+                                            DecimalFormat df = new DecimalFormat("#.#");
+                                            String confidencePercentage = df.format(confidence * 100) + "%";
+
+                                            if (prediction.equals("true")) {
+                                                PredictionDataDto predictionDto = new PredictionDataDto();
+                                                predictionDto.setUserInterest(instance.stringValue(0));
+                                                predictionDto.setUserAvailableTime(instance.value(1));
+                                                predictionDto.setBudget((int) instance.value(2));
+                                                predictionDto.setPlatformPreference(instance.stringValue(3));
+                                                predictionDto.setCourseModality(instance.stringValue(4));
+                                                predictionDto.setCourseDuration((int) instance.value(5));
+                                                predictionDto.setCoursePrice(instance.value(6));
+                                                predictionDto.setCourseCategory(instance.stringValue(7));
+                                                predictionDto.setCourseRatingAvg(instance.value(8));
+                                                predictionDto.setCourseMaxReaction(instance.stringValue(9));
+                                                predictionDto.setCourseVisits((int) instance.value(10));
+                                                predictionDto.setCourseReviewsCount((int) instance.value(11));
+                                                predictionDto.setCourseRecomended(prediction.equals("true"));
+                                                predictionDto.setConfidence(confidencePercentage);
+
+                                                UserDto userDto = userMapper.toUserDto(user);
+                                                userDto.setProfile(profileMapper.toProfileDto(profile));
+                                                userDto.setPrediction(predictionDto);
+                                                
+                                                return Mono.just(userDto);
+                                            } else {
+                                                return Mono.empty();
+                                            }
+                                        } catch (Exception e) {
+                                            e.printStackTrace();
+                                            return Mono.empty();
+                                        }
+                                    });
+                            })
+                        )
+                        .collectList()
+                        .flatMap(users -> {
+                            List<UserDto> paginatedUsers = users.stream()
+                                .filter(c -> c != null)
+                                .skip(page * size)
+                                .limit(size)            
+                                .toList();
+            
+                            Page<UserDto> pageResult = new PageImpl<>(paginatedUsers, pageable, users.size());
+                            return Mono.just(pageResult);
+                        })
+                    )
+                )
             )
             .defaultIfEmpty(new PageImpl<>(List.of(), pageable, 0));
     }

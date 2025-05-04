@@ -139,8 +139,16 @@ public class CourseService implements InterfaceCourseService {
                 Flux<Content> contentFlux = contentRepository.findByCourseId(course.getId());
                 Flux<Reaction> reactionFlux = reactionRepository.findByCourseId(course.getId());
                 Flux<Review> reviewFlux = reviewRepository.findByCourseId(course.getId());
+                Flux<ViewDto> viewFlux = viewRepository.findByCourseId(course.getId())
+                    .flatMap(view -> userRepository.findById(view.getUserId())
+                        .map(user -> {
+                            ViewDto viewDto = viewMapper.toViewDto(view);
+                            viewDto.setUser(new UserDto(user.getId(), user.getEmail()));
+                            return viewDto;
+                        })
+                    );
 
-                return Mono.zip(categoryMono, institutionMono, contentFlux.collectList(), reactionFlux.collectList(), reviewFlux.collectList())
+                return Mono.zip(categoryMono, institutionMono, contentFlux.collectList(), reactionFlux.collectList(), reviewFlux.collectList(), viewFlux.collectList())
                     .map(tuple -> {
                         CourseDto courseDto = courseMapper.toCourseDto(course);
                         courseDto.setCategory(categoryMapper.toCategoryDto(tuple.getT1()));
@@ -154,6 +162,7 @@ public class CourseService implements InterfaceCourseService {
                             .map(reviewMapper::toReviewDto)
                             .toList()
                         );
+                        courseDto.setViews(tuple.getT6());
 
                         return courseDto;
                     });
