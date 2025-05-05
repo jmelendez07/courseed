@@ -153,6 +153,7 @@ public class RouterConfig {
             .route()
             .GET("", userController::getAllUsers)
             .GET("/count", userController::getAllUsersCount)
+            .GET("/count/interest-or-modality", userController::getAllUsersCountByInterestOrModality)
             .GET("/{id}", userController::getUserById)
             .GET("/email/{email}", userController::getUserByEmail)
             .GET("/total/this-month", userController::getTotalUsers)
@@ -221,6 +222,7 @@ public class RouterConfig {
             .GET("/courses-recomended/auth", predictionController::getRecomendedCoursesByAuth)
             .GET("/courses-recomended/history/auth", predictionController::getRecomendedCoursesByHistoryAndAuth)
             .GET("/users-recomended/course/{courseId}", predictionController::getRecomendedUsersByCourse)
+            .GET("/courses", predictionController::getAllCoursesWithAvgConfidence)
             .POST("/form-prediction", predictionController::predictCourseRecommendation)
             .build();
     }

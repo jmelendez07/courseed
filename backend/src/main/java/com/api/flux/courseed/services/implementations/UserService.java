@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import com.api.flux.courseed.persistence.documents.Reaction;
 import com.api.flux.courseed.persistence.documents.Review;
 import com.api.flux.courseed.persistence.documents.User;
+import com.api.flux.courseed.persistence.repositories.ProfileRepository;
 import com.api.flux.courseed.persistence.repositories.ReactionRepository;
 import com.api.flux.courseed.persistence.repositories.ReviewRepository;
 import com.api.flux.courseed.persistence.repositories.UserRepository;
@@ -50,10 +51,19 @@ public class UserService implements InterfaceUserService {
     private ReactionRepository reactionRepository;
 
     @Autowired
+    private ProfileRepository profileRepository;
+
+    @Autowired
     private UserMapper userMapper;
 
     @Autowired    
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private CategoryService categoryService;
+
+    @Autowired
+    private CourseService courseService;
 
     @Override
     public Mono<TotalUsersDto> getTotalUsers() {
@@ -65,6 +75,27 @@ public class UserService implements InterfaceUserService {
             .flatMap(total -> userRepository.countByCreatedAtBetween(startOfMonth, endOfMonth)
                 .map(lastMonth -> new TotalUsersDto(total, lastMonth))
             );
+    }
+
+    @Override
+    public Mono<Integer> getAllUsersCountByInterestOrModality(String interest, String modality) {
+        return userRepository.findAll()
+            .flatMap(user -> profileRepository.findByUserId(user.getId())
+                .flatMap(profile -> {
+                    String interestStandarized = categoryService.standarizeCategory(interest);
+                    String modalityStandarized = courseService.standarizeModality(modality);
+                    String profileInterestStandarized = categoryService.standarizeCategory(profile.getInterest());
+                    String profileModalityStandarized = courseService.standarizeModality(profile.getPlatformPreference());
+
+                    if (interestStandarized.equals(profileInterestStandarized) || modalityStandarized.equals(profileModalityStandarized)) {
+                        return Mono.just(user.getId());
+                    } else {
+                        return Mono.empty();
+                    }
+                })
+            )
+            .collectList()
+            .map(List::size);
     }
 
     @Override

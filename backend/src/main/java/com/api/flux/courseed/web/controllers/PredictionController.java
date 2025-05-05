@@ -87,4 +87,14 @@ public class PredictionController {
             .flatMap(users -> ServerResponse.ok().bodyValue(users))
             .switchIfEmpty(ServerResponse.notFound().build());
     }
+
+    public Mono<ServerResponse> getAllCoursesWithAvgConfidence(ServerRequest serverRequest) {
+        return predictionService.getAllCoursesWithAvgConfidence(
+            serverRequest.queryParam("search").orElse(""),
+            Integer.parseInt(serverRequest.queryParam("page").orElse("0")), 
+            Integer.parseInt(serverRequest.queryParam("size").orElse("10"))
+        )
+            .flatMap(courses -> ServerResponse.ok().bodyValue(courses))
+            .switchIfEmpty(ServerResponse.notFound().build());
+    }
 }

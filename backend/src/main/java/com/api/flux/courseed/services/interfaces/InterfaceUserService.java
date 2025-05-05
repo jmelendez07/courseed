@@ -16,6 +16,7 @@ import reactor.core.publisher.Mono;
 
 public interface InterfaceUserService {
     Mono<TotalUsersDto> getTotalUsers();
+    Mono<Integer> getAllUsersCountByInterestOrModality(String interest, String modality);
     Mono<Page<UserDto>> getAllUsers(int page, int size);
     Mono<Integer> getAllUsersCount();
     Mono<UserDto> getUserById(String id);

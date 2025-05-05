@@ -37,6 +37,15 @@ public class UserController {
             .switchIfEmpty(ServerResponse.notFound().build());
     }
 
+    public Mono<ServerResponse> getAllUsersCountByInterestOrModality(ServerRequest serverRequest) {
+        return userService.getAllUsersCountByInterestOrModality(
+                serverRequest.queryParam("interest").orElse(""),
+                serverRequest.queryParam("modality").orElse("")
+            )
+            .flatMap(user -> ServerResponse.ok().bodyValue(user))
+            .switchIfEmpty(ServerResponse.notFound().build());
+    }
+
     public Mono<ServerResponse> getAllUsersCount(ServerRequest serverRequest) {
         return userService.getAllUsersCount()
             .flatMap(user -> ServerResponse.ok().bodyValue(user))

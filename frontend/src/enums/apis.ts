@@ -1,6 +1,7 @@
 enum APIS {
     USERS = 'api/users',
     USERS_COUNT = 'api/users/count',
+    USERS_COUNT_BY_INTEREST_OR_MODALITY = 'api/users/count/interest-or-modality',
     USERS_TOTAL = 'api/users/total/this-month',
     USER_AUTHENTICATED = 'api/auth',
     UPDATE_AUTH_PASSWORD = 'api/auth/password',
@@ -15,6 +16,7 @@ enum APIS {
     USER_COURSES_RECOMENDED = 'api/predictions/courses-recomended/auth',
     USER_COURSES_RECOMENDED_BY_HISTORY = 'api/predictions/courses-recomended/history/auth',
     USERS_RECOMENDED_BY_COURSE = 'api/predictions/users-recomended/course/',
+    COURSES_RECOMENDED = 'api/predictions/courses',
     LOGIN = 'api/auth/login',
     REGISTER = 'api/auth/register',
     COURSES = 'api/courses',

@@ -2,7 +2,7 @@ import APIS from "@/enums/apis";
 import CourseInterface from "@/interfaces/course";
 import UserInterface from "@/interfaces/user";
 import axios, { AxiosResponse } from "axios";
-import { ArrowUpDown, ClipboardPaste, DollarSign, LoaderCircle, Timer, X } from "lucide-react";
+import { ArrowUpDown, ClipboardPaste, DollarSign, LoaderCircle, Timer, X, Info } from "lucide-react";
 import React from "react";
 import LazyImage from "./ui/LazyImage";
 import { ColumnDef, ColumnFiltersState, flexRender, getCoreRowModel, getFilteredRowModel, getSortedRowModel, SortingState, useReactTable } from "@tanstack/react-table";
@@ -10,7 +10,9 @@ import { Button } from "./ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./ui/table";
 import { Input } from "./ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
-import { ColorContext } from "@/providers/ColorProvider";
+import { Card, CardHeader } from "./ui/card";
+import { Badge } from "./ui/badge";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./ui/tooltip";
 
 interface TableRecomendedUsersByCourseProps {
     course: CourseInterface;
@@ -36,8 +38,7 @@ const copyPrediction = (course: UserInterface) => {
 			.then(() => {
 				alert("Predicción copiada al portapapeles.");
 			})
-			.catch((err) => {
-				console.error("Error al copiar al portapapeles:", err);
+			.catch(() => {
 				alert("No se pudo copiar al portapapeles.");
 			});
 	}
@@ -53,7 +54,6 @@ function TableRecomendedUsersByCourse({ course, exit }: TableRecomendedUsersByCo
     const [totalRecomendedUsers, setTotalRecomendedUsers] = React.useState<number>(0);
     const [sorting, setSorting] = React.useState<SortingState>([]);
     const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
-    const colorContext = React.useContext(ColorContext);
 
     React.useEffect(() => {
         setLoading(true);
@@ -75,7 +75,12 @@ function TableRecomendedUsersByCourse({ course, exit }: TableRecomendedUsersByCo
     }, [pageNumber]);
 
     React.useEffect(() => {
-        axios.get(APIS.USERS_COUNT)
+        axios.get(APIS.USERS_COUNT_BY_INTEREST_OR_MODALITY, {
+            params: {
+                interest: course.category,
+                modality: course.modality
+            }
+        })
             .then((response: AxiosResponse<number>) => {
                 setTotalUsers(response.data);
             })
@@ -111,41 +116,21 @@ function TableRecomendedUsersByCourse({ course, exit }: TableRecomendedUsersByCo
         },
         {
             id: "interest",
-            header: ({ column }) => {
-                return (
-                    <Button
-                        variant="ghost"
-                        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-                    >
-                        Categoria de Interes
-                        <ArrowUpDown className="ml-2 h-4 w-4" />
-                    </Button>
-                )
-            },
+            header: "Categoria de Interes",
             cell: ({ row }) => {
                 const interest: string = row.original.prediction?.userInterest ?? '';
                 return (
-                    <p className="truncate pl-4">{interest}</p>
+                    <p className="truncate">{interest}</p>
                 );
             }
         },
         {
             id: "duration",
-            header: ({ column }) => {
-                return (
-                    <Button
-                        variant="ghost"
-                        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-                    >
-                        Tiempo disponible
-                        <ArrowUpDown className="ml-2 h-4 w-4" />
-                    </Button>
-                )
-            },
+            header: "Tiempo disponible",
             cell: ({ row }) => {
                 const duration = row.original.prediction?.userAvailableTime;
     
-                return <div className="flex items-center gap-x-1 pl-4">
+                return <div className="flex items-center gap-x-1">
                     {duration} horas
                     <Timer className="size-4 text-gray-600" />
                 </div>
@@ -153,17 +138,7 @@ function TableRecomendedUsersByCourse({ course, exit }: TableRecomendedUsersByCo
         },
         {
             id: "budget",
-            header: ({ column }) => {
-                return (
-                    <Button
-                        variant="ghost"
-                        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-                    >
-                        Presupuesto
-                        <ArrowUpDown className="ml-2 h-4 w-4" />
-                    </Button>
-                )
-            },
+            header: "Presupuesto",
             cell: ({ row }) => {
                 const price = row.original.prediction?.budget;
                 const formattedPrice : string = price
@@ -173,31 +148,34 @@ function TableRecomendedUsersByCourse({ course, exit }: TableRecomendedUsersByCo
                     }).format(price)
                     : '0';
     
-                return <div className="flex items-center gap-x-1 pl-4">
+                return <div className="flex items-center gap-x-1">
                     {formattedPrice}
                     <DollarSign className="size-4 text-gray-600" />
                 </div>
             },
         },
         {
-            accessorKey: "category",
-            header: ({ column }) => {
-                return (
-                    <Button
-                        variant="ghost"
-                        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-                    >
-                        Preferencia de plataforma
-                        <ArrowUpDown className="ml-2 h-4 w-4" />
-                    </Button>
-                )
-            },
+            id: "category",
+            header: "Plataforma preferida",
             cell: ({ row }) => {
                 const platformPreference: string = row.original.prediction?.platformPreference ?? ''; 
 
                 return (
-                    <p className="pl-4">
+                    <p>
                         {platformPreference}
+                    </p>
+                )
+            }
+        },
+        {
+            id: "confidence",
+            header: "Confidencia",
+            cell: ({ row }) => {
+                const confidence: string = row.original.prediction?.confidence ?? ''; 
+
+                return (
+                    <p>
+                        {confidence}
                     </p>
                 )
             }
@@ -232,21 +210,66 @@ function TableRecomendedUsersByCourse({ course, exit }: TableRecomendedUsersByCo
         <div 
             className={`grid grid-cols-1 grid-rows-[auto_1fr] gap-6 ${loading ? 'h-full' : ''}`}
         >
-            <div className="grid grid-cols-[1fr_auto] justify-between items-center gap-x-10">
-                <div className="grid items-center grid-cols-[auto_1fr] gap-x-2">
-                    <LazyImage src={course.image ?? ''} className="min-w-10 min-h-10 size-10 shrink-0 rounded-md object-cover" />
-                    <h2 className="truncate text-2xl font-semibold">
-                        {course.title}
-                    </h2>
-                </div> 
-                <button 
-                    type="button"
-                    onClick={exit} 
-                    className="p-2 border border-gray-200 bg-gray-100 rounded-md hover:bg-gray-200 hover:border-gray-300 transition-all duration-200 ease-out"
-                >
-                    <X className="size-4" />
-                </button>
-            </div>
+            <Card>
+                <CardHeader className="flex flex-col relative gap-2">
+                    <div className="flex flex-col md:flex-row gap-4 items-start">
+                        <LazyImage
+                            src={course.image || ""}
+                            className="object-cover w-16 h-16 max-w-16 rounded-md shrink-0"
+                        />
+                        <div className="space-y-2 flex-1">
+                            <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4">
+                                <h1 className="text-xl font-bold">{course.title}</h1>
+                                <div className="flex flex-wrap gap-2">
+                                    <Badge variant="outline" className="bg-amber-50 text-amber-700 hover:bg-amber-100 border-amber-200">
+                                        {course.category.name}
+                                    </Badge>
+                                    <Badge
+                                        variant="outline"
+                                        className="bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border-emerald-200"
+                                    >
+                                        {course.modality}
+                                    </Badge>
+                                </div>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <span className="text-sm font-medium">Usuarios recomendados</span>
+                                <span className="font-semibold">
+                                    {totalRecomendedUsers} / {totalUsers}
+                                </span>
+                                <TooltipProvider>
+                                    <Tooltip>
+                                        <TooltipTrigger asChild>
+                                            <Info className="h-4 w-4 text-muted-foreground cursor-help" />
+                                        </TooltipTrigger>
+                                        <TooltipContent className="max-w-xs">
+                                            <p>
+                                                Total de usuarios interesados en la categoria {course.category.name} o la modalidad{" "}
+                                                {course.modality}
+                                            </p>
+                                        </TooltipContent>
+                                    </Tooltip>
+                                </TooltipProvider>
+                            </div>
+                        </div>
+                    </div>
+                    <Input
+                        placeholder="Buscar por email..."
+                        value={(table.getColumn("email")?.getFilterValue() as string) ?? ""}
+                        onChange={(event) =>
+                            table.getColumn("email")?.setFilterValue(event.target.value)
+                        }
+                        className="max-w-sm"
+                    />
+                    <button 
+                        type="button"
+                        onClick={exit} 
+                        className="absolute top-1 right-3 bg-gray-100 hover:bg-gray-200 cursor-pointer p-1 rounded-md"
+                    >
+                        <X className="size-5" />
+                    </button>
+                </CardHeader>
+            </Card>
             <div 
                 className={`grid grid-cols-1 w-full ${loading ? 'place-items-center h-full' : 'place-content-start'}`}
             >
@@ -254,27 +277,6 @@ function TableRecomendedUsersByCourse({ course, exit }: TableRecomendedUsersByCo
                     <LoaderCircle className="animate-spin text-gray-600" />
                 ) : (
                     <>
-                        <div className="flex sm:items-center pb-4 flex-col gap-2 sm:flex-row sm:justify-between">
-                            <div className="flex items-center">
-                                <h2 className="text-xl font-medium flex items-center gap-2">
-                                    <span>Usuarios recomendados</span>
-                                    <span>
-                                        <span className={`text-${colorContext?.color}-600`}>
-                                            {totalRecomendedUsers + " "}
-                                        </span>
-                                        / {totalUsers}
-                                    </span>
-                                </h2>
-                            </div>
-                            <Input
-                                placeholder="Buscar por email..."
-                                value={(table.getColumn("email")?.getFilterValue() as string) ?? ""}
-                                onChange={(event) =>
-                                    table.getColumn("email")?.setFilterValue(event.target.value)
-                                }
-                                className="max-w-sm"
-                            />
-                        </div>
                         <div 
                             className="rounded-md border border-zinc-200 dark:border-zinc-800 
                             dark:file:text-zinc-50 dark:placeholder:text-zinc-400 

@@ -21,6 +21,7 @@ public class CourseDto implements Serializable {
     private List<ReactionDto> reactions;
     private List<ViewDto> views;
     private PredictionDataDto prediction;
+    private String predictionAvgConfidence;
 
     public String getId() {
         return id;
@@ -156,5 +157,13 @@ public class CourseDto implements Serializable {
 
     public void setPrediction(PredictionDataDto prediction) {
         this.prediction = prediction;
+    }
+
+    public String getPredictionAvgConfidence() {
+        return predictionAvgConfidence;
+    }
+
+    public void setPredictionAvgConfidence(String predictionAvgConfidence) {
+        this.predictionAvgConfidence = predictionAvgConfidence;
     }
 }

@@ -254,22 +254,12 @@ function DashboardCourseRecomendation() {
 		},
 		{
 			id: "reviewCount",
-			header: ({ column }) => {
-				return (
-					<Button
-						variant="ghost"
-						onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-					>
-						Reseñas
-						<ArrowUpDown className="ml-2 h-4 w-4" />
-					</Button>
-				)
-			},
+			header: "Reseñas",
 			cell: ({ row }) => {
 				const reviews: ReviewInterface[] = row.getValue("reviews");
                 
 				return (
-                    <div className="flex items-center gap-x-1 pl-4">
+                    <div className="flex items-center gap-x-1">
                         <p>
                             {reviews.length}
                         </p>
@@ -317,7 +307,7 @@ function DashboardCourseRecomendation() {
     });
 
     React.useEffect(() => {
-        axios.get(APIS.COURSES, {
+        axios.get(APIS.COURSES_RECOMENDED, {
             params: {
                 page: pageNumber,
                 size: pageSize,
