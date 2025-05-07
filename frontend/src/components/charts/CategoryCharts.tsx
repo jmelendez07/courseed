@@ -88,7 +88,7 @@ function CategoryCharts({ popularCategories, predictedCategories, decliningCateg
                 ctx.fillText("Predicciones por Confianza", width / 2, 15)
 
                 // Dibujar sectores
-                predictedCategories.forEach((category, index) => {
+                predictedCategories.forEach(category => {
                     const sliceAngle = (category.confidence / total) * 2 * Math.PI
 
                     // Sector

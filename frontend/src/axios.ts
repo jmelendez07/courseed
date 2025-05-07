@@ -1,3 +1,3 @@
 import axios from "axios";
 
-axios.defaults.baseURL = "http://localhost:8090"
+axios.defaults.baseURL = import.meta.env.VITE_BACKEND_BASE_URL;

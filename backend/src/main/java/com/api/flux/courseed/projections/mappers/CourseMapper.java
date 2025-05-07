@@ -24,5 +24,7 @@ public interface CourseMapper {
     @Mapping(target = "reviews", ignore = true)
     @Mapping(target = "reactions", ignore = true)
     @Mapping(target = "views", ignore = true)
+    @Mapping(target = "prediction", ignore = true)
+    @Mapping(target = "predictionAvgConfidence", ignore = true)
     CourseDto toCourseDto(Course course);
 }

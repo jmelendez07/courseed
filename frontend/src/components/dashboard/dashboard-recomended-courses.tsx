@@ -20,7 +20,7 @@ function DashboardRecomendedCourses() {
     const colorContext = React.useContext(ColorContext);
 
     const ordenedCourses: CourseInterface[] = React.useMemo(() => {
-        if (!courses.length || !authHook?.user?.profile.interest) {
+        if (!courses.length || !authHook?.user?.profile?.interest) {
             return courses;
         }
 
@@ -58,9 +58,9 @@ function DashboardRecomendedCourses() {
         <div className="grid grid-cols-1 overflow-hidden gap-4">
             <h2 className="text-xl font-semibold">
                 Programas recomendados para ti, basados en tu interés por {" "}
-                <span className={`text-${colorContext?.color}-600`}>{ authHook?.user?.profile.interest }</span>
+                <span className={`text-${colorContext?.color}-600`}>{ authHook?.user?.profile?.interest }</span>
                 {" "}y aprendizaje {" "}
-                <span className={`text-${colorContext?.color}-600`}>{ authHook?.user?.profile.platformPrefered }</span>.
+                <span className={`text-${colorContext?.color}-600`}>{ authHook?.user?.profile?.platformPrefered }</span>.
             </h2>
             <Carousel
                 opts={{

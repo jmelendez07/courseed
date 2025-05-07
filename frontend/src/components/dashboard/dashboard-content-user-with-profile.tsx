@@ -309,7 +309,7 @@ function DashboardContentUserWithProfile() {
                                                     </div>
                                                     <div>
                                                         <p className="text-sm font-medium">Nivel de Conocimiento</p>
-                                                        <p className="text-sm text-muted-foreground">{authHook?.user?.profile.knowledgeLevel}</p>
+                                                        <p className="text-sm text-muted-foreground">{authHook?.user?.profile?.knowledgeLevel}</p>
                                                     </div>
                                                 </div>
 
@@ -319,7 +319,7 @@ function DashboardContentUserWithProfile() {
                                                     </div>
                                                     <div>
                                                         <p className="text-sm font-medium">Horas Disponibles</p>
-                                                        <p className="text-sm text-muted-foreground">{authHook?.user?.profile.availableHoursTime} horas/semana</p>
+                                                        <p className="text-sm text-muted-foreground">{authHook?.user?.profile?.availableHoursTime} horas/semana</p>
                                                     </div>
                                                 </div>
 
@@ -329,7 +329,7 @@ function DashboardContentUserWithProfile() {
                                                     </div>
                                                     <div>
                                                         <p className="text-sm font-medium">Modalidad Preferida</p>
-                                                        <p className="text-sm text-muted-foreground">{authHook?.user?.profile.platformPrefered}</p>
+                                                        <p className="text-sm text-muted-foreground">{authHook?.user?.profile?.platformPrefered}</p>
                                                     </div>
                                                 </div>
                                             </div>
@@ -341,7 +341,7 @@ function DashboardContentUserWithProfile() {
                                                     </div>
                                                     <div>
                                                         <p className="text-sm font-medium">Presupuesto</p>
-                                                        <p className="text-sm text-muted-foreground">{new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP' }).format(authHook?.user?.profile.budget ?? 0)}</p>
+                                                        <p className="text-sm text-muted-foreground">{new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP' }).format(authHook?.user?.profile?.budget ?? 0)}</p>
                                                     </div>
                                                 </div>
 
@@ -351,7 +351,7 @@ function DashboardContentUserWithProfile() {
                                                     </div>
                                                     <div>
                                                         <p className="text-sm font-medium">Interés Principal</p>
-                                                        <p className="text-sm text-muted-foreground">{authHook?.user?.profile.interest}</p>
+                                                        <p className="text-sm text-muted-foreground">{authHook?.user?.profile?.interest}</p>
                                                     </div>
                                                 </div>
 
@@ -361,7 +361,7 @@ function DashboardContentUserWithProfile() {
                                                     </div>
                                                     <div>
                                                         <p className="text-sm font-medium">Última Actualización</p>
-                                                        <p className="text-sm text-muted-foreground">{dayjs(authHook?.user?.profile.createdAt).format("MMMM D, YYYY h:mm A")}</p>
+                                                        <p className="text-sm text-muted-foreground">{dayjs(authHook?.user?.profile?.createdAt).format("MMMM D, YYYY h:mm A")}</p>
                                                     </div>
                                                 </div>
                                             </div>
@@ -391,9 +391,9 @@ function DashboardContentUserWithProfile() {
                                                 className={`h-full bg-${colorContext?.color}-600 rounded-full`}
                                                 style={{
                                                     width:
-                                                    authHook?.user?.profile.knowledgeLevel === "principiante"
+                                                    authHook?.user?.profile?.knowledgeLevel === "principiante"
                                                         ? "25%"
-                                                        : authHook?.user?.profile.knowledgeLevel === "intermedio"
+                                                        : authHook?.user?.profile?.knowledgeLevel === "intermedio"
                                                             ? "50%"
                                                             : "100%",
                                                 }}
@@ -414,21 +414,21 @@ function DashboardContentUserWithProfile() {
                                                     <Lightbulb className="h-6 w-6" />
                                                 </div>
                                                 <h4 className="font-medium">Interés Principal</h4>
-                                                <p className="text-sm text-muted-foreground">{ authHook?.user?.profile.interest }</p>
+                                                <p className="text-sm text-muted-foreground">{ authHook?.user?.profile?.interest }</p>
                                             </div>
                                             <div className="bg-muted p-4 rounded-lg text-center">
                                                 <div className="mx-auto bg-muted/50 p-3 rounded-full w-12 h-12 flex items-center justify-center mb-2">
                                                     <Laptop className="h-6 w-6" />
                                                 </div>
                                                 <h4 className="font-medium">Modalidad</h4>
-                                                <p className="text-sm text-muted-foreground">{ authHook?.user?.profile.platformPrefered }</p>
+                                                <p className="text-sm text-muted-foreground">{ authHook?.user?.profile?.platformPrefered }</p>
                                             </div>
                                             <div className="bg-muted p-4 rounded-lg text-center">
                                                 <div className="mx-auto bg-muted/50 p-3 rounded-full w-12 h-12 flex items-center justify-center mb-2">
                                                     <DollarSign className="h-6 w-6" />
                                                 </div>
                                                 <h4 className="font-medium">Presupuesto</h4>
-                                                <p className="text-sm text-muted-foreground">{new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP' }).format(authHook?.user?.profile.budget ?? 0)}</p>
+                                                <p className="text-sm text-muted-foreground">{new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP' }).format(authHook?.user?.profile?.budget ?? 0)}</p>
                                             </div>
                                         </div>
                                     </div>
@@ -437,7 +437,7 @@ function DashboardContentUserWithProfile() {
                                         <h3 className="text-lg font-medium mb-2">Tiempo Disponible</h3>
                                         <div className="flex items-center gap-4">
                                             <div className={`w-16 h-16 rounded-full border-4 border-${colorContext?.color}-600 flex items-center justify-center`}>
-                                                <span className="text-2xl font-bold">{authHook?.user?.profile.availableHoursTime}</span>
+                                                <span className="text-2xl font-bold">{authHook?.user?.profile?.availableHoursTime}</span>
                                             </div>
                                             <div>
                                                 <p className="font-medium">Horas por semana</p>

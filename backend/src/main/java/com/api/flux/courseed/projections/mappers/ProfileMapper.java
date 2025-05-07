@@ -16,5 +16,6 @@ public interface ProfileMapper {
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
     @Mapping(target = "userId", ignore = true)
+    @Mapping(target = "platformPreference", ignore = true)
     Profile toProfile(SaveProfileDto saveProfileDto);
 }

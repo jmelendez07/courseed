@@ -52,11 +52,9 @@ function ProfileFormDialog({ open, setOpen, setExploding }: ProfileFormDialogPro
         budget: null,
         interest: null
     });
-    const [loading, setLoading] = React.useState<boolean>(false);
 
     React.useEffect(() => {
         if (open && Object.values(form).every(value => value !== null)) {
-            setLoading(true);
             axios.post(APIS.CREATE_PROFILE, form)
                 .then((response: AxiosResponse) => {
                     console.log(response);
@@ -66,7 +64,6 @@ function ProfileFormDialog({ open, setOpen, setExploding }: ProfileFormDialogPro
                 .catch((error) => {
                     console.log(error);
                 })
-                .finally(() => setLoading(false));
         }
     }, [form, open]);
 

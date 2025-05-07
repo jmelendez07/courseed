@@ -29,7 +29,7 @@ function DashboardHistoryRecomendations() {
     }, []);
 
     const ordenedCourses: CourseInterface[] = React.useMemo(() => {
-        if (!courses.length || !authHook?.user?.profile.interest) {
+        if (!courses.length || !authHook?.user?.profile?.interest) {
             return courses;
         }
 

@@ -263,7 +263,7 @@ function CourseForm({ course, onCreated, onUpdated }: CourseFormProps) {
                             setSelectedStatus={i => {
                                 setForm({
                                     ...form,
-                                    institution: i,
+                                    institution: i as InstitutionInterface,
                                 });
                             }}
                             disabled={authHook?.user?.roles?.some(role => role === ROLES.SUBSCRIBER)}

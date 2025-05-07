@@ -29,7 +29,7 @@ const PayUCheckout: React.FC = () => {
 			<h2 className="text-xl font-bold mb-4">Pagar con PayU</h2>
 			<form
 				method="post"
-				action="https://sandbox.checkout.payulatam.com/ppp-web-gateway-payu/"
+				action={import.meta.env.VITE_BACKEND_BASE_URL}
 			>
 				{/* Campos ocultos con la información de pago */}
 				<input type="hidden" name="merchantId" value={MERCHANT_ID} />

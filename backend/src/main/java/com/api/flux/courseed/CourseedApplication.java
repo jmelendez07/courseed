@@ -19,6 +19,7 @@ public class CourseedApplication {
 		System.setProperty("ADMIN_PASS", dotenv.get("ADMIN_PASS"));
 		System.setProperty("PAYU_API_KEY", dotenv.get("PAYU_API_KEY"));
 		System.setProperty("PAYU_MERCHANT_ID", dotenv.get("PAYU_MERCHANT_ID"));
+		System.setProperty("VITE_BASE_URL", dotenv.get("VITE_BASE_URL"));
 		
 		SpringApplication.run(CourseedApplication.class, args);
 	}

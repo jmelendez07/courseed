@@ -12,6 +12,7 @@ import React from "react";
 import FadeItem from "./fadeItem";
 import CourseSkeleton from "../skeleton/course-skeleton";
 import SearchDraw from "../draws/SearchDraw";
+import InstitutionInterface from "@/interfaces/institution";
 
 interface BlogCoursesProps {
     heading: string;
@@ -26,7 +27,7 @@ const BlogCourses = ({
     const [searchParams] = useSearchParams();
     const [clipboardText, setClipboardText] = React.useState<string>("");
     const courseHook = useCourses({
-        institutionParam: { id: searchParams.get('institucion'), name: undefined },
+        institutionParam: { id: searchParams.get('institucion'), name: undefined, image: "", user: null },
         facultyParam: { id: searchParams.get('facultad'), name: undefined },
         searchParam: searchParams.get("busqueda") || undefined,
         isVisibleParam: false
@@ -58,7 +59,7 @@ const BlogCourses = ({
 
         courseHook.setParams({
             ...courseHook.params,
-            institution: institutionParamId ? { id: institutionParamId, name: undefined } : null,
+            institution: institutionParamId ? { id: institutionParamId, name: undefined, image: "", user: null } : null,
             faculty: facultyParamId ? { id: facultyParamId, name: undefined } : null,
             pageNumber: 0,
         });
@@ -150,7 +151,7 @@ const BlogCourses = ({
                                     setSelectedStatus={i => {
                                         courseHook.setParams({
                                             ...courseHook.params,
-                                            institution: i,
+                                            institution: i as InstitutionInterface,
                                             pageNumber: 0
                                         });
                                     }}

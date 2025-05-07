@@ -62,7 +62,7 @@ function DashboardContentCourses({ className }: { className?: string }) {
                     setSelectedStatus={i => {
                         courseHook.setParams({
                             ...courseHook.params,
-                            institution: i,
+                            institution: i ? { ...i, image: '', user: null } : null,
                             pageNumber: 0
                         });
                     }}

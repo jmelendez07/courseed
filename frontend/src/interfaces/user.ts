@@ -12,7 +12,7 @@ interface UserInterface {
     updatedAt?: string;
     reviews?: number;
     views?: number;
-    profile: ProfileInterface;
+    profile?: ProfileInterface;
     image?: string;
     prediction?: PredictionInterface;
 }

@@ -1,8 +1,8 @@
 import { ArrowRight, CircleCheck } from "lucide-react";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "./ui/card";
-import { Separator } from "./ui/separator";
-import { Button } from "./ui/button";
-import FadeItem from "./ui/fadeItem";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+import { Button } from "@/components/ui/button";
+import FadeItem from "@/components/ui/fadeItem";
 import { useAuth } from "@/providers/AuthProvider";
 import { useNavigate } from "react-router-dom";
 import React from "react";

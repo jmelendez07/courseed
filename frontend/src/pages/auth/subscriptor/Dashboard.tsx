@@ -7,14 +7,10 @@ import { Separator } from "@/components/ui/separator";
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Theme from "@/components/ui/theme";
-import { useAuth } from "@/providers/AuthProvider";
 import HeadProvider from "@/providers/HeadProvider";
 import InstitutionToSuscriptorProvider from "@/providers/InstitutionToSuscriptorProvider";
 
 function Dashboard() {
-
-    const authHook = useAuth();
-
     return (
         <InstitutionToSuscriptorProvider>
             <SidebarProvider>
