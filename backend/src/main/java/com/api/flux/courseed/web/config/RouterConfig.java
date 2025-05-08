@@ -101,8 +101,8 @@ public class RouterConfig {
             .GET("/category/{categoryId}", courseController::getCoursesByCategoryId)
             .GET("/institution/{institutionId}", courseController::getCoursesByInstitutionId)
             .GET("/reviews-reactions/count", courseController::getTopCoursesWithReviewsAndReactions)
-            .POST(courseController::createCourse)
-            .PUT("/{id}", courseController::updateCourse)
+            .POST(RequestPredicates.accept(MediaType.MULTIPART_FORM_DATA), courseController::createCourse)
+            .PUT("/{id}", RequestPredicates.accept(MediaType.MULTIPART_FORM_DATA), courseController::updateCourse)
             .DELETE("/{id}", courseController::deleteCourse)
             .build();
     }

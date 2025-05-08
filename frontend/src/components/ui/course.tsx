@@ -19,6 +19,7 @@ interface CourseComponentProps {
 function Course({ className, course, optionsEnable, handleEdit, handleDelete }: CourseComponentProps) {
 
 	const [isReverse, setIsReverse] = React.useState<boolean>(false);
+	const [optionsOpen, setOptionsOpen] = React.useState<boolean>(false);
 
 	const getAvgRating = (): number => {
 		if (!course.reviews || course.reviews.length === 0) {
@@ -154,7 +155,7 @@ function Course({ className, course, optionsEnable, handleEdit, handleDelete }: 
 							</Button>
 						) }
 						{optionsEnable && (
-							<DropdownMenu>
+							<DropdownMenu open={optionsOpen} onOpenChange={setOptionsOpen}>
 								<DropdownMenuTrigger asChild>
 									<Button variant="ghost" className="absolute top-2 right-2 h-8 w-8 p-0 bg-gray-100 text-gray-800 hover:bg-gray-200">
 										<MoreVertical className="h-4 w-4" />
@@ -163,13 +164,19 @@ function Course({ className, course, optionsEnable, handleEdit, handleDelete }: 
 								</DropdownMenuTrigger>
 								<DropdownMenuContent align="end">
 									<DropdownMenuItem onClick={() => {
-										if (handleEdit) handleEdit(course)
+										if (handleEdit) {
+											handleEdit(course);
+											setOptionsOpen(false);
+										}
 									}}>
 										<Edit className="mr-2 h-4 w-4" />
 										<span>Editar</span>
 									</DropdownMenuItem>
 									<DropdownMenuItem onClick={() => {
-										if (handleDelete) handleDelete(course)
+										if (handleDelete) {
+											handleDelete(course);
+											setOptionsOpen(false);
+										}
 									}}>
 										<Trash2 className="mr-2 h-4 w-4" />
 										<span>Eliminar</span>

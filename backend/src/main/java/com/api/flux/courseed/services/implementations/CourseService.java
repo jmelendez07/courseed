@@ -1,6 +1,10 @@
 package com.api.flux.courseed.services.implementations;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.Principal;
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -65,6 +69,7 @@ public class CourseService implements InterfaceCourseService {
     private ReactionMapper reactionMapper;
     private ViewMapper viewMapper;
     private UserMapper userMapper;
+    private String uploadPath = "uploads/courses";
 
     public CourseService(
         CourseRepository courseRepository, CategoryRepository categoryRepository, ReactionRepository reactionRepository,
@@ -383,7 +388,7 @@ public class CourseService implements InterfaceCourseService {
     }
 
     @Override
-    public Mono<CourseDto> createCourse(Principal principal, SaveCourseDto saveCourseDto) {
+    public Mono<CourseDto> createCourse(Principal principal, SaveCourseDto saveCourseDto, String baseUrl) {
         return userRepository.findByEmail(principal.getName())
             .flatMap(user -> categoryRepository.findById(saveCourseDto.getCategoryId())
                 .flatMap(category -> institutionRepository.findById(saveCourseDto.getInstitutionId())
@@ -391,15 +396,39 @@ public class CourseService implements InterfaceCourseService {
                         Course course = courseMapper.toCourse(saveCourseDto);
                         course.setUserId(user.getId());
 
-                        return courseRepository.save(course)
-                            .map(savedCourse -> {
-                                CourseDto savedCourseDto = courseMapper.toCourseDto(savedCourse);
-                                savedCourseDto.setCategory(categoryMapper.toCategoryDto(category));
-                                savedCourseDto.setInstitution(institutionMapper.toInstitutionDto(institution));
-                                savedCourseDto.setUser(userMapper.toUserDto(user));
+                        if (saveCourseDto.getImage() != null) {
+                            String filename = UUID.randomUUID() + "-" + saveCourseDto.getImage().filename();
+                            Path uploadDir = Paths.get(uploadPath).toAbsolutePath().normalize();
+                            Path filePath = uploadDir.resolve(filename);
 
-                                return savedCourseDto;
-                            });
+                            return Mono.fromCallable(() -> {
+                                Files.createDirectories(uploadDir);
+                                return filePath;
+                            })
+                                .flatMap(path -> saveCourseDto.getImage().transferTo(path))
+                                .then(Mono.defer(() -> {
+                                    course.setImage(baseUrl + "/" + uploadPath + "/" + filename);
+                                    return courseRepository.save(course)
+                                        .map(savedCourse -> {
+                                            CourseDto savedCourseDto = courseMapper.toCourseDto(savedCourse);
+                                            savedCourseDto.setCategory(categoryMapper.toCategoryDto(category));
+                                            savedCourseDto.setInstitution(institutionMapper.toInstitutionDto(institution));
+                                            savedCourseDto.setUser(userMapper.toUserDto(user));
+        
+                                            return savedCourseDto;
+                                        });
+                                }));
+                        } else {
+                            return courseRepository.save(course)
+                                .map(savedCourse -> {
+                                    CourseDto savedCourseDto = courseMapper.toCourseDto(savedCourse);
+                                    savedCourseDto.setCategory(categoryMapper.toCategoryDto(category));
+                                    savedCourseDto.setInstitution(institutionMapper.toInstitutionDto(institution));
+                                    savedCourseDto.setUser(userMapper.toUserDto(user));
+
+                                    return savedCourseDto;
+                                });
+                        }
                     })
                     .switchIfEmpty(Mono.error(
                         new CustomWebExchangeBindException(
@@ -420,7 +449,7 @@ public class CourseService implements InterfaceCourseService {
     }
 
     @Override
-    public Mono<CourseDto> updateCourse(Principal principal, String id, SaveCourseDto saveCourseDto) {
+    public Mono<CourseDto> updateCourse(Principal principal, String id, SaveCourseDto saveCourseDto, String baseUrl) {
         return userRepository.findByEmail(principal.getName())
             .flatMap(user -> courseRepository.findById(id)
                 .flatMap(course -> categoryRepository.findById(saveCourseDto.getCategoryId())
@@ -430,6 +459,32 @@ public class CourseService implements InterfaceCourseService {
                                 Course courseToUpdate = courseMapper.toCourse(saveCourseDto);
                                 courseToUpdate.setId(course.getId());
                                 courseToUpdate.setUserId(course.getUserId());
+
+                                if (saveCourseDto.getImage() != null) {
+                                    String filename = UUID.randomUUID() + "-" + saveCourseDto.getImage().filename();
+                                    Path uploadDir = Paths.get(uploadPath).toAbsolutePath().normalize();
+                                    Path filePath = uploadDir.resolve(filename);
+
+                                    if (course.getImage() != null) {
+                                        Path oldFilePath = Paths.get(uploadDir.toString(), course.getImage().substring(course.getImage().lastIndexOf("/") + 1));
+                                        try {
+                                            Files.deleteIfExists(oldFilePath);
+                                        } catch (Exception e) {
+                                            return Mono.error(new RuntimeException("Error al eliminar la imagen antigua: " + e.getMessage()));
+                                        }
+                                    }
+
+                                    return Mono.fromCallable(() -> {
+                                        Files.createDirectories(uploadDir);
+                                        return filePath;
+                                    })
+                                    .flatMap(path -> saveCourseDto.getImage().transferTo(path))
+                                    .then(Mono.defer(() -> {
+                                        course.setImage(baseUrl + "/" + uploadPath + "/" + filename);
+                                        return courseRepository.save(course)
+                                            .map(courseMapper::toCourseDto);
+                                    }));
+                                }
     
                                 return courseRepository.save(courseToUpdate)
                                     .flatMap(updatedCourse -> this.getCourseById(updatedCourse.getId()));
@@ -472,6 +527,17 @@ public class CourseService implements InterfaceCourseService {
             .flatMap(user -> courseRepository.findById(id)
                 .flatMap(course -> {
                     if (user.getRoles().contains(Roles.PREFIX + Roles.ADMIN) || user.getId().equals(course.getUserId())) {
+
+                        if (course.getImage() != null) {
+                            Path uploadDir = Paths.get(uploadPath).toAbsolutePath().normalize();
+                            Path oldFilePath = Paths.get(uploadDir.toString(), course.getImage().substring(course.getImage().lastIndexOf("/") + 1));
+                            try {
+                                Files.deleteIfExists(oldFilePath);
+                            } catch (Exception e) {
+                                return Mono.error(new RuntimeException("Error al eliminar la imagen: " + e.getMessage()));
+                            }
+                        }
+
                         return courseRepository.deleteById(id)
                             .then(Mono.just(true));
                     } else {

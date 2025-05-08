@@ -2,6 +2,9 @@ package com.api.flux.courseed.projections.dtos;
 
 import java.io.Serializable;
 
+import org.springframework.http.MediaType;
+import org.springframework.http.codec.multipart.FilePart;
+
 import com.api.flux.courseed.projections.validators.groups.FirstValidationGroup;
 import com.api.flux.courseed.projections.validators.groups.SecondValidationGroup;
 
@@ -19,7 +22,7 @@ public class SaveCourseDto implements Serializable {
     @NotBlank(message = "Para proceder, debes completar el campo correspondiente al titulo del curso.", groups = FirstValidationGroup.class)
     private String title;
 
-    private String image;
+    private FilePart image;
     private String description;
     private String prerequisites;
 
@@ -55,11 +58,11 @@ public class SaveCourseDto implements Serializable {
         this.title = title;
     }
 
-    public String getImage() {
+    public FilePart getImage() {
         return image;
     }
 
-    public void setImage(String image) {
+    public void setImage(FilePart image) {
         this.image = image;
     }
 
@@ -117,5 +120,24 @@ public class SaveCourseDto implements Serializable {
 
     public void setInstitutionId(String institutionId) {
         this.institutionId = institutionId;
+    }
+
+    public boolean isValidImage() {
+        if (image == null) {
+            return false;
+        }
+
+        MediaType mediaType = image.headers().getContentType();
+
+        if (mediaType == null) {
+            return false;
+        }
+
+        if (!mediaType.toString().startsWith("image/")) {
+            return false;
+        }
+
+        final long MAX_SIZE = 2 * 1024 * 1024;
+        return image.headers().getContentLength() <= MAX_SIZE;
     }
 }

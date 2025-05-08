@@ -1,6 +1,14 @@
 package com.api.flux.courseed.web.controllers;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.codec.multipart.FilePart;
+import org.springframework.http.codec.multipart.FormFieldPart;
+import org.springframework.http.codec.multipart.Part;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 
@@ -17,6 +25,9 @@ public class CourseController {
 
     @Autowired
     private ValidationService validationService;
+
+    @Value("${spring.webflux.base-path:}")
+    private String basePath;
 
     public Mono<ServerResponse> getAllCourses(ServerRequest serverRequest) {
         return courseService
@@ -111,27 +122,84 @@ public class CourseController {
     }
 
     public Mono<ServerResponse> createCourse(ServerRequest serverRequest) {
-        return serverRequest.bodyToMono(SaveCourseDto.class)
-            .doOnNext(validationService::validate)
-            .flatMap(saveCourseDto -> serverRequest.principal()
-                .flatMap(principal -> courseService.createCourse(principal, saveCourseDto))
-                    .flatMap(courseDto -> ServerResponse.ok().bodyValue(courseDto))
-                    .switchIfEmpty(ServerResponse.notFound().build())
-            );
+        return serverRequest.multipartData()
+            .flatMap(parts -> {
+                FilePart image = (FilePart) parts.getFirst("image");
+                SaveCourseDto saveCourseDto = new SaveCourseDto();
+
+                saveCourseDto.setUrl(getFormFieldValue(parts, "url"));
+                saveCourseDto.setTitle(getFormFieldValue(parts, "title"));
+                saveCourseDto.setDescription(getFormFieldValue(parts, "description"));
+                saveCourseDto.setModality(getFormFieldValue(parts, "modality"));
+                saveCourseDto.setPrice(parseDoubleOrDefault(getFormFieldValue(parts, "price"), 0.0));
+                saveCourseDto.setDuration(getFormFieldValue(parts, "duration"));
+                saveCourseDto.setCategoryId(getFormFieldValue(parts, "categoryId"));
+                saveCourseDto.setInstitutionId(getFormFieldValue(parts, "institutionId"));
+
+                if (image != null && image.filename() != null && !image.filename().isBlank()) {
+                    saveCourseDto.setImage(image);
+    
+                    if (!saveCourseDto.isValidImage()) {
+                        Map<String, String> errors = new HashMap<>();
+                        errors.put("image", "La imagen debe ser de tipo válido (jpg, png, jpeg) y menor a 2 MB.");
+                        
+                        return ServerResponse.badRequest().bodyValue(errors);
+                    }
+                }
+
+                String baseUrl = serverRequest.uri().getScheme() + "://" + serverRequest.uri().getHost() + 
+                    ((serverRequest.uri().getPort() != -1 ? ":" + serverRequest.uri().getPort() : "") +
+                    (basePath != null && !basePath.isBlank() ? basePath : ""));
+
+                return Mono.just(saveCourseDto)
+                    .doOnNext(validationService::validate)
+                    .flatMap(validatedDto -> serverRequest.principal()
+                        .flatMap(principal -> courseService.createCourse(principal, saveCourseDto, baseUrl)
+                            .flatMap(courseDto -> ServerResponse.ok().bodyValue(courseDto))
+                            .switchIfEmpty(ServerResponse.notFound().build())
+                        )
+                    );
+            });
     }
     
     public Mono<ServerResponse> updateCourse(ServerRequest serverRequest) {
-        return serverRequest.bodyToMono(SaveCourseDto.class)
-            .doOnNext(validationService::validate)
-            .flatMap(saveCourseDto -> serverRequest.principal()
-                .flatMap(principal -> courseService.updateCourse(
-                    principal,
-                    serverRequest.pathVariable("id"), 
-                    saveCourseDto
-                )
-                .flatMap(courseDto -> ServerResponse.ok().bodyValue(courseDto))
-                .switchIfEmpty(ServerResponse.notFound().build())
-            ));
+        return serverRequest.multipartData()
+            .flatMap(parts -> {
+                FilePart image = (FilePart) parts.getFirst("image");
+                SaveCourseDto saveCourseDto = new SaveCourseDto();
+
+                saveCourseDto.setUrl(getFormFieldValue(parts, "url"));
+                saveCourseDto.setTitle(getFormFieldValue(parts, "title"));
+                saveCourseDto.setDescription(getFormFieldValue(parts, "description"));
+                saveCourseDto.setModality(getFormFieldValue(parts, "modality"));
+                saveCourseDto.setPrice(parseDoubleOrDefault(getFormFieldValue(parts, "price"), 0.0));
+                saveCourseDto.setDuration(getFormFieldValue(parts, "duration"));
+                saveCourseDto.setCategoryId(getFormFieldValue(parts, "categoryId"));
+                saveCourseDto.setInstitutionId(getFormFieldValue(parts, "institutionId"));
+
+                if (image != null && image.filename() != null && !image.filename().isBlank()) {
+                    saveCourseDto.setImage(image);
+    
+                    if (!saveCourseDto.isValidImage()) {
+                        Map<String, String> errors = new HashMap<>();
+                        errors.put("image", "La imagen debe ser de tipo válido (jpg, png, jpeg) y menor a 2 MB.");
+                        
+                        return ServerResponse.badRequest().bodyValue(errors);
+                    }
+                }
+
+                String baseUrl = serverRequest.uri().getScheme() + "://" + serverRequest.uri().getHost() + 
+                    ((serverRequest.uri().getPort() != -1 ? ":" + serverRequest.uri().getPort() : "") +
+                    (basePath != null && !basePath.isBlank() ? basePath : ""));
+
+                return Mono.just(saveCourseDto)
+                    .doOnNext(validationService::validate)
+                    .flatMap(validatedDto -> serverRequest.principal()
+                        .flatMap(principal -> courseService.updateCourse(principal, serverRequest.pathVariable("id"), validatedDto, baseUrl)
+                            .flatMap(courseDto -> ServerResponse.ok().bodyValue(courseDto))
+                            .switchIfEmpty(ServerResponse.notFound().build())
+                        ));
+            });
     }
 
     public Mono<ServerResponse> deleteCourse(ServerRequest serverRequest) {
@@ -143,5 +211,21 @@ public class CourseController {
                 .flatMap(c -> ServerResponse.ok().bodyValue(c))
                 .switchIfEmpty(ServerResponse.notFound().build())
             );
-    }    
+    }  
+    
+    private String getFormFieldValue(MultiValueMap<String, Part> parts, String fieldName) {
+        Part part = parts.getFirst(fieldName);
+        if (part instanceof FormFieldPart) {
+            return ((FormFieldPart) part).value();
+        }
+        return null;
+    }
+    
+    private double parseDoubleOrDefault(String value, double defaultValue) {
+        try {
+            return value != null ? Double.parseDouble(value) : defaultValue;
+        } catch (NumberFormatException e) {
+            return defaultValue;
+        }
+    }
 }

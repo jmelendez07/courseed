@@ -22,7 +22,7 @@ public interface InterfaceCourseService {
     Mono<Page<CourseDto>> getCoursesByType(String type, int page, int size);
     Mono<Page<CourseDto>> searchCoursesByText(String text, int page, int size);
     Mono<CourseDto> getCourseById(String id);
-    Mono<CourseDto> createCourse(Principal principal, SaveCourseDto saveCourseDto);
-    Mono<CourseDto> updateCourse(Principal principal, String id, SaveCourseDto saveCourseDto);
+    Mono<CourseDto> createCourse(Principal principal, SaveCourseDto saveCourseDto, String baseUrl);
+    Mono<CourseDto> updateCourse(Principal principal, String id, SaveCourseDto saveCourseDto, String baseUrl);
     Mono<Object> deleteCourse(Principal principal, String id);
 }
