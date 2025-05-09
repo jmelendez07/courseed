@@ -166,8 +166,13 @@ function CourseForm({ course, onCreated, onUpdated }: CourseFormProps) {
             duration: form.duration,
             categoryId: form.category?.id,
             institutionId: form.institution?.id
+        }, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            }
         })
             .then((response: AxiosResponse<CourseInterface>) => {
+                console.log(response);
                 dialogContext?.setContext({
                     ...dialogContext.context,
                     open: false
@@ -181,6 +186,7 @@ function CourseForm({ course, onCreated, onUpdated }: CourseFormProps) {
                 }
             })
             .catch((error: AxiosError<ErrorProps>) => {
+                console.log(error);
                 if (error.response?.data.courseId) {
                     dialogContext?.setContext({
                         ...dialogContext.context,

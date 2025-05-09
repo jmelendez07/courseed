@@ -459,6 +459,7 @@ public class CourseService implements InterfaceCourseService {
                                 Course courseToUpdate = courseMapper.toCourse(saveCourseDto);
                                 courseToUpdate.setId(course.getId());
                                 courseToUpdate.setUserId(course.getUserId());
+                                courseToUpdate.setImage(course.getImage());
 
                                 if (saveCourseDto.getImage() != null) {
                                     String filename = UUID.randomUUID() + "-" + saveCourseDto.getImage().filename();
@@ -482,7 +483,7 @@ public class CourseService implements InterfaceCourseService {
                                     .then(Mono.defer(() -> {
                                         course.setImage(baseUrl + "/" + uploadPath + "/" + filename);
                                         return courseRepository.save(course)
-                                            .map(courseMapper::toCourseDto);
+                                            .flatMap(updatedCourse -> this.getCourseById(updatedCourse.getId()));
                                     }));
                                 }
     
