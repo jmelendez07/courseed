@@ -30,6 +30,7 @@ enum APIS {
     COURSES_CREATE = 'api/courses',
     COURSES_UPDATE = 'api/courses/',
     COURSES_DELETE = 'api/courses/',
+    COURSES_TOTAL_BY_SUSCRIPTOR = 'api/courses/suscriptor/count',
     INSTITUTIONS = 'api/institutions',
     INSTITUTION_BY_AUTH = 'api/institutions/auth',
     INSTITUTIONS_COURSES_COUNT = 'api/institutions/courses/count',
@@ -37,6 +38,7 @@ enum APIS {
     INSTITUTION_UPDATE = 'api/institutions/',
     REVIEWS = 'api/reviews',
     REVIEWS_TOTAL = 'api/reviews/total/this-month',
+    REVIEWS_TOTAL_BY_SUSCRIPTOR = 'api/reviews/suscriptor/count',
     REVIEWS_TOTAL_NEGATIVE = 'api/reviews/total/negative',
     REVIEWS_BY_AUTH_USER = 'api/reviews/auth', 
     REVIEWS_COUNT_BY_MONTH = 'api/reviews/months/count',
@@ -45,6 +47,7 @@ enum APIS {
     REVIEWS_DELETE = 'api/reviews/',
     REACTIONS_BY_AUTH_USER = 'api/reactions/auth',
     REACTIONS_TOTAL = 'api/reactions/total/this-month',
+    REACTIONS_TOTAL_BY_SUSCRIPTOR = 'api/reactions/suscriptor/count',
     REACTION_CREATE = 'api/reactions',
     REACTION_UPDATE = 'api/reactions',
     REACTION_DELETE = 'api/reactions/',
@@ -53,6 +56,7 @@ enum APIS {
     VIEWS_CREATE = 'api/views/create',
     VIEWS_BY_AUTH_USER = 'api/views/auth',
     VIEWS_TOTAL = 'api/views/total/this-month',
+    VIEWS_TOTAL_BY_SUSCRIPTOR = 'api/views/suscriptor/count',
     VIEWS_COURSES_DECREASING = 'api/views/courses/this-month/decreasing',
     SEARCH_HISTORIES_BY_AUTH_USER = 'api/search-histories/auth',
     SEARCH_HISTORY_CREATE = 'api/search-histories/create',
@@ -63,7 +67,8 @@ enum APIS {
     SUBSCRIPTIONS_BY_AUTH_USER = 'api/subscriptions/auth',
     CREATE_PROFILE = 'api/profiles/create',
     UPDATE_USER_PROFILE = 'api/profiles/update',
-    UPLOAD_AVATAR = 'api/auth/upload-avatar'
+    UPLOAD_AVATAR = 'api/auth/upload-avatar',
+    
 }
 
 export default APIS;

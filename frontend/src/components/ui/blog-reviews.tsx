@@ -3,7 +3,7 @@ import React, { forwardRef } from "react";
 import Review from "./review";
 import { Button } from "./button";
 import { ChevronUp } from "lucide-react";
-import FadeItem from "./fadeItem";
+import FadeItem from "./fade-item";
 import { useAuth } from "@/providers/AuthProvider";
 import CreateReviewCard from "./createReviewCard";
 import { DialogContext } from "@/providers/DialogProvider";

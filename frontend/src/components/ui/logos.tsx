@@ -6,7 +6,7 @@ import {
 	CarouselItem,
 } from "@/components/ui/carousel";
 import useInstitution from "@/hooks/useInstitution";
-import FadeItem from "./fadeItem";
+import FadeItem from "./fade-item";
 
 interface LogosProps {
 	heading: string;

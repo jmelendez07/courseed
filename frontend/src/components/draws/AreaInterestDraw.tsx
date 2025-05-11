@@ -1,11 +1,11 @@
 import { ColorContext } from "@/providers/ColorProvider";
 import React from "react";
 
-function AreaInterestDraw() {
+function AreaInterestDraw({ className }: { className?: string }) {
     const colorContext = React.useContext(ColorContext);
 
     return (
-        <svg xmlns="http://www.w3.org/2000/svg" data-name="Layer 1" width="821.67627" height="579.00958" viewBox="0 0 821.67627 579.00958" className="injected-svg w-full object-center">
+        <svg xmlns="http://www.w3.org/2000/svg" data-name="Layer 1" width="821.67627" height="579.00958" viewBox="0 0 821.67627 579.00958" className={`injected-svg w-full object-center ${className}`}>
             <path d="M371.238,218.49521h-52.3999a19.01722,19.01722,0,0,0-19,19v56.81c-.66992-.04-1.33985-.1-2-.18a66.99888,66.99888,0,1,1,73.10009-77.63C371.0481,217.15518,371.1482,217.82523,371.238,218.49521Z" transform="translate(-189.16186 -160.49521)" fill="#f2f2f2">
             </path>
         <path d="M989.83814,216.49521h-671a21.023,21.023,0,0,0-21,21v354a21.023,21.023,0,0,0,21,21h671a21.023,21.023,0,0,0,21-21v-354A21.023,21.023,0,0,0,989.83814,216.49521Zm19,375a19.01722,19.01722,0,0,1-19,19h-671a19.01722,19.01722,0,0,1-19-19v-354a19.01722,19.01722,0,0,1,19-19h671a19.01722,19.01722,0,0,1,19,19Z" transform="translate(-189.16186 -160.49521)" fill="#3f3d56">

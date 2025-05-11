@@ -77,7 +77,7 @@ function ProfileForm() {
 
     return (
         <div 
-            className="w-screen relative h-screen grid place-items-center"
+            className="w-screen relative h-screen grid place-items-center overflow-x-hidden overflow-y-auto"
         >
             <div
                 className={`
@@ -95,9 +95,9 @@ function ProfileForm() {
                                         : ''}
                 `}
             />
-            <div className="p-6 lg:p-16 w-full relative overflow-hidden">
+            <div className="p-6 lg:p-16 w-full relative">
                 { !loading ? (
-                    <div className="grid grid-cols-1 grid-rows-1 max-h-full h-full">
+                    <div className="grid grid-cols-1">
                         {form.knowledgeLevel === null ? (
                             <KnowledgeLevel
                                 setLevel={(level) => setForm({
@@ -147,38 +147,38 @@ function ProfileForm() {
 
 function KnowledgeLevel({ setLevel }: KnowledgeLevelProps) {
     return (
-        <div className="grid grid-cols-1 grid-rows-[auto_1fr]">
-            <div className="w-full text-center space-y-1">
-                <h3 className="text-2xl font-medium antialiased">Selecciona tu nivel de educación</h3>
+        <div className="grid grid-cols-1 h-full">
+            <div className="w-full shrink-0 text-center space-y-1">
+                <h3 className="text-2xl lg:text-4xl font-medium antialiased">Selecciona tu nivel de educación</h3>
                 <p className="text-gray-400">
                     Selecciona el nivel que mejor se adapte a tus conocimientos actuales
                 </p>
             </div>
-            <div className="grid grid-cols-3 place-content-center gap-4 px-4 mt-10">
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 place-content-center gap-4 px-4 mt-10">
                 <button
                     onClick={() => setLevel("principiante")}
                     type="button"
-                    className="bg-gray-50 border h-[30rem] border-gray-100 shadow hover:shadow-md rounded-md cursor-pointer grid grid-cols-1 place-items-center p-4 gap-2 hover:bg-gray-100 hover:border-gray-200 transition-all duration-300 ease-in-out"
+                    className="bg-gray-50 border border-gray-100 shadow hover:shadow-md rounded-md cursor-pointer grid grid-cols-1 place-items-center p-4 gap-2 hover:bg-gray-100 hover:border-gray-200 transition-all duration-300 ease-in-out"
                 >
-                    <BeginnerDraw />    
+                    <BeginnerDraw className="!size-52 lg:!size-80" />    
                     <h4 className="text-xl">Principiante</h4>
                     <p className="text-gray-500">Ideal para quienes estan comenzando su viaje de aprendizaje</p>
                 </button>
                 <button
                     onClick={() => setLevel("intermedio")}
                     type="button"
-                    className="bg-gray-50 border h-[30rem] border-gray-100 shadow hover:shadow-md rounded-md cursor-pointer grid grid-cols-1 place-items-center p-4 gap-2 hover:bg-gray-100 hover:border-gray-200 transition-all duration-300 ease-in-out"
+                    className="bg-gray-50 border border-gray-100 shadow hover:shadow-md rounded-md cursor-pointer grid grid-cols-1 place-items-center p-4 gap-2 hover:bg-gray-100 hover:border-gray-200 transition-all duration-300 ease-in-out"
                 >
-                    <IntermediateDraw />
+                    <IntermediateDraw className="!size-52 lg:!size-80" />
                     <h4 className="text-xl">Intermedio</h4>
                     <p className="text-gray-500">Para estudiantes con conocimientos básicos que buscan profundizar</p>
                 </button>
                 <button
                     onClick={() => setLevel("experto")}
                     type="button"
-                    className="bg-gray-50 border h-[30rem] border-gray-100 shadow hover:shadow-md rounded-md cursor-pointer grid grid-cols-1 place-items-center p-4 gap-2 hover:bg-gray-100 hover:border-gray-200 transition-all duration-300 ease-in-out"
+                    className="bg-gray-50 border border-gray-100 shadow hover:shadow-md rounded-md cursor-pointer grid grid-cols-1 place-items-center p-4 gap-2 hover:bg-gray-100 hover:border-gray-200 transition-all duration-300 ease-in-out"
                 >
-                    <ExpertDraw />    
+                    <ExpertDraw className="!size-52 lg:!size-80" />    
                     <h4 className="text-xl">Experto</h4>
                     <p className="text-gray-500">Para estudiantes experimentados que buscan dominar el tema</p>
                 </button>
@@ -191,89 +191,89 @@ function AvailableHoursTime({ setHours }: AvailableHoursTimeProps) {
     return (
         <div className="grid max-h-full">
             <div className="w-full text-center space-y-1">
-                <h3 className="text-2xl font-medium antialiased">¿Cuánto tiempo tienes disponible?</h3>
+                <h3 className="text-2xl lg:text-4xl font-medium antialiased">¿Cuánto tiempo tienes disponible?</h3>
                 <p className="text-gray-400">
-                    Selecciona cuántas horas puedes dedicar a tu aprendizaje
+                    Selecciona cuántas horas dedicas a tu aprendizaje
                 </p>
             </div>
-            <div className="grid grid-cols-2 max-h-full gap-20 px-4 mt-10">
-                <div className="grid grid-cols-1 place-items-center items-start gap-4">
-                    <div className="grid grid-cols-3 grid-rows-3 justify-between gap-4 w-full h-full">
+            <div className="grid grid-cols-1 xl:grid-cols-2 max-h-full md:mt-10 gap-4 lg:gap-8">
+                <div className="order-2 xl:order-1 grid grid-cols-1 place-items-center items-start">
+                    <div className="grid grid-cols-3 grid-rows-3 justify-between gap-2 md:gap-4 w-full h-full">
                         <button
                             onClick={() => setHours(0)}
                             type="button"
-                            className="bg-gray-50 border border-gray-100 rounded-lg hover:bg-gray-100 hover:border-gray-200 shadow hover:shadow-md cursor-pointer grid grid-cols-1 place-items-center place-content-center gap-2 transition-all duration-300 ease-in-out"
+                            className="bg-gray-50 border border-gray-100 rounded-lg hover:bg-gray-100 hover:border-gray-200 shadow hover:shadow-md cursor-pointer grid grid-cols-1 place-items-center place-content-center gap-2 p-4 transition-all duration-300 ease-in-out"
                         >
-                            <Clock12 className="size-16 text-gray-500" />
-                            <p className="font-medium text-base antialiased">0 Horas</p>
+                            <Clock12 className="size-10 md:size-14 lg:size-16 text-gray-500" />
+                            <p className="text-base antialiased">0 Horas</p>
                         </button>
                         <button
                             onClick={() => setHours(1)}
                             type="button"
-                            className="bg-gray-50 border border-gray-100 rounded-lg hover:bg-gray-100 hover:border-gray-200 shadow hover:shadow-md cursor-pointer grid grid-cols-1 place-items-center place-content-center gap-2 transition-all duration-300 ease-in-out"
+                            className="bg-gray-50 border border-gray-100 rounded-lg hover:bg-gray-100 hover:border-gray-200 shadow hover:shadow-md cursor-pointer grid grid-cols-1 place-items-center place-content-center gap-2 transition-all duration-300 ease-in-out p-4"
                         >
-                            <Clock2 className="size-16 text-gray-500" />
-                            <p className="font-medium text-base antialiased">1 Hora</p>
+                            <Clock2 className="size-10 md:size-14 lg:size-16 text-gray-500" />
+                            <p className="text-base antialiased">1 Hora</p>
                         </button>
                         <button
                             onClick={() => setHours(2)}
                             type="button"
-                            className="bg-gray-50 border border-gray-100 rounded-lg hover:bg-gray-100 hover:border-gray-200 shadow hover:shadow-md cursor-pointer grid grid-cols-1 place-items-center place-content-center gap-2 transition-all duration-300 ease-in-out"
+                            className="bg-gray-50 border border-gray-100 rounded-lg hover:bg-gray-100 hover:border-gray-200 shadow hover:shadow-md cursor-pointer grid grid-cols-1 place-items-center place-content-center gap-2 transition-all duration-300 ease-in-out p-4"
                         >
-                            <Clock3 className="size-16 text-gray-500" />
-                            <p className="font-medium text-base antialiased">2 Horas</p>
+                            <Clock3 className="size-10 md:size-14 lg:size-16 text-gray-500" />
+                            <p className="text-base antialiased">2 Horas</p>
                         </button>
                         <button
                             onClick={() => setHours(3)}
                             type="button"
-                            className="bg-gray-50 border border-gray-100 rounded-lg hover:bg-gray-100 hover:border-gray-200 shadow hover:shadow-md cursor-pointer grid grid-cols-1 place-items-center place-content-center gap-2 transition-all duration-300 ease-in-out"
+                            className="bg-gray-50 border border-gray-100 rounded-lg hover:bg-gray-100 hover:border-gray-200 shadow hover:shadow-md cursor-pointer grid grid-cols-1 place-items-center place-content-center gap-2 transition-all duration-300 ease-in-out p-4"
                         >
-                            <Clock4 className="size-16 text-gray-500" />
-                            <p className="font-medium text-base antialiased">3 Horas</p>
+                            <Clock4 className="size-10 md:size-14 lg:size-16 text-gray-500" />
+                            <p className="text-base antialiased">3 Horas</p>
                         </button>
                         <button
                             onClick={() => setHours(4)}
                             type="button"
-                            className="bg-gray-50 border border-gray-100 rounded-lg hover:bg-gray-100 hover:border-gray-200 shadow hover:shadow-md cursor-pointer grid grid-cols-1 place-items-center place-content-center gap-2 transition-all duration-300 ease-in-out"
+                            className="bg-gray-50 border border-gray-100 rounded-lg hover:bg-gray-100 hover:border-gray-200 shadow hover:shadow-md cursor-pointer grid grid-cols-1 place-items-center place-content-center gap-2 transition-all duration-300 ease-in-out p-4"
                         >
-                            <Clock5 className="size-16 text-gray-500" />
-                            <p className="font-medium text-base antialiased">4 Horas</p>
+                            <Clock5 className="size-10 md:size-14 lg:size-16 text-gray-500" />
+                            <p className="text-base antialiased">4 Horas</p>
                         </button>
                         <button
                             onClick={() => setHours(5)}
                             type="button"
-                            className="bg-gray-50 border border-gray-100 rounded-lg hover:bg-gray-100 hover:border-gray-200 shadow hover:shadow-md cursor-pointer grid grid-cols-1 place-items-center place-content-center gap-2 transition-all duration-300 ease-in-out"
+                            className="bg-gray-50 border border-gray-100 rounded-lg hover:bg-gray-100 hover:border-gray-200 shadow hover:shadow-md cursor-pointer grid grid-cols-1 place-items-center place-content-center gap-2 transition-all duration-300 ease-in-out p-4"
                         >
-                            <Clock6 className="size-16 text-gray-500" />
-                            <p className="font-medium text-base antialiased">5 Horas</p>
+                            <Clock6 className="size-10 md:size-14 lg:size-16 text-gray-500" />
+                            <p className="text-base antialiased">5 Horas</p>
                         </button>
                         <button
                             onClick={() => setHours(6)}
                             type="button"
-                            className="bg-gray-50 border border-gray-100 rounded-lg hover:bg-gray-100 hover:border-gray-200 shadow hover:shadow-md cursor-pointer grid grid-cols-1 place-items-center place-content-center gap-2 transition-all duration-300 ease-in-out"
+                            className="bg-gray-50 border border-gray-100 rounded-lg hover:bg-gray-100 hover:border-gray-200 shadow hover:shadow-md cursor-pointer grid grid-cols-1 place-items-center place-content-center gap-2 transition-all duration-300 ease-in-out p-4"
                         >
-                            <Clock7 className="size-16 text-gray-500" />
-                            <p className="font-medium text-base antialiased">6 Horas</p>
+                            <Clock7 className="size-10 md:size-14 lg:size-16 text-gray-500" />
+                            <p className="text-base antialiased">6 Horas</p>
                         </button>
                         <button
                             onClick={() => setHours(7)}
                             type="button"
-                            className="bg-gray-50 border border-gray-100 rounded-lg hover:bg-gray-100 hover:border-gray-200 shadow hover:shadow-md cursor-pointer grid grid-cols-1 place-items-center place-content-center gap-2 transition-all duration-300 ease-in-out"
+                            className="bg-gray-50 border border-gray-100 rounded-lg hover:bg-gray-100 hover:border-gray-200 shadow hover:shadow-md cursor-pointer grid grid-cols-1 place-items-center place-content-center gap-2 transition-all duration-300 ease-in-out p-4"
                         >
-                            <Clock8 className="size-16 text-gray-500" />
-                            <p className="font-medium text-base antialiased">7 Horas</p>
+                            <Clock8 className="size-10 md:size-14 lg:size-16 text-gray-500" />
+                            <p className="text-base antialiased">7 Horas</p>
                         </button>
                         <button
                             onClick={() => setHours(8)}
                             type="button"
-                            className="bg-gray-50 border border-gray-100 rounded-lg hover:bg-gray-100 hover:border-gray-200 shadow hover:shadow-md cursor-pointer grid grid-cols-1 place-items-center place-content-center gap-2 transition-all duration-300 ease-in-out"
+                            className="bg-gray-50 border border-gray-100 rounded-lg hover:bg-gray-100 hover:border-gray-200 shadow hover:shadow-md cursor-pointer grid grid-cols-1 place-items-center place-content-center gap-2 transition-all duration-300 ease-in-out p-4"
                         >
-                            <Clock9 className="size-16 text-gray-500" />
-                            <p className="font-medium text-base antialiased">8 Horas</p>
+                            <Clock9 className="size-10 md:size-14 lg:size-16 text-gray-500" />
+                            <p className="text-base antialiased">8 Horas</p>
                         </button>
                     </div>
                 </div>
-                <ClockDraw />
+                <ClockDraw className="order-1 xl:order-2 !h-64 md:!h-72 lg:!h-96" />
             </div>
         </div>
     );
@@ -283,39 +283,47 @@ function PlatformPrefered({ setPlatform }: PlatformPreferedProps) {
     return (
         <div className="w-full grid grid-cols-1 grid-rows-[auto_1fr]">
             <div className="w-full text-center space-y-1">
-                <h3 className="text-2xl font-medium antialiased">¿Que modalidad prefieres?</h3>
+                <h3 className="text-2xl lg:text-4xl font-medium antialiased">¿Que modalidad prefieres?</h3>
                 <p className="text-gray-400">
                     Selecciona una de las modalidades que te ofrecemos
                 </p>
             </div>
-            <div className="grid w-full grid-cols-4 place-content-center gap-4 px-4 mt-10">
+            <div className="grid w-full grid-cols-1 md:grid-cols-2 2xl:grid-cols-4 place-content-center gap-4 mt-10">
                 <button 
-                    type="button" onClick={() => setPlatform("presencial")} className="bg-gray-50 border h-[30rem] border-gray-100 rounded-lg hover:bg-gray-100 hover:border-gray-200 shadow hover:shadow-md cursor-pointer grid grid-cols-1 place-items-center place-content-center gap-2 p-4 transition-all duration-300 ease-in-out"
+                    type="button" onClick={() => setPlatform("presencial")} className="bg-gray-50 border border-gray-100 rounded-lg hover:bg-gray-100 hover:border-gray-200 shadow hover:shadow-md cursor-pointer grid grid-cols-1 place-items-center place-content-center gap-2 p-4 transition-all duration-300 ease-in-out"
                 >
-                    <InPersonDraw />
-                    <h3 className="text-xl">Presencial</h3>
-                    <p className="text-gray-500">Aprende cara a cara</p>
+                    <InPersonDraw className="!size-52 lg:!size-72" />
+                    <div className="flex items-center flex-col">
+                        <h3 className="text-xl text-center">Presencial</h3>
+                        <p className="text-gray-500 text-center">Aprende cara a cara</p>
+                    </div>
                 </button>
                 <button 
-                    type="button" onClick={() => setPlatform("a distancia")} className="bg-gray-50 border h-[30rem] border-gray-100 rounded-lg hover:bg-gray-100 hover:border-gray-200 shadow hover:shadow-md cursor-pointer grid grid-cols-1 place-items-center place-content-center gap-2 p-4 transition-all duration-300 ease-in-out"
+                    type="button" onClick={() => setPlatform("a distancia")} className="bg-gray-50 border border-gray-100 rounded-lg hover:bg-gray-100 hover:border-gray-200 shadow hover:shadow-md cursor-pointer grid grid-cols-1 place-items-center place-content-center gap-2 p-4 transition-all duration-300 ease-in-out"
                 >
-                    <RemotelyDraw />
-                    <h3 className="text-xl">A distancia</h3>
-                    <p className="text-gray-500">Estudia sin importar donde estes</p>
+                    <RemotelyDraw className="!size-52 lg:!size-72" />
+                    <div className="flex items-center flex-col">
+                        <h3 className="text-xl">A distancia</h3>
+                        <p className="text-gray-500">Estudia sin importar donde estes</p>
+                    </div>
                 </button>
                 <button 
-                    type="button" onClick={() => setPlatform("hibrido")} className="bg-gray-50 border h-[30rem] border-gray-100 rounded-lg hover:bg-gray-100 hover:border-gray-200 shadow hover:shadow-md cursor-pointer grid grid-cols-1 place-items-center place-content-center gap-2 p-4 transition-all duration-300 ease-in-out"
+                    type="button" onClick={() => setPlatform("hibrido")} className="bg-gray-50 border border-gray-100 rounded-lg hover:bg-gray-100 hover:border-gray-200 shadow hover:shadow-md cursor-pointer grid grid-cols-1 place-items-center place-content-center gap-2 p-4 transition-all duration-300 ease-in-out"
                 >
-                    <HybridDraw />
-                    <h3 className="text-xl">Híbrido</h3>
-                    <p className="text-gray-500">Estudia conociendo ambas modalidades de aprendizaje</p>
+                    <HybridDraw className="!size-52 lg:!size-72" />
+                    <div className="flex items-center flex-col">
+                        <h3 className="text-xl">Híbrido</h3>
+                        <p className="text-gray-500">Estudia conociendo ambas modalidades de aprendizaje</p>
+                    </div>
                 </button>
                 <button 
-                    type="button" onClick={() => setPlatform("virtual")} className="bg-gray-50 border h-[30rem] border-gray-100 rounded-lg hover:bg-gray-100 hover:border-gray-200 shadow hover:shadow-md cursor-pointer grid grid-cols-1 place-items-center place-content-center gap-2 p-4 transition-all duration-300 ease-in-out"
+                    type="button" onClick={() => setPlatform("virtual")} className="bg-gray-50 border border-gray-100 rounded-lg hover:bg-gray-100 hover:border-gray-200 shadow hover:shadow-md cursor-pointer grid grid-cols-1 place-items-center place-content-center gap-2 p-4 transition-all duration-300 ease-in-out"
                 >
-                    <VirtualDraw />
-                    <h3 className="text-xl">Virtual</h3>
-                    <p className="text-gray-500">Estudia desde donde quieras</p>
+                    <VirtualDraw className="!size-52 lg:!size-72" />
+                    <div className="flex items-center flex-col">
+                        <h3 className="text-xl">Virtual</h3>
+                        <p className="text-gray-500">Estudia desde donde quieras</p>
+                    </div>
                 </button>
             </div>
         </div>
@@ -326,95 +334,95 @@ function Budget({ setBudget }: BudgetProps) {
     return (
         <div className="">
             <div className="w-full text-center space-y-1">
-                <h3 className="text-2xl font-medium antialiased">¿De cuánto dinero dispones aproximadamente?</h3>
+                <h3 className="text-2xl lg:text-4xl font-medium antialiased">¿De cuánto dinero dispones aproximadamente?</h3>
                 <p className="text-gray-400">
                     Indícanos tu presupuesto estimado para ayudarte a encontrar opciones que se ajusten a ti.
                 </p>
             </div>
-            <div className="grid grid-cols-2 gap-8 px-4 mt-10 h-full items-center">
-                <div className="grid grid-cols-2 gap-6">
+            <div className="w-full grid grid-cols-1 xl:grid-cols-2 place-items-center xl:mt-10 items-center">
+                <div className="w-full order-2 grid grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
                     <button
                         type="button"
                         onClick={() => setBudget(500000)}
                         className="inline-flex items-center gap-2 bg-gray-50 hover:bg-gray-100 border border-gray-100 rounded-lg shadow hover:shadow-lg transition-all duration-200 ease-in-out p-4"
                     >
-                        <DollarSign />
-                        <p className="text-lg font-medium antialiased">500.000,00</p>
+                        <DollarSign className="shrink-0 size-5" />
+                        <p className="text-sm md:text-lg font-medium antialiased">500.000,00</p>
                     </button>
                     <button
                         type="button"
                         onClick={() => setBudget(1000000)}
                         className="inline-flex items-center gap-2 bg-gray-50 hover:bg-gray-100 border border-gray-100 rounded-lg shadow hover:shadow-lg transition-all duration-200 ease-in-out p-4"
                     >
-                        <DollarSign />
-                        <p className="text-lg font-medium antialiased">1.000.000,00</p>
+                        <DollarSign className="shrink-0 size-5" />
+                        <p className="text-sm md:text-lg font-medium antialiased">1.000.000,00</p>
                     </button>
                     <button
                         type="button"
                         onClick={() => setBudget(1500000)}
                         className="inline-flex items-center gap-2 bg-gray-50 hover:bg-gray-100 border border-gray-100 rounded-lg shadow hover:shadow-lg transition-all duration-200 ease-in-out p-4"
                     >
-                        <DollarSign />
-                        <p className="text-lg font-medium antialiased">1.500.000,00</p>
+                        <DollarSign className="shrink-0 size-5" />
+                        <p className="text-sm md:text-lg font-medium antialiased">1.500.000,00</p>
                     </button>
                     <button
                         type="button"
                         onClick={() => setBudget(2000000)}
                         className="inline-flex items-center gap-2 bg-gray-50 hover:bg-gray-100 border border-gray-100 rounded-lg shadow hover:shadow-lg transition-all duration-200 ease-in-out p-4"
                     >
-                        <BadgeDollarSign />
-                        <p className="text-lg font-medium antialiased">2.000.000,00</p>
+                        <BadgeDollarSign className="shrink-0 size-5" />
+                        <p className="text-sm md:text-lg font-medium antialiased">2.000.000,00</p>
                     </button>
                     <button
                         type="button"
                         onClick={() => setBudget(2500000)}
                         className="inline-flex items-center gap-2 bg-gray-50 hover:bg-gray-100 border border-gray-100 rounded-lg shadow hover:shadow-lg transition-all duration-200 ease-in-out p-4"
                     >
-                        <BadgeDollarSign />
-                        <p className="text-lg font-medium antialiased">2.500.000,00</p>
+                        <BadgeDollarSign className="shrink-0 size-5" />
+                        <p className="text-sm md:text-lg font-medium antialiased">2.500.000,00</p>
                     </button>
                     <button
                         type="button"
                         onClick={() => setBudget(3000000)}
                         className="inline-flex items-center gap-2 bg-gray-50 hover:bg-gray-100 border border-gray-100 rounded-lg shadow hover:shadow-lg transition-all duration-200 ease-in-out p-4"
                     >
-                        <BadgeDollarSign />
-                        <p className="text-lg font-medium antialiased">3.000.000,00</p>
+                        <BadgeDollarSign className="shrink-0 size-5" />
+                        <p className="text-sm md:text-lg font-medium antialiased">3.000.000,00</p>
                     </button>
                     <button
                         type="button"
                         onClick={() => setBudget(3500000)}
                         className="inline-flex items-center gap-2 bg-gray-50 hover:bg-gray-100 border border-gray-100 rounded-lg shadow hover:shadow-lg transition-all duration-200 ease-in-out p-4"
                     >
-                        <BadgeDollarSign />
-                        <p className="text-lg font-medium antialiased">3.500.000,00</p>
+                        <BadgeDollarSign className="shrink-0 size-5" />
+                        <p className="text-sm md:text-lg font-medium antialiased">3.500.000,00</p>
                     </button>
                     <button
                         type="button"
                         onClick={() => setBudget(4000000)}
                         className="inline-flex items-center gap-2 bg-gray-50 hover:bg-gray-100 border border-gray-100 rounded-lg shadow hover:shadow-lg transition-all duration-200 ease-in-out p-4"
                     >
-                        <Gem />
-                        <p className="text-lg font-medium antialiased">4.000.000,00</p>
+                        <Gem className="shrink-0 size-5" />
+                        <p className="text-sm md:text-lg font-medium antialiased">4.000.000,00</p>
                     </button>
                     <button
                         type="button"
                         onClick={() => setBudget(4500000)}
                         className="inline-flex items-center gap-2 bg-gray-50 hover:bg-gray-100 border border-gray-100 rounded-lg shadow hover:shadow-lg transition-all duration-200 ease-in-out p-4"
                     >
-                        <Gem />
-                        <p className="text-lg font-medium antialiased">4.500.000,00</p>
+                        <Gem className="shrink-0 size-5" />
+                        <p className="text-sm md:text-lg font-medium antialiased">4.500.000,00</p>
                     </button>
                     <button
                         type="button"
                         onClick={() => setBudget(5000000)}
                         className="inline-flex items-center gap-2 bg-gray-50 hover:bg-gray-100 border border-gray-100 rounded-lg shadow hover:shadow-lg transition-all duration-200 ease-in-out p-4"
                     >
-                        <Gem />
-                        <p className="text-lg font-medium antialiased">5.000.000,00</p>
+                        <Gem className="shrink-0 size-5" />
+                        <p className="text-sm md:text-lg font-medium antialiased">5.000.000,00</p>
                     </button>
                 </div>
-                <BudgetDraw />
+                <BudgetDraw className="order-1 xl:order-2 !h-64 md:!h-72 md:w-96 lg:!h-[24rem] lg:w-[34rem] xl:w-[40rem]" />
             </div>
         </div>
     );
@@ -444,26 +452,24 @@ function AreaInterests({ setArea }: AreaInterestProps) {
     ];
 
     return (
-        <div className="grid grid-cols-1 grid-rows-[auto_1fr]">
+        <div className="grid grid-cols-1">
             <div className="w-full text-center space-y-1">
-                <h3 className="text-2xl font-medium antialiased">¿Qué áreas de estudio te interesan?</h3>
-                <p className="text-gray-400">
-                    Selecciona las categorías que más te llamen la atención para personalizar tu experiencia de búsqueda.
-                </p>
+                <h3 className="text-2xl lg:text-4xl font-medium antialiased">¿Qué áreas de estudio te interesan?</h3>
+                <p className="text-gray-400">Selecciona la categoría que más te llamen la atención.</p>
             </div>
-            <div className="grid grid-cols-3 gap-8 items-center place-content-start px-4 mt-10">
-                <div className="flex items-center gap-4 col-start-2">
+            <div className="grid grid-cols-1 gap-8 items-center place-items-center mt-10">
+                <div className="flex items-center gap-4">
                     <Popover open={open} onOpenChange={setOpen}>
                         <PopoverTrigger asChild>
                             <Button
                                 variant="outline"
                                 role="combobox"
                                 aria-expanded={open}
-                                className="w-full justify-between text-lg text-gray-500 font-normal truncate"
+                                className="w-full text-lg overflow-hidden text-gray-600 font-normal"
                             >
-                                <p className="truncate">
+                                <span className="truncate">
                                     { areaSelected ?? "Selecciona las categorías disponibles"}
-                                </p>
+                                </span>
                                 <ChevronsUpDown className="opacity-50" />
                             </Button>
                         </PopoverTrigger>
@@ -507,10 +513,8 @@ function AreaInterests({ setArea }: AreaInterestProps) {
                         </button>
                     )}
                 </div>
-                <div className="col-start-1 row-start-2 col-span-3 w-full">
-                    <AreaInterestDraw />    
-                </div>
-            </div>
+                <AreaInterestDraw className="w-full h-52 md:h-80 lg:h-[30rem]" />
+            </div>  
         </div>
     );
 }

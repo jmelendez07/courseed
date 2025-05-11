@@ -211,7 +211,15 @@ public class CourseController {
                 .flatMap(c -> ServerResponse.ok().bodyValue(c))
                 .switchIfEmpty(ServerResponse.notFound().build())
             );
-    }  
+    }
+    
+    public Mono<ServerResponse> getTotalCoursesBySuscriptor(ServerRequest serverRequest) {
+        return serverRequest.principal()
+            .flatMap(principal -> courseService.getTotalCoursesBySuscriptor(principal)
+                .flatMap(courses -> ServerResponse.ok().bodyValue(courses))
+                .switchIfEmpty(ServerResponse.notFound().build())
+            );    
+    }
     
     private String getFormFieldValue(MultiValueMap<String, Part> parts, String fieldName) {
         Part part = parts.getFirst(fieldName);

@@ -31,6 +31,7 @@ import com.api.flux.courseed.projections.mappers.UserMapper;
 import com.api.flux.courseed.services.interfaces.InterfaceReactionService;
 import com.api.flux.courseed.web.exceptions.CustomWebExchangeBindException;
 
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Service
@@ -238,5 +239,16 @@ public class ReactionService implements InterfaceReactionService {
                 .map(lastMonth -> new TotalReactionsDto(total, lastMonth))
             );
     }
-    
+  
+    @Override
+    public Mono<Integer> getTotalReactionsBySuscriptor(Principal principal) {
+        return userRepository.findByEmail(principal.getName())
+            .flatMap(user -> courseRepository.findByUserId(user.getId())
+                .collectList()
+                .flatMapMany(Flux::fromIterable)
+                .flatMap(course -> reactionRepository.findByCourseId(course.getId()))
+                .count()
+                .map(Long::intValue)
+            );
+    }
 }

@@ -2,7 +2,7 @@ import { ArrowRight, CircleCheck } from "lucide-react";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
-import FadeItem from "@/components/ui/fadeItem";
+import FadeItem from "@/components/ui/fade-item";
 import { useAuth } from "@/providers/AuthProvider";
 import { useNavigate } from "react-router-dom";
 import React from "react";
@@ -43,10 +43,10 @@ function Pricing({
             currency: "COP",
             duration: "M",
             features: [
-                { text: "Up to 5 team members" },
-                { text: "Basic components library" },
-                { text: "Community support" },
-                { text: "1GB storage space" },
+                { text: "Publicación de 100 programas" },
+                { text: "Acceso a estadisticas Basicas" },
+                { text: "Visibilidad estandar en los listados" },
+                { text: "2GB de almacenamiento" },
             ],
             button: {
                 text: "Comprar",
@@ -60,10 +60,10 @@ function Pricing({
             currency: "COP",
             duration: "M",
             features: [
-                { text: "Unlimited team members" },
-                { text: "Advanced components" },
-                { text: "Priority support" },
-                { text: "Unlimited storage" },
+                { text: "Publicación de programas ilimitados" },
+                { text: "Análisis de comportamiento del estudiante" },
+                { text: "Verificación de institución educativa" },
+                { text: "Almacenamiento ilimitado" },
             ],
             button: {
                 text: "Comprar",
@@ -77,10 +77,10 @@ function Pricing({
             currency: "COP",
             duration: "A",
             features: [
-                { text: "Unlimited team members" },
-                { text: "Advanced components" },
-                { text: "Priority support" },
-                { text: "Unlimited storage" },
+                { text: "Publicación de 200 Programas" },
+                { text: "Estadísticas avanzadas" },
+                { text: "Posicionamiento" },
+                { text: "Almacenamiento ilimitado" },
             ],
             button: {
                 text: "Comprar",

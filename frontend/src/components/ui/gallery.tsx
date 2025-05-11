@@ -4,7 +4,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import Course from "./course";
 import CourseInterface from "@/interfaces/course";
-import FadeItem from "./fadeItem";
+import FadeItem from "./fade-item";
 import { useScroll, useTransform, motion } from "motion/react";
 import CourseSkeleton from "../skeleton/course-skeleton";
 

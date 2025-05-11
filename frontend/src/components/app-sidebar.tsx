@@ -180,6 +180,13 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 				icon: CreditCard,
 				url: "/suscriptor/suscripciones"
 			},
+		],
+		navRecomendation: [
+			{
+				name: "Programas",
+				icon: ListChecks,
+				url: "/suscriptor/recomendaciones/programas",
+			},
 		]
 	}
 
@@ -195,8 +202,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 				<NavMain items={getNavMain()} />
 				{ authHook?.user?.roles?.some(r => r === ROLES.USER) ? (
 					<NavRecords records={dataUser.navRecord} />
-				) : authHook?.user?.roles?.some(r => r === ROLES.ADMIN) && (
-					<NavRecomendations recomendations={dataAdmin.navRecomendation} />
+				) : authHook?.user?.roles?.some(r => r === ROLES.ADMIN || r === ROLES.SUBSCRIBER) && (
+					<NavRecomendations recomendations={authHook?.user?.roles?.some(r => r === ROLES.ADMIN) ? dataAdmin.navRecomendation : dataSubscriber.navRecomendation} />
 				)}
 			</SidebarContent>
 			<SidebarFooter>

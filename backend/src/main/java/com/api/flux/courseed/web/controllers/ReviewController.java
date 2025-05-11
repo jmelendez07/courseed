@@ -103,4 +103,12 @@ public class ReviewController {
                 .switchIfEmpty(ServerResponse.notFound().build())
             );
     }
+
+    public Mono<ServerResponse> getTotalReviewsBySuscriptor(ServerRequest serverRequest) {
+        return serverRequest.principal()
+            .flatMap(principal -> reviewService.getTotalReviewsBySuscriptor(principal)
+                .flatMap(review -> ServerResponse.ok().bodyValue(review))
+                .switchIfEmpty(ServerResponse.notFound().build())
+            );
+    }
 }

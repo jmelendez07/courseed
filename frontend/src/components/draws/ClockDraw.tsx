@@ -1,11 +1,11 @@
 import { ColorContext } from "@/providers/ColorProvider";
 import React from "react";
 
-function ClockDraw() {
+function ClockDraw({ className }: { className?: string }) {
     const colorContext = React.useContext(ColorContext);
 
     return (
-        <svg xmlns="http://www.w3.org/2000/svg" data-name="Layer 1" width="892.6139" height="540.80203" viewBox="0 0 892.6139 540.80203" className="injected-svg w-full h-[30rem] object-cover">
+        <svg xmlns="http://www.w3.org/2000/svg" data-name="Layer 1" width="892.6139" height="540.80203" viewBox="0 0 892.6139 540.80203" className={`injected-svg w-full h-[30rem] object-cover ${ className }`}>
             <title>
             season_change</title>
         <circle cx="73.89615" cy="71.32961" r="46" className={`fill-${colorContext?.color}-700`}>

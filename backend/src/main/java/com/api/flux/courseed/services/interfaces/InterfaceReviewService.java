@@ -23,4 +23,5 @@ public interface InterfaceReviewService {
     Mono<Object> createReview(Principal principal, CreateReviewDto createReviewDto);
     Mono<ReviewDto> updateReview(Principal principal, String id, UpdateReviewDto saveReviewDto);
     Mono<Boolean> deleteReview(Principal principal, String id);
+    Mono<Integer> getTotalReviewsBySuscriptor(Principal principal);
 }

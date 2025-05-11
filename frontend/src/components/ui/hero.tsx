@@ -7,7 +7,7 @@ import { GraduationCap, LucideProps } from "lucide-react";
 import { Link } from "react-router-dom";
 import DialogCourses from "../dialog-courses";
 import React from "react";
-import FadeItem from "./fadeItem";
+import FadeItem from "./fade-item";
 import LazyImage from "./LazyImage";
 
 interface HeroProps {

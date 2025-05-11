@@ -60,7 +60,7 @@ function Profile() {
                             </div>
                         </header>
                         <div className="flex flex-col gap-2 p-4 pt-0">
-                            { (authHook?.user?.profile) ? (
+                            { (authHook?.user?.profile && !Object.values(authHook.user.profile).some(value => value === null)) ? (
                                 <DashboardContentUserWithProfile />
                             ) : (
                                 <DashboardContentProfile />

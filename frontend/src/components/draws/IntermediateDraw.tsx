@@ -1,11 +1,11 @@
 import { ColorContext } from "@/providers/ColorProvider";
 import React from "react";
 
-function IntermediateDraw() {
+function IntermediateDraw({ className }: { className?: string }) {
     const colorContext = React.useContext(ColorContext); 
 
     return (
-        <svg xmlns="http://www.w3.org/2000/svg" width="709.78574" height="788.7365" viewBox="0 0 709.78574 788.7365" className="injected-svg w-80 h-80" role="img">
+        <svg xmlns="http://www.w3.org/2000/svg" width="709.78574" height="788.7365" viewBox="0 0 709.78574 788.7365" className={`injected-svg w-80 h-80 ${className}`} role="img">
             <circle cx="354.89287" cy="354.89287" r="354.89287" fill="#f2f2f2">
             </circle>
         <path d="M311.65049,314.77666s-139.55047,60.75247-45.22219,150.97824,116.48142-91.63607,116.48142-91.63607l-71.25923-59.34217Z" fill="#090814">

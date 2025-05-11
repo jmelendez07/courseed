@@ -6,7 +6,7 @@ import CourseInterface from "@/interfaces/course";
 import { useAuth } from "@/providers/AuthProvider";
 import React from "react";
 import ConfettiExplosion from 'react-confetti-explosion';
-import FadeItem from "./fadeItem";
+import FadeItem from "./fade-item";
 import REACTION from "@/enums/reaction";
 import ReactionInterface from "@/interfaces/reaction";
 import useReaction from "@/hooks/useReaction";

@@ -25,4 +25,5 @@ public interface InterfaceCourseService {
     Mono<CourseDto> createCourse(Principal principal, SaveCourseDto saveCourseDto, String baseUrl);
     Mono<CourseDto> updateCourse(Principal principal, String id, SaveCourseDto saveCourseDto, String baseUrl);
     Mono<Object> deleteCourse(Principal principal, String id);
+    Mono<Long> getTotalCoursesBySuscriptor(Principal principal);
 }

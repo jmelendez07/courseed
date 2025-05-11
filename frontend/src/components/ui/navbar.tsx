@@ -34,7 +34,7 @@ import ROLES from "@/enums/roles";
 import { THEME, ThemeContext } from "@/providers/ThemeProvider";
 import Color from "./Color";
 import { motion, useMotionValueEvent, useScroll } from "motion/react";
-import FadeItem from "./fadeItem";
+import FadeItem from "./fade-item";
 import AvatarProfile from "./avatar-profile";
 
 interface MenuItem {

@@ -1,21 +1,20 @@
 import { AppSidebar } from "@/components/app-sidebar";
 import DashboardSuscriptorCourseRecomendation from "@/components/dashboard/dashboard-suscriptor-course-recomendation";
-import DashboardSuscriptorStats from "@/components/dashboard/dashboard-suscriptor-stats";
-import WelcomeBanner from "@/components/dashboard/welcome-banner";
-import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
+import { Breadcrumb, BreadcrumbItem, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
 import Color from "@/components/ui/Color";
 import { Separator } from "@/components/ui/separator";
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import Theme from "@/components/ui/theme";
+import DialogProvider from "@/providers/DialogProvider";
 import HeadProvider from "@/providers/HeadProvider";
-import InstitutionToSuscriptorProvider from "@/providers/InstitutionToSuscriptorProvider";
+import { Link } from "react-router-dom";
 
-function Dashboard() {
+function CourseRecomendation() {
     return (
-        <InstitutionToSuscriptorProvider>
-            <SidebarProvider>
+        <SidebarProvider>
+            <DialogProvider>
+                <HeadProvider title="Suscriptor - Recomendación de programas" />
                 <AppSidebar />
-                <HeadProvider title="Suscriptor" />
                 <SidebarInset>
                     <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12 justify-between">
                         <div className="flex items-center gap-2 px-4">
@@ -24,13 +23,13 @@ function Dashboard() {
                             <Breadcrumb>
                                 <BreadcrumbList>
                                     <BreadcrumbItem className="hidden md:block">
-                                        <BreadcrumbLink href="#">
+                                        <Link to="/suscriptor" className="hover:text-gray-800">
                                             Suscriptor
-                                        </BreadcrumbLink>
+                                        </Link>
                                     </BreadcrumbItem>
                                     <BreadcrumbSeparator className="hidden md:block" />
                                     <BreadcrumbItem>
-                                        <BreadcrumbPage>Inicio</BreadcrumbPage>
+                                        <BreadcrumbPage>Recomendación de programas</BreadcrumbPage>
                                     </BreadcrumbItem>
                                 </BreadcrumbList>
                             </Breadcrumb>
@@ -40,17 +39,13 @@ function Dashboard() {
                             <Theme />
                         </div>
                     </header>
-                    <main className="flex-1 p-6">
-                        <div className="mb-8 space-y-6">
-                            <WelcomeBanner />
-                            <DashboardSuscriptorStats />
-                            <DashboardSuscriptorCourseRecomendation title="Programas Recomendados" />
-                        </div>
-                    </main>
+                    <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
+                        <DashboardSuscriptorCourseRecomendation />
+                    </div>
                 </SidebarInset>
-            </SidebarProvider>
-        </InstitutionToSuscriptorProvider>
+            </DialogProvider>
+        </SidebarProvider>
     );
 }
 
-export default Dashboard;
+export default CourseRecomendation;

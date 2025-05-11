@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import FadeItem from "./fadeItem";
+import FadeItem from "./fade-item";
 
 interface MenuItem {
     title: string;

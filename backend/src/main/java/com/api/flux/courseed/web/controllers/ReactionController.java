@@ -73,5 +73,13 @@ public class ReactionController {
                 .flatMap(reaction -> ServerResponse.ok().bodyValue(reaction))
                 .switchIfEmpty(ServerResponse.notFound().build())
             ); 
-    } 
+    }
+
+    public Mono<ServerResponse> getTotalReactionsBySuscriptor(ServerRequest serverRequest) {
+        return serverRequest.principal()
+            .flatMap(principal -> reactionService.getTotalReactionsBySuscriptor(principal)
+                .flatMap(reactions -> ServerResponse.ok().bodyValue(reactions))
+                .switchIfEmpty(ServerResponse.notFound().build())
+            );
+    }
 }

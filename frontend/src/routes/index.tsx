@@ -26,7 +26,8 @@ import Prediction from "@/pages/prediction";
 import SearchHistory from "@/pages/auth/user/SearchHistory";
 import ProgramsViewed from "@/pages/auth/user/ProgramsViewed";
 import ProfileInterestForm from "@/pages/ProfileInterestForm";
-import CourseRecomendation from "@/pages/auth/admin/CourseRecomendation";
+import CourseRecomendationAdmin from "@/pages/auth/admin/CourseRecomendation";
+import CourseRecomendationSuscriptor from "@/pages/auth/subscriptor/CourseRecomendation";
 
 function Routes() {
 
@@ -109,7 +110,7 @@ function Routes() {
                 },
                 {
                     path: 'recomendaciones/programas',
-                    element: <CourseRecomendation />
+                    element: <CourseRecomendationAdmin />
                 }
             ]
         }
@@ -160,6 +161,10 @@ function Routes() {
                 {
                     path: 'suscripciones',
                     element: <Subscriptions />
+                },
+                {
+                    path: 'recomendaciones/programas',
+                    element: <CourseRecomendationSuscriptor />
                 }
             ]
         }

@@ -1,11 +1,11 @@
 import { ColorContext } from "@/providers/ColorProvider";
 import React from "react";
 
-function VirtualDraw() {
+function VirtualDraw({ className }: { className?: string }) {
     const colorContext = React.useContext(ColorContext);
     
     return (
-        <svg xmlns="http://www.w3.org/2000/svg" data-name="Layer 1" width="618.5" height="567.88189" viewBox="0 0 618.5 567.88189" className="injected-svg w-80 h-80 object-cover">
+        <svg xmlns="http://www.w3.org/2000/svg" data-name="Layer 1" width="618.5" height="567.88189" viewBox="0 0 618.5 567.88189" className={`injected-svg w-80 h-80 object-cover ${ className }`}>
             <path d="M333.94482,671.57974c-10.14013,6.98242-20.50927,14.18854-27.53076,24.30218-7.021,10.11371-10.08594,23.91974-4.44433,34.86322l-.14551.68207a26.3915,26.3915,0,0,0,25.48486-4.48913c8.92578-7.49189,11.72461-19.83472,14.00147-31.26349l6.73535-33.8042Z" transform="translate(-290.75 -166.05906)" fill="#f0f0f0">
             </path>
         <path d="M343.71141,705.66908c-6.76417,1.49654-13.695,3.06129-19.4952,6.85012-5.7999,3.789-10.31778,10.3399-9.6903,17.23941l-.22011.32489a14.85042,14.85042,0,0,0,14.23834,3.04866c6.23868-2.019,10.30836-7.86324,13.91256-13.34122l10.661-16.20269Z" transform="translate(-290.75 -166.05906)" fill="#f0f0f0">

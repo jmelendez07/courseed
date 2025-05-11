@@ -101,6 +101,7 @@ public class RouterConfig {
             .GET("/category/{categoryId}", courseController::getCoursesByCategoryId)
             .GET("/institution/{institutionId}", courseController::getCoursesByInstitutionId)
             .GET("/reviews-reactions/count", courseController::getTopCoursesWithReviewsAndReactions)
+            .GET("/suscriptor/count", courseController::getTotalCoursesBySuscriptor)
             .POST(RequestPredicates.accept(MediaType.MULTIPART_FORM_DATA), courseController::createCourse)
             .PUT("/{id}", RequestPredicates.accept(MediaType.MULTIPART_FORM_DATA), courseController::updateCourse)
             .DELETE("/{id}", courseController::deleteCourse)
@@ -127,6 +128,7 @@ public class RouterConfig {
             .GET("/course/{courseId}", reactionController::findReactionsByCourseId)
             .GET("/auth", reactionController::findReactionsByAuthUser)
             .GET("/total/this-month", reactionController::getTotalReactions)
+            .GET("/suscriptor/count", reactionController::getTotalReactionsBySuscriptor)    
             .POST(reactionController::createReaction)
             .PUT(reactionController::updateReaction)
             .DELETE("/{id}", reactionController::deleteReaction)
@@ -142,6 +144,7 @@ public class RouterConfig {
             .GET("/total/negative", reviewController::getTotalNegativeReviews)
             .GET("/course/{courseId}", reviewController::getReviewsByCourseId)
             .GET("/auth", reviewController::getReviewsByAuthUser)
+            .GET("/suscriptor/count", reviewController::getTotalReviewsBySuscriptor)
             .POST(reviewController::createReview)
             .PUT("/{id}", reviewController::updateReview)
             .DELETE("/{id}", reviewController::deleteReview)
@@ -181,6 +184,7 @@ public class RouterConfig {
             .GET("/auth", viewController::findViewsByAuthUser)
             .GET("/total/this-month", viewController::getTotalViews)
             .GET("/courses/this-month/decreasing", viewController::findCoursesWithDecreasingViews)
+            .GET("/suscriptor/count", viewController::getTotalViewsBySuscriptor)
             .POST("/create", viewController::createView)
             .build();
     }

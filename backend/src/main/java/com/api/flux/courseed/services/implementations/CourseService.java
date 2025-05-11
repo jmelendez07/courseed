@@ -636,6 +636,13 @@ public class CourseService implements InterfaceCourseService {
             .map(p -> new PageImpl<>(p.getT1(), pageable, p.getT2()));
     }
 
+    @Override
+    public Mono<Long> getTotalCoursesBySuscriptor(Principal principal) {
+        return userRepository.findByEmail(principal.getName())
+            .flatMap(user -> courseRepository.countByUserId(user.getId()));
+    }
+
+
     public String standarizeModality(String modality) {
 
         if (modality == null || modality.isEmpty()) {

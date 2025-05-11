@@ -62,4 +62,12 @@ public class ViewController {
                 )
             );
     }
+
+    public Mono<ServerResponse> getTotalViewsBySuscriptor(ServerRequest serverRequest) {
+        return serverRequest.principal()
+            .flatMap(principal -> viewService.getTotalViewsBySuscriptor(principal)
+                .flatMap(views -> ServerResponse.ok().bodyValue(views))
+                .switchIfEmpty(ServerResponse.notFound().build())
+            );
+    } 
 }

@@ -1,11 +1,11 @@
 import { ColorContext } from "@/providers/ColorProvider";
 import React from "react";
 
-function HybridDraw() {
+function HybridDraw({ className }: { className?: string }) {
     const colorContext = React.useContext(ColorContext);
 
     return (
-        <svg xmlns="http://www.w3.org/2000/svg" width="1158.89111" height="591.13816" className="njected-svg w-80 h-80 object-cover" viewBox="0 0 1158.89111 591.13816" role="img">
+        <svg xmlns="http://www.w3.org/2000/svg" width="1158.89111" height="591.13816" className={`injected-svg w-80 h-80 object-cover ${className}`} viewBox="0 0 1158.89111 591.13816" role="img">
             <rect x="973.22836" y="515.09845" width="21.48737" height="71.07918" fill="#d6d6e3"/>
             <polygon points="850.4434 432.21859 832.02565 444.49709 825.8864 462.91484 1062.24746 545.79469 1071.45634 512.02882 850.4434 432.21859" fill="#d6d6e3"/>
             <polygon points="916.44032 65.3985 832.02565 444.49709 1071.45634 512.02882 1140.52288 19.35414 916.44032 65.3985" fill="#f2f2f2"/>

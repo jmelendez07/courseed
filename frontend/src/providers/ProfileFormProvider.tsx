@@ -1,6 +1,7 @@
 import React from "react";
 import { useAuth } from "./AuthProvider";
 import { useNavigate } from "react-router-dom";
+import ROLES from "@/enums/roles";
 
 interface ChildrenProps {
     children: React.ReactNode,
@@ -19,7 +20,7 @@ function ProfileFormProvider({ children }: ChildrenProps) {
     const navigate = useNavigate();
     
     React.useEffect(() => {
-        if (authHook?.user && (!authHook.user.profile || Object.values(authHook.user.profile).some(value => value === null))) {
+        if (authHook?.user && authHook.user.roles?.some(r => r === ROLES.USER) && (!authHook.user.profile || Object.values(authHook.user.profile).some(value => value === null))) {
             setRedirect(true);
             navigate("/formulario-perfil", { replace: true });
         } else {

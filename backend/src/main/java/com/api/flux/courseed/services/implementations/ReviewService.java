@@ -440,6 +440,18 @@ public class ReviewService implements InterfaceReviewService {
                                 .getWebExchangeBindException()));
     }
 
+    @Override
+    public Mono<Integer> getTotalReviewsBySuscriptor(Principal principal) {
+        return userRepository.findByEmail(principal.getName())
+    		.flatMap(user -> courseRepository.findByUserId(user.getId())
+        		.collectList()
+        		.flatMapMany(Flux::fromIterable) 
+        		.flatMap(course -> reviewRepository.findByCourseId(course.getId())) 
+        		.count()
+        		.map(Long::intValue)
+    		);
+    }
+
     private boolean isNumeric(String str) {
         try {
             Integer.parseInt(str);

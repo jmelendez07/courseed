@@ -1,11 +1,11 @@
 import { ColorContext } from "@/providers/ColorProvider";
 import { useContext } from "react";
 
-function BeginnerDraw() {
+function BeginnerDraw({ className }: { className?: string }) {
     const colorContext = useContext(ColorContext);
     
     return (
-        <svg xmlns="http://www.w3.org/2000/svg" width="532" height="532" viewBox="0 0 532 532" className="injected-svg w-80 h-80" role="img">
+        <svg xmlns="http://www.w3.org/2000/svg" width="532" height="532" viewBox="0 0 532 532" className={`injected-svg w-80 h-80 ${ className }`} role="img">
             <circle cx="270.75986" cy="260.93427" r="86.34897" fill="#ffb6b6">
             </circle>
         <polygon points="221.18982 360.05209 217.28876 320.6185 295.18982 306.05209 341.18982 418.05209 261.18982 510.05209 204.18982 398.05209 221.18982 360.05209" fill="#ffb6b6">

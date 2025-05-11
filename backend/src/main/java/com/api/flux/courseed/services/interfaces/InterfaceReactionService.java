@@ -17,4 +17,5 @@ public interface InterfaceReactionService {
     Mono<Object> createReaction(Principal principal, SaveReactionDto saveReactionDto);
     Mono<ReactionDto> updateReaction(Principal principal, SaveReactionDto saveReactionDto); 
     Mono<Boolean> deleteReaction(Principal principal, String courseId);
+    Mono<Integer> getTotalReactionsBySuscriptor(Principal principal);
 }

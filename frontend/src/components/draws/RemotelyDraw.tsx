@@ -1,11 +1,11 @@
 import { ColorContext } from "@/providers/ColorProvider";
 import React from "react";
 
-function RemotelyDraw() {
+function RemotelyDraw({ className }: { className?: string }) {
     const colorContext = React.useContext(ColorContext);
 
     return(
-        <svg xmlns="http://www.w3.org/2000/svg" className="injected-svg w-80 h-80 object-cover" width="882.34637" height="778.99856" viewBox="0 0 882.34637 778.99856" role="img">
+        <svg xmlns="http://www.w3.org/2000/svg" className={`injected-svg w-80 h-80 object-cover ${className}`} width="882.34637" height="778.99856" viewBox="0 0 882.34637 778.99856" role="img">
             <title>
             remotely</title>
         <path d="M501.18877,80.56067l3.46953-5.362a80.3872,80.3872,0,0,0-3.55952-8.33251l-2.24352,1.81205,1.77642-2.74534c-1.69294-3.3325-3.02505-5.43215-3.02505-5.43215s-6.95827,10.96511-9.283,22.57466l4.45222,6.88072-4.9288-3.981a32.52249,32.52249,0,0,0-.27041,4.0782c0,13.74959,4.49056,24.89583,10.03,24.89583s10.03-11.14624,10.03-24.89583a42.818,42.818,0,0,0-2.29454-12.84723Z" transform="translate(-158.82681 -60.50072)" fill="#e6e6e6"/>

@@ -47,4 +47,6 @@ public interface CourseRepository extends ReactiveMongoRepository<Course, String
     Flux<Course> findByUserIdAndTitleContainingOrderByCreatedAtDesc(String userId, String title, Pageable pageable);
     Mono<Long> countByInstitutionId(String institutionId);
     Flux<Course> findByTitleContainingIgnoreCase(String title);
+    Flux<Course> findByUserId(String userId);
+    Mono<Long> countByUserId(String userId);
 }

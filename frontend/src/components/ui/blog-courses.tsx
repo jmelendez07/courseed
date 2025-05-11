@@ -9,7 +9,7 @@ import useFaculty from "@/hooks/useFaculty";
 import ComboBoxResponsive from "./combo-box-responsive";
 import { useSearchParams } from "react-router-dom";
 import React from "react";
-import FadeItem from "./fadeItem";
+import FadeItem from "./fade-item";
 import CourseSkeleton from "../skeleton/course-skeleton";
 import SearchDraw from "../draws/SearchDraw";
 import InstitutionInterface from "@/interfaces/institution";

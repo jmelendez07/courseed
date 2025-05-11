@@ -34,6 +34,7 @@ import com.api.flux.courseed.projections.mappers.ViewMapper;
 import com.api.flux.courseed.services.interfaces.InterfaceViewService;
 import com.api.flux.courseed.web.exceptions.CustomWebExchangeBindException;
 
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Service
@@ -204,4 +205,15 @@ public class ViewService implements InterfaceViewService {
             .collectList();
     }
 
+    @Override
+    public Mono<Integer> getTotalViewsBySuscriptor(Principal principal) {
+        return userRepository.findByEmail(principal.getName())
+            .flatMap(user -> courseRepository.findByUserId(user.getId())
+                .collectList()
+                .flatMapMany(Flux::fromIterable)
+                .flatMap(course -> viewRepository.findByCourseId(course.getId()))
+                .count()
+                .map(Long::intValue)
+            );
+    }
 }
