@@ -9,9 +9,11 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import NoSuchElementException
 import re
+from app.lib.utils import standarize_modality, standarize_duration, standarize_category, uploadFile
 
 class UniMagdalena(BaseScraper):
     INSTITUTION: str = "universidad del magdalena"
+    INSTITUTION_IMAGE_URL: str = "https://radio.unimagdalena.edu.co/assets/logo.png"
 
     def getCourses(self) -> list[CourseInteface]:
         courses: list[CourseInteface] = []
@@ -23,7 +25,11 @@ class UniMagdalena(BaseScraper):
             facultyTabMenu = self.driver.find_element(By.XPATH, '//a[@class="elementor-item elementor-item-anchor has-submenu" and contains(text(), "Todas las Facultades")]')
             self.driver.execute_script("arguments[0].click();", facultyTabMenu)
 
-            faculties = [{ "url": faculty.get_attribute("href"), "name": faculty.text.lower() } for faculty in self.driver.find_elements(By.XPATH, '//ul[@class="sub-menu elementor-nav-menu--dropdown sm-nowrap"]/li/a[@class="elementor-sub-item"]')]
+            faculties = [
+                { "url": faculty.get_attribute("href"), "name": faculty.text.lower() } 
+                for faculty in self.driver.find_elements(By.XPATH, '//ul[@class="sub-menu elementor-nav-menu--dropdown sm-nowrap"]/li/a[@class="elementor-sub-item"]')
+                if faculty.get_attribute("href") != "https://bloque10.unimagdalena.edu.co/ciencias-de-la-salud/"
+            ]
 
             for faculty in faculties:
                 self.logger.info(f"Loading the faculty URL: {faculty["url"]}")
@@ -72,12 +78,12 @@ class UniMagdalena(BaseScraper):
             except Exception as e:
                 self.logger.error(f"Failed to get data for course URL: {courseUrl}. Exception: {str(e)}")
                 
-            prerequisites = None
-            price = None
+            price = 0
             try:
                 priceElement = self.driver.find_element(By.XPATH, '//strong[contains(text(), "Valor:")]//ancestor::span[1]')
-                priceMatch = re.search(r'\s*\$\s*([\d,\.]+)', priceElement.text).group(1)
-                price = float(priceMatch.replace('$', '').replace('.', '').replace(',', '.').strip())
+                if priceElement:
+                    priceMatch = re.search(r'\s*\$\s*([\d,\.]+)', priceElement.text).group(1)
+                    price = float(priceMatch.replace('$', '').replace('.', '').replace(',', '.').strip())
             except Exception as e:
                 self.logger.error(f"Failed to get data for course URL: {courseUrl}. Exception: {str(e)}")
 
@@ -120,13 +126,13 @@ class UniMagdalena(BaseScraper):
                 title=title,
                 image=image,
                 description=description,
-                prerequisites=prerequisites,
                 price=price,
-                duration=duration,
-                modality=modality,
+                duration=standarize_duration(duration),
+                modality=standarize_modality(modality),
                 type=type,
                 institution=self.INSTITUTION,
-                category=self.normalize_string(category),
+                institution_image_url=self.INSTITUTION_IMAGE_URL,
+                category=standarize_category(self.normalize_string(category)),
                 contents=contents
             )
 
@@ -165,17 +171,21 @@ class UniMagdalena(BaseScraper):
         return ''.join(resultado)
 
     def saveToDatabase(self, courses: list[CourseInteface]):
+        institutionImage = uploadFile(self.INSTITUTION_IMAGE_URL, "institutions")
+        institutionDocument = Institution.objects(name=self.INSTITUTION).modify(upsert=True, set__name=self.INSTITUTION, set__image=institutionImage, new=True)
+        
         for course in courses:
             try:
-                institutionDocument = Institution.objects(name=course.institution).modify(upsert=True, set__name=course.institution, new=True)
                 categoryDocument = Category.objects(name=course.category).modify(upsert=True, set__name=course.category, new=True)
+                
+                courseImageUrl: str = uploadFile(course.image, "courses")
                 courseDocument = Course.objects(url=course.url).modify(
                     upsert=True, 
                     set__url=course.url,
                     set__title=course.title,
-                    set__image=course.image,
+                    set__image=courseImageUrl,
+                    set__originalImage=course.image,
                     set__description=course.description,
-                    set__prerequisites=course.prerequisites,
                     set__price=course.price,
                     set__duration=course.duration,
                     set__modality=course.modality,

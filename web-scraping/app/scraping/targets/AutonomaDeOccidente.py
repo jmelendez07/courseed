@@ -9,9 +9,11 @@ from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 import re
+from app.lib.utils import standarize_modality, standarize_duration, standarize_category, uploadFile
 
 class AutonomaDeOccidente(BaseScraper):
     INSTITUTION: str = "universidad autónoma de occidente"
+    INSTITUTION_IMAGE_URL: str = "https://estudiarvirtual.uao.edu.co/wp-content/themes/uao-virtual/assets/favicon/ms-icon-144x144.png"
 
     def getCourses(self) -> list[CourseInteface]:
         courses: list[CourseInteface] = []
@@ -20,21 +22,12 @@ class AutonomaDeOccidente(BaseScraper):
             self.logger.info(f"Loading the URL: {self.url}")
             self.driver.get(self.url)
 
-            courseUrls: list[str] = []
-
-            while True:
-                try:
-                    courseElements = self.driver.find_elements(By.XPATH, '//div[@class="tc-cards-container"]/div[contains(@class, "virtual-program-card")]/a')
-                    for courseElement in courseElements:
-                        courseUrls.append(courseElement.get_attribute("href"))
-
-                    newPage = self.driver.find_element(By.XPATH, '//div[@class="pagination"]/a[@class="next"]').get_attribute("href")
-                    self.driver.get(newPage)
-
-                except NoSuchElementException:
-                    break
-
-            print(len(courseUrl))
+            courseUrls = []
+            courseElements = self.driver.find_elements(By.XPATH, '//div[contains(@class, "program-cards-container")]//a[contains(@class, "program-card")]')
+            for courseElement in courseElements:
+                courseUrl = courseElement.get_attribute("href")
+                if courseUrl not in courseUrls:
+                    courseUrls.append(courseUrl)
 
             for courseUrl in courseUrls:
                 course = self.getCourse(courseUrl)
@@ -51,72 +44,43 @@ class AutonomaDeOccidente(BaseScraper):
             self.logger.info(f"Loading the course URL: {courseUrl}")
             self.driver.get(courseUrl)
 
-            title = self.cleanText(self.driver.find_element(By.XPATH, '//div[@class="virtual-program-detail"]//h1').text)
-
-            image = None 
+            title = self.cleanText(self.driver.find_element(By.XPATH, '//meta[@property="og:title"]').get_attribute('content'))
+            image = self.driver.find_element(By.XPATH, '//meta[@property="og:image"]').get_attribute("content")
+            description = self.cleanText(self.driver.find_element(By.XPATH, '//meta[@property="og:description"]').get_attribute("content"))
+            price = 0
             try:
-                image = self.driver.find_element(By.XPATH, '//img[@class="attachment-large size-large wp-post-image"]').get_attribute("src")
-            except Exception as e:
-                self.logger.error(f"Failed to get data for course URL: {courseUrl}. Exception: {str(e)}")
+                priceText = self.driver.find_element(By.XPATH, '//h5[contains(text(), "Valor periodo académico")]/following-sibling::span').text
+                match =  re.search(r'\$?\s*([\d\.,]+)', priceText)
+                if match:
+                    price = float(match.group(1).replace('.', '').replace(',', '.'))
+            except Exception:
+                priceText = self.driver.find_element(By.XPATH, '//p[contains(text(), "Valor periodo académico")]/following-sibling::p').text
+                cleanedPrice = re.sub(r'[^\d,]', '', priceText).replace(',', '.')
+                if cleanedPrice:
+                    price = float(cleanedPrice)
 
-            description = None
+            duration = "0 horas"  
             try:
-                description = self.cleanText(self.driver.find_element(By.XPATH, '//div[@class="detail-content virtual-program-detail-content"]/h2[contains(text(), "¿Por qué hacerlo?") or contains(text(), "¿Por qué tomar el Curso?")]/following-sibling::p').text)
-                description = f"{description[:2000-3]}..." if len(description) > 2000 else description
-                description = None if description.strip() == "" else description
-            except Exception as e:
-                self.logger.error(f"Failed to get data for course URL: {courseUrl}. Exception: {str(e)}")
-
-            prerequisites = None
-
-            detailsElement = self.driver.find_element(By.XPATH, '//div[@class="virtual-program-details aos-init"]')
-            self.driver.execute_script("arguments[0].scrollIntoView();", detailsElement)
-            WebDriverWait(self.driver, 10).until(EC.visibility_of(detailsElement))
-
-            price = None
-            try: 
-                priceElement = self.driver.find_element(By.XPATH, '//p[contains(text(), "Valor del curso")]//ancestor::div[1]//*[@class="term"]') 
-                priceMatch = re.search(r'\s*\$\s*([\d,\.]+)', priceElement.text).group(1)
-                price = float(priceMatch.replace('$', '').replace('.', '').replace(',', '.').strip())
-            except Exception as e:
-                pass
-                
-            if not price:
-                try:
-                    priceElement = self.driver.find_element(By.XPATH, '//p[contains(text(), "Valor periodo académico")]//following-sibling::*')
-                    priceMatch = re.search(r'\s*\$\s*([\d,\.]+)', priceElement.text).group(1)
-                    price = float(priceMatch.replace('$', '').replace('.', '').replace(',', '.').strip())
-                except Exception as e:
-                    self.logger.error(f"Failed to get data for course URL: {courseUrl}. Exception: {str(e)}")
-
-            duration = None
-            try:
-                duration = self.cleanText(self.driver.find_element(By.XPATH, '//p[contains(text(), "Duración del curso") or contains(text(), "Duración del programa")]//following-sibling::*').text)
-            except Exception as e:
-                self.logger.error(f"Failed to get data for course URL: {courseUrl}. Exception: {str(e)}")
+                durationText = self.driver.find_element(By.XPATH, '//h5[contains(text(), "Duración del programa")]/following-sibling::span').text 
+                match = re.search(r'\b\d+\s*horas\b', durationText, re.IGNORECASE)
+                if match:
+                    duration = match.group(0)
+            except Exception:
+                duration = self.cleanText(self.driver.find_element(By.XPATH, '//p[contains(text(), "Duración del programa")]/following-sibling::p').text)
 
             modality = None
             try:
-                modality = self.cleanText(self.driver.find_element(By.XPATH, '//p[contains(text(), "Modalidad")]//following-sibling::*').text)
-            except Exception as e:
-                self.logger.error(f"Failed to get data for course URL: {courseUrl}. Exception: {str(e)}")
-
-            category = None
+                modality = self.cleanText(self.driver.find_element(By.XPATH, '//h5[contains(text(), "Modalidad")]/following-sibling::span').text)  
+            except Exception:
+                modality = self.cleanText(self.driver.find_element(By.XPATH, '//p[contains(text(), "Modalidad")]/following-sibling::p').text)
+                
+            category = "sin categoría"
             try:
-                category = self.normalize_string(self.cleanText(self.driver.find_element(By.XPATH, '//div[@class="field-of-study"]//p').text))
-            except Exception as e:
-                self.logger.error(f"Failed to get data for course URL: {courseUrl}. Exception: {str(e)}")
+                category = self.cleanText(self.driver.find_element(By.XPATH, '//div[contains(@class, "field-of-study")]//p').text)
+            except Exception:
+                category = "sin categoría"
 
-            contents: list[str] = [] 
-            try:
-                contentElements = self.driver.find_elements(By.XPATH, '//div[@class="detail-content virtual-program-detail-content"]/h2[contains(text(), "¿Qué vas a aprender?") or contains(text(), "Habilidades que vas a adquirir")]/following-sibling::ul/li')
-                for contentElement in contentElements:
-                    content = self.cleanText(contentElement.text)
-                    if  content != "":
-                        contents.append(content)
-            except Exception as e:
-                self.logger.error(f"Failed to get data for course URL: {courseUrl}. Exception: {str(e)}")
-
+            contents = []
             type = None
 
             if "diplomado" in title.lower():
@@ -133,13 +97,13 @@ class AutonomaDeOccidente(BaseScraper):
                 title=title,
                 image=image,
                 description=description,
-                prerequisites=prerequisites,
                 price=price,
-                duration=duration,
-                modality=modality,
+                duration=standarize_duration(duration),
+                modality=standarize_modality(modality),
                 type=type,
                 institution=self.INSTITUTION,
-                category=category,
+                institution_image_url=self.INSTITUTION_IMAGE_URL,
+                category=standarize_category(category),
                 contents=contents
             )
 
@@ -155,40 +119,24 @@ class AutonomaDeOccidente(BaseScraper):
     def cleanText(self, text: str) -> str:
         cleanedText = re.sub(r'[\t\n\xa0]', ' ', text).strip()
         return cleanedText
-    
-    def normalize_string(self, text: str) -> str:
-        text = text.lower()
-        resultado = []
-        alphabet = "abcdefghijklmnñopqrstuvwxyz"
-        replaces = {
-            'á': 'a', 'é': 'e', 'í': 'i', 'ó': 'o', 'ú': 'u',
-            'à': 'a', 'è': 'e', 'ì': 'i', 'ò': 'o', 'ù': 'u',
-            'ä': 'a', 'ë': 'e', 'ï': 'i', 'ö': 'o', 'ü': 'u',
-            'â': 'a', 'ê': 'e', 'î': 'i', 'ô': 'o', 'û': 'u'
-        }
-
-        for character in text:
-            if character in replaces:
-                resultado.append(replaces[character])
-            elif character in alphabet:
-                resultado.append(character)
-            elif character.isspace():
-                resultado.append(character)
-        
-        return ''.join(resultado)
 
     def saveToDatabase(self, courses: list[CourseInteface]):
+        self.logger.info(f"Saving {len(courses)} courses to the database.")
+        institutionImage = uploadFile(self.INSTITUTION_IMAGE_URL, "institutions")
+        institutionDocument = Institution.objects(name=self.INSTITUTION).modify(upsert=True, set__name=self.INSTITUTION, set__image=institutionImage, new=True)
+                
         for course in courses:
             try:
-                institutionDocument = Institution.objects(name=course.institution).modify(upsert=True, set__name=course.institution, new=True)
                 categoryDocument = Category.objects(name=course.category).modify(upsert=True, set__name=course.category, new=True)
+                
+                courseImageUrl: str = uploadFile(course.image, "courses")
                 courseDocument = Course.objects(url=course.url).modify(
                     upsert=True, 
                     set__url=course.url,
                     set__title=course.title,
-                    set__image=course.image,
+                    set__image=courseImageUrl,
+                    set__originalImage=course.image,
                     set__description=course.description,
-                    set__prerequisites=course.prerequisites,
                     set__price=course.price,
                     set__duration=course.duration,
                     set__modality=course.modality,

@@ -9,151 +9,78 @@ from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 import re
+import requests
+from app.lib.utils import standarize_modality, standarize_duration, standarize_category, uploadFile, clean_html
 
 class UniAndes(BaseScraper):
     INSTITUTION: str = "universidad de los andes"
+    INSTITUTION_IMAGE_URL: str = "https://upload.wikimedia.org/wikipedia/commons/thumb/4/47/University_of_Los_Andes_logo.svg/1726px-University_of_Los_Andes_logo.svg.png"
 
     def getCourses(self) -> list[CourseInteface]:
         courses: list[CourseInteface] = []
+        from_idx = 0
+        step = 50
 
         try:
-            self.logger.info(f"Loading the URL: {self.url}")
-            self.driver.get(self.url)
-
-            checkboxes = self.driver.find_elements(By.XPATH, '//*[@id="collapsefacu"]//input[@type="checkbox"]')
-            faculties = [{ "name": checkbox.get_attribute("name"), "value": checkbox.get_attribute("value") } for checkbox in checkboxes ]
-
-            for faculty in faculties:
-                urlWithParam = f"{self.url}?{faculty["name"]}={faculty["value"]}"
-
-                self.logger.info(f"Loading the faculty URL: {urlWithParam}")
-                self.driver.get(urlWithParam)
-
-                courseUrls: list[str] = []
-                courseElements = self.driver.find_elements(By.XPATH, '//div[@class="module__modulares module__modulares--catalogo"]//a[@class="btn btn-secundary-edco"]')
-
-                for courseElement in courseElements:
-                    courseUrls.append(courseElement.get_attribute("href"))
+            while True:
+                to_idx = from_idx + step - 1
+                url = f"{self.url}?_from={from_idx}&_to={to_idx}"
+                self.logger.info(f"Loading the URL: {url}")
+                response = requests.get(url)
+                data = response.json()
                 
-                paginationElements = self.driver.find_elements(By.XPATH, '//ul[@class="pagination"]//a[text()[normalize-space()]]')
-                paginationUrls = [paginationElement.get_attribute('href') for paginationElement in paginationElements if paginationElement.text.isdigit() and paginationElement.text != "1"]
+                if not data:
+                    break
 
-                for paginationUrl in paginationUrls:
-                    self.driver.get(paginationUrl)
-                    courseElements = self.driver.find_elements(By.XPATH, '//div[@class="module__modulares module__modulares--catalogo"]//a[@class="btn btn-secundary-edco"]')
-
-                    for courseElement in courseElements:
-                        courseUrls.append(courseElement.get_attribute("href"))
-
-                for courseUrl in courseUrls:
-                    course = self.getCourse(courseUrl=courseUrl, facultyName =self.normalize_string(faculty["value"]))
+                for courseData in data:
+                    course = self.getCourse(courseData)
                     if course:
                         courses.append(course)
+                    
+                from_idx += step
 
             return courses
+
         except Exception as e:
             self.logger.error(f"Web scraping process encountered a failure. Exception: {str(e)}")
             return None
+            
 
-    def getCourse(self, courseUrl: str, facultyName: str) -> CourseInteface:
+    def getCourse(self, courseData: dict[str, str]) -> CourseInteface:
         try:
-            self.logger.info(f"Loading the course URL: {courseUrl}")
-            self.driver.get(courseUrl)
-
-            title = self.cleanText(self.driver.find_element(By.XPATH, '//div[@class="bannercourse__bgyellow animated fadeInLeft title-slider"]//h1').text).capitalize()
-
-            image = None
-            try:
-                image = self.driver.find_element(By.XPATH, '//figure//img[@class="banner-desk hidden-xs"]').get_attribute('src')
-            except NoSuchElementException:
-                pass
-
-            if not image:
-                try:
-                    image = self.driver.find_element(By.XPATH, '//figure//img[@class="banner-mobi hidden-sm hidden-md hidden-lg"]').get_attribute('src')
-                except NoSuchElementException:
-                    pass
-
-            description = None
-            try:
-                pElements = self.driver.find_elements(By.XPATH, '//div[@class="container_item bg__gray"]/p')
-                description = self.cleanText(" ".join([p.text.strip() for p in pElements if p.text]))
-                description = f"{description[:2000-3]}..." if len(description) > 2000 else description
-                description = None if description.strip() == "" else description
-            except Exception as e:
-                self.logger.error(f"Failed to get data for course URL: {courseUrl}. Exception: {str(e)}")
-
-            prerequisites = None
-            price = None
-
-            try:
-                priceElement = self.driver.find_element(By.XPATH, '//h4[contains(text(), "Inversión:")]//ancestor::div[1]/div[@class="order__rate"]/p[@class="info__rate" and (@data-rate="temprana" or @data-rate="plena")]')
-                priceMatch = re.search(r'\s*\$\s*([\d,\.]+)', priceElement.text).group(1)
-                price = float(priceMatch.replace('$', '').replace('.', '').replace(',', '.').strip())
-            except Exception as e:
-                pass
-
-            if not price:
-                try:
-                    buttonShowPriceElement = self.driver.find_element(By.XPATH, '//a[@class="link--default popup--open" and contains(text(), "Ver opciones de inversión")]')
-                    self.driver.execute_script("arguments[0].click();", buttonShowPriceElement)
-
-                    priceElement = WebDriverWait(self.driver, 10).until(
-                        EC.visibility_of_element_located(((By.XPATH, '//p[@class="popup__paragraph" and @data-coin="COP"]'))
-                    ))
-
-                    priceMatch = re.search(r'\s*\$\s*([\d,\.]+)', priceElement.text).group(1)
-                    price = float(priceMatch.replace('$', '').replace('.', '').replace(',', '.').strip())
-                except Exception as e:
-                    self.logger.error(f"Failed to get data for course URL: {courseUrl}. Exception: {str(e)}")
-
-            duration = None
-
-            try:
-                duration = self.cleanText(self.driver.find_element(By.XPATH, '//h4[contains(text(), "Duración:")]//ancestor::div[1]/h3').text)
-            except Exception as e:
-                self.logger.error(f"Failed to get data for course URL: {courseUrl}. Exception: {str(e)}")
-
-            modality = None
-
-            try:
-                modality = self.cleanText(self.driver.find_element(By.XPATH, '//h4[contains(text(), "Modalidad:")]//ancestor::div[1]/h3').text)    
-            except Exception as e:
-                self.logger.error(f"Failed to get data for course URL: {courseUrl}. Exception: {str(e)}")
-
-            contents = []
-            try:
-                contentElements = self.driver.find_elements(By.XPATH, '//h2[contains(text(), "Contenido")]//ancestor::div[1]/p/strong')
-                for contentElement in contentElements:
-                    if self.cleanText(contentElement.text) != "":
-                        content = self.cleanText(contentElement.text).replace(":", ".")
-                        contents.append(content)
-            except Exception as e:
-                self.logger.error(f"Failed to get data for course URL: {courseUrl}. Exception: {str(e)}")
-
-            type = None
-
-            if "diplomado" in title.lower():
+            courseUrl = courseData["link"]
+            title = courseData["productName"]
+            image = courseData["items"][0]["images"][0]["imageUrl"]
+            description = clean_html(courseData["description"])
+            price = courseData["items"][0]["sellers"][0]["commertialOffer"]["Price"]
+            duration = courseData["Duración Horas"][0]
+            modality = courseData["Modalidad"][0]
+            category = courseData["brand"]
+            type = courseData["Tipo de Curso"][0]
+            
+            if "diplomado" in type.lower():
                 type = "diplomado"
-            elif "seminario" in title.lower(): 
+            elif "seminario" in type.lower(): 
                 type = "seminario"
-            elif "taller" in title.lower():
+            elif "taller" in type.lower():
                 type = "taller"
             else: 
                 type = "curso"
+
+            contents = []
 
             course = CourseInteface(
                 url=courseUrl,
                 title=title,
                 image=image,
                 description=description,
-                prerequisites=prerequisites,
                 price=price,
-                duration=duration,
-                modality=modality,
+                duration=standarize_duration(duration),
+                modality=standarize_modality(modality),
                 type=type,
                 institution=self.INSTITUTION,
-                category=facultyName,
+                institution_image_url=self.INSTITUTION_IMAGE_URL,
+                category=standarize_category(category),
                 contents=contents
             )
 
@@ -166,43 +93,22 @@ class UniAndes(BaseScraper):
         finally:
             self.driver.back()
 
-    def cleanText(self, text: str) -> str:
-        cleanedText = re.sub(r'[\t\n\xa0]', ' ', text).strip()
-        return cleanedText
-    
-    def normalize_string(self, text: str) -> str:
-        text = text.lower()
-        resultado = []
-        alphabet = "abcdefghijklmnñopqrstuvwxyz"
-        replaces = {
-            'á': 'a', 'é': 'e', 'í': 'i', 'ó': 'o', 'ú': 'u',
-            'à': 'a', 'è': 'e', 'ì': 'i', 'ò': 'o', 'ù': 'u',
-            'ä': 'a', 'ë': 'e', 'ï': 'i', 'ö': 'o', 'ü': 'u',
-            'â': 'a', 'ê': 'e', 'î': 'i', 'ô': 'o', 'û': 'u'
-        }
-
-        for character in text:
-            if character in replaces:
-                resultado.append(replaces[character])
-            elif character in alphabet:
-                resultado.append(character)
-            elif character.isspace():
-                resultado.append(character)
-        
-        return ''.join(resultado)
-
     def saveToDatabase(self, courses: list[CourseInteface]):
+        institutionImageUrl: str = uploadFile(self.INSTITUTION_IMAGE_URL, "institutions")
+        institutionDocument = Institution.objects(name=self.INSTITUTION).modify(upsert=True, set__name=self.INSTITUTION, set__image=institutionImageUrl, new=True)
+        
         for course in courses:
             try:
-                institutionDocument = Institution.objects(name=course.institution).modify(upsert=True, set__name=course.institution, new=True)
                 categoryDocument = Category.objects(name=course.category).modify(upsert=True, set__name=course.category, new=True)
+                
+                courseImageUrl: str = uploadFile(course.image, "courses")
                 courseDocument = Course.objects(url=course.url).modify(
                     upsert=True, 
                     set__url=course.url,
                     set__title=course.title,
-                    set__image=course.image,
+                    set__image=courseImageUrl,
+                    set__originalImage=course.image,
                     set__description=course.description,
-                    set__prerequisites=course.prerequisites,
                     set__price=course.price,
                     set__duration=course.duration,
                     set__modality=course.modality,

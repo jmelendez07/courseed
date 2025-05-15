@@ -51,10 +51,10 @@ class BaseScraper:
         raise NotImplementedError("You must implement this method in the child class.")
 
     def scrape(self):
-        if self.verifyRobots():
-            courses = self.getCourses()
-            if courses is not None:
-                self.saveToDatabase(courses)
+        # if self.verifyRobots():
+        courses = self.getCourses()
+        if courses is not None:
+            self.saveToDatabase(courses)
 
-            self.driver.quit()
-            self.logger.close()
+        self.driver.quit()
+        self.logger.close()

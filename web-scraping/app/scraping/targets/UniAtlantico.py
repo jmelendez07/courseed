@@ -6,9 +6,11 @@ from app.persistence.documents.Course import Course
 from app.persistence.documents.Content import Content
 from selenium.webdriver.common.by import By
 import re
+from app.lib.utils import standarize_modality, standarize_duration, standarize_category, uploadFile
 
 class UniAtlantico(BaseScraper):
     INSTITUTION: str = "universidad del atlántico"
+    INSTITUTION_IMAGE_URL: str = "https://www.acofi.edu.co/wp-content/uploads/2013/10/UNIVERSIDAD-DEL-ATLANTICO-1.jpg"
 
     def getCourses(self) -> list[CourseInteface]:
         courses: list[CourseInteface] = []
@@ -58,7 +60,6 @@ class UniAtlantico(BaseScraper):
             except Exception as e:
                 self.logger.error(f"Failed to get data for course URL: {courseUrl}. Exception: {str(e)}")
 
-            prerequisites = None
             price = None
 
             duration = None
@@ -98,13 +99,13 @@ class UniAtlantico(BaseScraper):
                 title=title,
                 image=image,
                 description=description,
-                prerequisites=prerequisites,
                 price=price,
-                duration=duration,
-                modality=modality,
+                duration=standarize_duration(duration),
+                modality=standarize_modality(modality),
                 type=type,
                 institution=self.INSTITUTION,
-                category=self.normalize_string(category),
+                institution_image_url=self.INSTITUTION_IMAGE_URL,
+                category=standarize_category(self.normalize_string(category)),
                 contents=contents
             )
 
@@ -148,17 +149,21 @@ class UniAtlantico(BaseScraper):
         return ''.join(resultado)
 
     def saveToDatabase(self, courses: list[CourseInteface]):
+        institutionImage = uploadFile(self.INSTITUTION_IMAGE_URL, "institutions")
+        institutionDocument = Institution.objects(name=self.INSTITUTION).modify(upsert=True, set__name=self.INSTITUTION, set__image=institutionImage, new=True)
+
         for course in courses:
             try:
-                institutionDocument = Institution.objects(name=course.institution).modify(upsert=True, set__name=course.institution, new=True)
                 categoryDocument = Category.objects(name=course.category).modify(upsert=True, set__name=course.category, new=True)
+                
+                courseImageUrl: str = uploadFile(course.image, "courses")
                 courseDocument = Course.objects(url=course.url).modify(
                     upsert=True, 
                     set__url=course.url,
                     set__title=course.title,
-                    set__image=course.image,
+                    set__image=courseImageUrl,
+                    set__originalImage=course.image,
                     set__description=course.description,
-                    set__prerequisites=course.prerequisites,
                     set__price=course.price,
                     set__duration=course.duration,
                     set__modality=course.modality,

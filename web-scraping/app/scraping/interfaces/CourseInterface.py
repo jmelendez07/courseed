@@ -7,11 +7,11 @@ class CourseInteface:
     title: str
     image: Optional[str]
     description: Optional[str]
-    prerequisites: Optional[str]
     price: Optional[float]
     duration: Optional[str]
     modality: Optional[str]
     type: str
     institution: str
+    institution_image_url: str
     category: Optional[str]
     contents: list[str]

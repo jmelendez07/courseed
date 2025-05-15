@@ -8,9 +8,11 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import re
+from app.lib.utils import standarize_modality, standarize_duration, standarize_category, uploadFile
 
 class UniTecnar(BaseScraper):
     INSTITUTION: str = "fundación universitaria antonio de arévalo"
+    INSTITUTION_IMAGE_URL: str = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSMR2iJEQ0gsTZbI9cYIxiCB-hafDWZ9fpeJg&s"
 
     def getCourses(self) -> list[CourseInteface]:
         courses: list[CourseInteface] = []
@@ -60,8 +62,7 @@ class UniTecnar(BaseScraper):
             except Exception as e:
                 self.logger.error(f"Failed to get data for course URL: {courseUrl}. Exception: {str(e)}")
 
-            prerequisites = None
-            price = None
+            price = 0
 
             duration = None
             try:
@@ -117,13 +118,13 @@ class UniTecnar(BaseScraper):
                 title=title,
                 image=image,
                 description=description,
-                prerequisites=prerequisites,
                 price=price,
-                duration=duration,
-                modality=modality,
+                duration=standarize_duration(duration),
+                modality=standarize_modality(modality),
                 type=type,
                 institution=self.INSTITUTION,
-                category=self.normalize_string(category),
+                institution_image_url=self.INSTITUTION_IMAGE_URL,
+                category=standarize_category(self.normalize_string(category)),
                 contents=contents
             )
 
@@ -162,17 +163,21 @@ class UniTecnar(BaseScraper):
         return ''.join(resultado)
 
     def saveToDatabase(self, courses: list[CourseInteface]):
+        institutionImage = uploadFile(self.INSTITUTION_IMAGE_URL, "institutions")
+        institutionDocument = Institution.objects(name=self.INSTITUTION).modify(upsert=True, set__name=self.INSTITUTION, set__image=institutionImage, new=True)
+        
         for course in courses:
             try:
-                institutionDocument = Institution.objects(name=course.institution).modify(upsert=True, set__name=course.institution, new=True)
                 categoryDocument = Category.objects(name=course.category).modify(upsert=True, set__name=course.category, new=True)
+                
+                courseImageUrl: str = uploadFile(course.image, "courses")
                 courseDocument = Course.objects(url=course.url).modify(
                     upsert=True, 
                     set__url=course.url,
                     set__title=course.title,
-                    set__image=course.image,
+                    set__image=courseImageUrl,
+                    set__originalImage=course.image,
                     set__description=course.description,
-                    set__prerequisites=course.prerequisites,
                     set__price=course.price,
                     set__duration=course.duration,
                     set__modality=course.modality,

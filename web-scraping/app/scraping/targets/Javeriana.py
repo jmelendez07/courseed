@@ -7,10 +7,11 @@ from app.persistence.documents.Content import Content
 from typing import Optional
 import requests
 import re
-import unicodedata
+from app.lib.utils import standarize_modality, standarize_duration, standarize_category, uploadFile
 
 class Javeriana(BaseScraper):
     INSTITUTION: str = "pontificia universidad javeriana"
+    INSTITUTION_IMAGE_URL: str = "https://educacionvirtual.javeriana.edu.co/documents/40061/53871/javeriana_logo.png"
     PAGE_URL: str = "https://educacionvirtual.javeriana.edu.co"
     BODY: dict[str, str] = {
         "query": "",
@@ -51,7 +52,6 @@ class Javeriana(BaseScraper):
             title = self.cleanText(f"{courseData["tipoPrograma"]} {courseData["nombre"]}")
             image = self.getAbsoluteUrl(url=courseData["urlImagenPrograma"])
             description = self.cleanText(courseData["descripcion"])
-            prerequisites = None
             price = None
 
             for tag in courseData["tags"]:
@@ -73,13 +73,13 @@ class Javeriana(BaseScraper):
                 title=title,
                 image=image,
                 description=description,
-                prerequisites=prerequisites,
                 price=price,
-                duration=duration,
-                modality=modality,
+                duration=standarize_duration(duration),
+                modality=standarize_modality(modality),
                 type=type,
                 institution=self.INSTITUTION,
-                category=category,
+                institution_image_url=self.INSTITUTION_IMAGE_URL,
+                category=standarize_category(category),
                 contents=contents
             )
 
@@ -125,20 +125,23 @@ class Javeriana(BaseScraper):
                 resultado.append(character)
         
         return ''.join(resultado)
-    
 
     def saveToDatabase(self, courses: list[CourseInteface]):
+        institutionImageUrl: str = uploadFile(self.INSTITUTION_IMAGE_URL, "institutions")
+        institutionDocument = Institution.objects(name=self.INSTITUTION).modify(upsert=True, set__name=self.INSTITUTION, set__image=institutionImageUrl, new=True)
+                
         for course in courses:
             try:
-                institutionDocument = Institution.objects(name=course.institution).modify(upsert=True, set__name=course.institution, new=True)
                 categoryDocument = Category.objects(name=course.category).modify(upsert=True, set__name=course.category, new=True)
+
+                courseImageUrl: str = uploadFile(course.image, "courses")
                 courseDocument = Course.objects(url=course.url).modify(
                     upsert=True, 
                     set__url=course.url,
                     set__title=course.title,
-                    set__image=course.image,
+                    set__image=courseImageUrl,
+                    set__originalImage=course.image,
                     set__description=course.description,
-                    set__prerequisites=course.prerequisites,
                     set__price=course.price,
                     set__duration=course.duration,
                     set__modality=course.modality,
@@ -160,3 +163,4 @@ class Javeriana(BaseScraper):
             except Exception as e:
                 self.logger.error(self.logger.error(f"Failed to save course in the database. URL: {course.url}. Exception: {str(e)}"))
 
+    

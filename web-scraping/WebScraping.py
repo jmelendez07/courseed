@@ -10,23 +10,23 @@ from app.persistence.Database import Database
 class WebScraping: 
     @staticmethod
     def main():
-        # utb = Utb(url="https://www.utb.edu.co/cursos-diplomados-y-talleres")
-        # utb.scrape()
+        utb = Utb(url="https://www.utb.edu.co/cursos-diplomados-y-talleres")
+        utb.scrape()
 
-        # uniAndes = UniAndes(url="https://educacioncontinua.uniandes.edu.co/es/programas/nuestros-cursos")
-        # uniAndes.scrape()
+        uniAndes = UniAndes(url="https://educacioncontinua.uniandes.edu.co/api/catalog_system/pub/products/search/")
+        uniAndes.scrape()
 
-        # uao = AutonomaDeOccidente(url="https://estudiarvirtual.uao.edu.co/categoria/autogestionado/")
-        # uao.scrape()
+        uao = AutonomaDeOccidente(url="https://www.uao.edu.co/oferta-academica/educacion-continua-cursos-diplomados-y-seminarios/")
+        uao.scrape()
 
-        # javeriana = Javeriana(url="https://educacionvirtual.javeriana.edu.co/prg-api/searchpuj/general-search-program")
-        # javeriana.scrape()
+        javeriana = Javeriana(url="https://educacionvirtual.javeriana.edu.co/prg-api/searchpuj/general-search-program")
+        javeriana.scrape()
 
-        # uniAtlantico = UniAtlantico(url="https://www.uniatlantico.edu.co/departamento-de-extension-y-proyeccion-social/diplomados/")
-        # uniAtlantico.scrape()
+        uniAtlantico = UniAtlantico(url="https://www.uniatlantico.edu.co/departamento-de-extension-y-proyeccion-social/diplomados/")
+        uniAtlantico.scrape()
 
-        # uniMagdalena = UniMagdalena(url="https://bloque10.unimagdalena.edu.co/diplomados")
-        # uniMagdalena.scrape()
+        uniMagdalena = UniMagdalena(url="https://bloque10.unimagdalena.edu.co/diplomados")
+        uniMagdalena.scrape()
 
         uniTecnar = UniTecnar(url="https://www.unitecnar.edu.co/educacion-continuada")
         uniTecnar.scrape()

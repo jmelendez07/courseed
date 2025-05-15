@@ -1,13 +1,13 @@
-from mongoengine import Document, StringField, FloatField
+from mongoengine import Document, StringField, FloatField, IntField
 
 class Course(Document):
     url = StringField(required=True, unique=True)
     title = StringField(required=True)
     image = StringField()
+    originalImage = StringField()
     description = StringField()
-    prerequisites = StringField()
     price = FloatField()
-    duration = StringField()
+    duration = IntField()
     modality = StringField()
     type = StringField()
     categoryId = StringField(required=True)
